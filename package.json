@@ -1,0 +1,16 @@
+{
+  "name": "fpl-gameweek-copilot",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Football data automation pipeline for Fantasy Premier League managers.",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "lint": "pnpm -r --if-present run lint",
+    "test": "pnpm -r --if-present run test",
+    "build": "pnpm -r --if-present run build"
+  }
+}

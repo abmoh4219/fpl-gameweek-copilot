@@ -1,0 +1,45 @@
+# --- dependencies ---
+node_modules/
+.pnpm-store/
+
+# --- build output ---
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# --- Next.js / Vercel ---
+web/.next/
+web/out/
+.vercel/
+
+# --- test & coverage ---
+coverage/
+.nyc_output/
+
+# --- secrets: real values NEVER live in this repo ---
+# They live in GitHub Secrets, Vercel env vars, or Make.
+.env
+.env.*
+!.env.example
+
+# --- Make.com raw exports ---
+# Raw exports embed live webhook URLs and connection IDs.
+# Only sanitised blueprints (placeholders instead of IDs) are committed.
+make/blueprints/*.raw.json
+
+# --- Supabase local tooling ---
+supabase/.temp/
+supabase/.branches/
+
+# --- logs ---
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# --- editors & OS ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
