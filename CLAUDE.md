@@ -43,7 +43,8 @@ Metrics to compute:
 - **Minutes risk** — rotation / cameo / injury-return risk
 - **Fixture difficulty** — next 3 and next 5 gameweeks
 - **Goal threat** — shots, big chances, penalty duty
-- **Price pressure** — net transfers vs. ownership, direction and momentum
+- **Price pressure** — from FPL's own price-change fields (see below), with
+  net transfers and ownership as supporting context
 - **Captain score** — combined fixture + threat + minutes confidence
 - **Differential score** — value relative to ownership
 - **Fixture congestion flag** — extra midweek Champions League games
@@ -53,12 +54,41 @@ facts and writes short prose around them. Gemini never calculates, never
 ranks, and never introduces a statistic that was not passed in. Anything
 forward-looking is labelled an **estimate** in the output text.
 
+### Price watch data source
+
+`bootstrap-static` now exposes FPL's own price-change telemetry:
+`price_change_percent`, `price_change_hourly_rate`,
+`price_change_projections`, `price_change_locked_until` and
+`price_change_calibrating`. **The price watch is built on these fields, not on
+our own reverse-engineered thresholds.** Guessing price moves from transfer
+counts is a badly-solved problem; FPL is telling us directly.
+
+Two rules that follow from observation:
+
+- **Never take direction from `price_change_hourly_rate`.** It was expected
+  to be an unsigned activity level, but the Phase 1 sample shows it **signed**
+  (range -1,191 to 2,700; 340 of 667 negative), and its sign **disagrees**
+  with `price_change_percent` for 113 players. Until that is resolved, treat
+  the rate as magnitude only and **take direction from the sign of
+  `price_change_percent`** (negative = moving toward a fall).
+- **`price_change_percent` can exceed 100% without a price change**
+  (103.8% observed). Never present crossing 100% as a confirmed change.
+
+- **`price_change_projections[].likelihood` is a signed integer**, observed
+  across -5..+5, so it carries direction as well as strength. The array always
+  has exactly three entries, `offset` 0, 1 and 2.
+
+Their exact semantics are **undocumented and to be confirmed by observation**,
+so they are stored daily from Phase 2 and we learn the rules from our own
+history. Open hypotheses live in `docs/data-dictionary.md`. Until they are
+confirmed, every price-watch output is labelled an **estimate**.
+
 ### Reports the product ships
 
 | Report | Trigger | Content |
 | --- | --- | --- |
 | Daily price report | Daily sync | Confirmed risers/fallers as full player cards: price change, net transfers, ownership, recent form, xGI/90, minutes, next fixtures with difficulty, goal threat, congestion flag, short verdict |
-| Price watch | Daily sync | Players approaching a change — **clearly labelled as an estimate** |
+| Price watch | Daily sync | Players approaching a change, from FPL's own price-change fields — **clearly labelled as an estimate** |
 | Injury / news changes | Daily sync | Status flag and news-text changes, with squad impact |
 | Pre-deadline preview | ~5× per month | Captain options, differentials, fixture swings, congestion |
 | Personal squad report | On request (FPL team ID) | The above, filtered to one manager's 15 players |
@@ -119,7 +149,7 @@ Free tiers only. No paid services anywhere in this project.
 | **Make.com** | 1,000 credits/month, 2 active scenarios, 15-min minimum interval | Daily report + preview must stay **under ~400 credits/month**. See math below. |
 | **Gemini API** | Free-tier RPM / RPD caps (re-check current values — they change) | ~5 calls/month for previews. Never called in a loop, never per player, never by a website visitor. |
 | **football-data.org** | 10 requests/minute, 12 competitions | **1 request/day.** See §6. |
-| **GitHub Actions** | Unlimited minutes (public repo) | Still keep each run under ~2 minutes. Schedule stays sensible, not chatty. |
+| **GitHub Actions** | 2,000 min/month (**private** repo) | Scheduled jobs stay **under ~600 min/month**; each run under ~2 minutes. See math below. |
 | **Supabase** | 500 MB, project **paused after 7 days idle** | Daily cron doubles as keep-alive. See note below. |
 | **Vercel Hobby** | Non-commercial, 100 GB bandwidth | Cached pages, no per-visit third-party calls. |
 
@@ -138,21 +168,34 @@ per event. Never iterate records inside Make when code can pre-format them.
 If a Make change would multiply module executions by the number of players,
 it belongs in `jobs/` instead.
 
+### GitHub Actions minutes
+
+The repo is **private**, so Actions minutes are metered: 2,000 free minutes
+per month.
+
+- Daily sync: ~2 min x 30 runs = **~60 min/month**
+- Deadline runs: ~2 min x ~20 runs = **~40 min/month**
+- CI on push (typecheck, lint, test): ~2 min x ~50 = **~100 min/month**
+- **Ceiling for scheduled jobs: ~600 min/month**, which leaves ample room for
+  CI and manual runs inside 2,000
+
+If a run starts creeping past ~2 minutes, find out why before adding more runs.
+
 ### GitHub Actions schedule
 
-- Main sync: **once daily**, timed to land after FPL price changes (~02:30
-  UK). GitHub cron is **UTC only** — UK time shifts with BST, so schedule
-  with enough margin to be safely after the change in both GMT and BST, and
-  keep the offset noted in the workflow file.
+- Main sync: **once daily at `30 2 * * *` (02:30 UTC)**. FPL price changes
+  land at **~01:30 UK**, which is 00:30 UTC during BST and 01:30 UTC during
+  GMT — so 02:30 UTC is safely after the change all year round. GitHub cron
+  is **UTC only**; never write a cron expression in UK local time.
 - Extra runs: **only near gameweek deadlines**, not all day.
 - Runs are cheap on a public repo, but every run costs FPL API politeness and
   Supabase rows. Frequency is a product decision, not a free-for-all.
 
-> **Scheduled workflows are disabled by GitHub after 60 days without repo
-> activity.** That silently stops the daily sync — and because the daily cron
-> is also the Supabase keep-alive, the Supabase project then pauses too. If
-> the repo goes quiet for two months, expect to re-enable the workflow and
-> un-pause the database.
+> **The 60-day scheduled-workflow pause applies to public repositories only.**
+> This repo is private, so it does not apply today. Keep it in mind for a
+> future public switch: GitHub disables scheduled workflows after 60 days
+> without repo activity, which would silently stop the daily sync — and with
+> it the Supabase keep-alive described below.
 
 > **Supabase keep-alive:** the daily cron doubles as the keep-alive. A free
 > project pauses after 7 days of inactivity, so if jobs fail for 7 days in a
@@ -170,12 +213,37 @@ good citizen: **few requests, cached, snapshotted.**
   Never fetch it twice in one process.
 - Per-gameweek stats for all players come from **`event/{gw}/live/` — one
   call** — instead of hundreds of `element-summary` calls.
-  *(Verify the exact shape in Phase 1 before relying on it.)*
+  **Confirmed in Phase 1: `event/{gw}/live/` DOES include per-player expected
+  stats** (`expected_goals`, `expected_assists`,
+  `expected_goal_involvements`, `expected_goals_conceded`, all as strings),
+  alongside `defensive_contribution`, `starts`, `bps` and ICT. One call
+  returns all 667 players, so there is **no reason to ever sweep
+  `element-summary`** for xGI.
 - `element-summary/{id}/` only for a **small set of players of interest**
   (squad members, alert subjects), never a full sweep.
 - Snapshot responses to Supabase and read from the database afterwards.
   Re-derive from stored snapshots rather than re-fetching.
+- **`event-status/`** is a cheap extra call telling us whether a gameweek's
+  points and bonus are final. Use it instead of inferring from `finished`
+  flags.
 - Every response is parsed with Zod before use (§9).
+
+**Data shape rules (confirmed by exploration, Phase 1):**
+
+- **All IDs are season-scoped.** Team, player and fixture IDs are reassigned
+  every season — this season's Premier League includes Coventry, Hull and
+  Ipswich. Never hardcode an ID, never carry one across seasons, and never
+  assume last season's mapping still holds.
+- **Mixed types in `elements`.** Season totals (`expected_goals`,
+  `expected_assists`, `expected_goal_involvements`, `expected_goals_conceded`,
+  `form`, `ep_next`, `selected_by_percent`, `ict_index`, `points_per_game`)
+  arrive as **strings**, while the `*_per_90` fields arrive as **numbers**.
+  Convert at the schema boundary; never do arithmetic on a raw value.
+- **`now_cost` is in tenths** (`55` = £5.5m). It stays in tenths throughout
+  the data layer; convert only for display, with the shared helper.
+- The price-change fields (§2) are **stored daily from Phase 2** so their
+  meaning can be confirmed against our own history. They are optional data:
+  see the pipeline rule in §10.
 
 ---
 
@@ -192,8 +260,21 @@ good citizen: **few requests, cached, snapshotted.**
   and domestic cups are **not** included — so the UI must state that the
   congestion flag covers **Champions League games only**.
 - **One request per day**, scoped with `dateFrom` / `dateTo` and
-  `status=SCHEDULED,TIMED`. Read the `X-RequestsAvailable` and
-  `X-RequestCounter-Reset` response headers and back off when low.
+  `status=SCHEDULED,TIMED`.
+- **Rate-limit headers: read case-insensitively and support both names.** The
+  API actually returns **`x-requests-available-minute`**, not the documented
+  `X-RequestsAvailable`, alongside `X-RequestCounter-Reset`. Check both
+  spellings and back off when low.
+- **Never map teams by TLA — TLAs are not unique.** `FCB` is both Barcelona
+  and Bayern Munich, and Bodø/Glimt reports `FK`. **Map by football-data
+  numeric team ID only**, through `packages/shared/src/teams.ts`.
+- **Refresh on every run; never cache "the season's fixtures" once.**
+  Champions League knockout fixtures are only added after the league stage
+  finishes, so a cached season snapshot goes stale silently.
+- **Which PL clubs are in the CL is derived, not hardcoded** — intersect each
+  fetch with the team map, so the list updates itself as clubs qualify or drop
+  out. (Observed this season: Arsenal 57, Aston Villa 58, Liverpool 64,
+  Man City 65, Man United 66 — kept only as a test sanity check.)
 - This sync is **optional**: if it fails, the pipeline must still complete
   and publish everything else, with the congestion flag simply absent.
 - **Development and tests use saved responses in `samples/`, never the live
@@ -247,6 +328,11 @@ before taking money:
 | `docs/` | `decisions.md` (ADRs), runbooks, setup notes |
 | `samples/` | Recorded API responses for offline development and tests |
 
+> **`samples/fpl/entry.json` and `samples/fpl/entry-picks.json` contain a real
+> manager's personal FPL team.** That is acceptable while this repo is
+> private. **Before any public switch, replace them with anonymised samples**,
+> alongside the `gitleaks` history scan in §10.
+
 Workspace packages are `jobs/` (`@fpl/jobs`), `web/` (`@fpl/web`) and
 `packages/shared/` (`@fpl/shared`). `supabase/`, `make/`, `docs/` and
 `samples/` are plain directories — no `package.json`, nothing installed.
@@ -270,6 +356,16 @@ extends the shared strictness.
   placeholders only. Raw Make exports (`make/blueprints/*.raw.json`) are
   gitignored because they embed live webhook and connection IDs; only
   sanitised blueprints are committed.
+- **Nothing scans for leaked secrets here.** GitHub secret scanning is
+  unlikely to be available on a private repo without Advanced Security, so a
+  committed key would go unnoticed. Never write a real secret into a file,
+  never print a token in logs or error messages, and **scan the full history
+  with `gitleaks` before making this repo public**.
+- **Optional data never takes down the core pipeline.** The price-change
+  fields and the Champions League sync are enrichment. If they are missing,
+  renamed or failing, the daily pipeline still completes and publishes
+  everything else, with the optional part absent and a warning logged. Only
+  data the core reports genuinely depend on is allowed to fail a run.
 - **Few and cached requests to the FPL API** (§5).
 - **No new dependency** without saying what it replaces and why the standard
   library or an existing dependency will not do.

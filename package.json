@@ -8,6 +8,7 @@
     "pnpm": ">=10"
   },
   "scripts": {
+    "sample": "pnpm --filter @fpl/jobs run sample",
     "typecheck": "pnpm -r --if-present run typecheck",
     "lint": "pnpm -r --if-present run lint",
     "test": "pnpm -r --if-present run test",

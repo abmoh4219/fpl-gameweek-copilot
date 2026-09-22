@@ -80,7 +80,7 @@ alert still arrives when the automation layer is the thing that broke.
 
 | Layer | Choice | Why |
 | --- | --- | --- |
-| Scheduling | GitHub Actions cron | Free and unlimited on a public repo |
+| Scheduling | GitHub Actions cron | 2,000 free minutes/month on a private repo |
 | Jobs | TypeScript, run with `tsx` | Testable logic, strict types, Zod at every boundary |
 | Database | Supabase (Postgres) | Free tier, SQL views, row-level security |
 | Automation | Make.com free plan | 1,000 credits/month, 2 scenarios — routing only |

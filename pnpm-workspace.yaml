@@ -2,3 +2,7 @@ packages:
   - "jobs"
   - "web"
   - "packages/*"
+
+# esbuild (via vitest/tsx) needs its postinstall to link the platform binary.
+onlyBuiltDependencies:
+  - esbuild

@@ -153,3 +153,49 @@ account.
 - **A Supabase Edge Function.** Reasonable, and closest to the data — but it
   splits the codebase across two deploy targets for a handful of handlers that
   the web app can serve with code it already shares.
+
+---
+
+## ADR-0004 — `@fpl/shared` ships TypeScript source, with no build step
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+
+### Context
+
+`packages/shared` holds the Zod schemas, the team map and (from Phase 4) the
+insight engine. Both `jobs/` and `web/` import it. A shared workspace package
+normally needs a compile step so consumers can import built JavaScript, which
+means a `dist/`, a watch mode during development, and a build ordering
+constraint in CI before anything can be typechecked or tested.
+
+Everything that consumes this package already understands TypeScript: `tsx`
+runs the jobs, Vitest transforms on the fly, and Next.js compiles workspace
+packages when they are listed in `transpilePackages`.
+
+### Decision
+
+`@fpl/shared` exposes its source directly — `"exports": { ".": "./src/index.ts" }`
+— and has no build script. `tsc` runs in `--noEmit` mode purely as a
+typechecker.
+
+### Consequences
+
+- No `dist/`, no stale build, no build ordering in CI. Editing a schema is
+  immediately visible to `jobs/` and the tests.
+- CI is simply typecheck plus test, which keeps Actions minutes low (§4).
+- `web/` **must** list `@fpl/shared` in `transpilePackages` in Phase 7, or the
+  Next.js build will fail on a `.ts` import. That is the one thing this
+  decision makes easier to get wrong.
+- Relative imports inside the package carry explicit `.ts` extensions, which
+  needs `allowImportingTsExtensions` in the tsconfig. Harmless under `noEmit`.
+- If the package is ever published outside this monorepo, it will need a real
+  build. It is private and workspace-only, so that is not a cost today.
+
+### Alternatives considered
+
+- **A `tsc` build emitting `dist/`.** The conventional answer, and the right
+  one for a published library. Here it buys nothing and adds a build step to
+  every test run and CI job.
+- **A bundler (tsup/unbuild).** Same cost, plus a dependency, to solve a
+  problem the consumers do not have.
