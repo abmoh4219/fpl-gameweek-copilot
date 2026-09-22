@@ -20,11 +20,18 @@ export async function finishSyncRun(
   db: Db,
   runId: number,
   results: readonly LoadResult[],
+  warnings: readonly string[] = [],
 ): Promise<void> {
-  const counts = Object.fromEntries(results.map((r) => [r.table, r.rows]));
+  const counts: Record<string, unknown> = Object.fromEntries(
+    results.map((r) => [r.table, r.rows]),
+  );
+  // Optional data that failed is recorded here, not as a run failure
+  // (CLAUDE.md §10) — so a Champions League outage is visible but harmless.
+  if (warnings.length > 0) counts["warnings"] = warnings;
+
   await db`
     update core.sync_runs
-    set status = 'success', finished_at = now(), row_counts = ${db.json(counts)}
+    set status = 'success', finished_at = now(), row_counts = ${db.json(counts as never)}
     where id = ${runId}
   `;
 }

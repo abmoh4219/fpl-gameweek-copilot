@@ -9,6 +9,7 @@ export async function loadPlayerSnapshots(
   ctx: LoadContext,
   bootstrap: BootstrapStatic,
   snapshotDate: string,
+  dryRun = false,
 ): Promise<LoadResult> {
   const rows = bootstrap.elements.map((e) => {
     const playerId = ctx.playerIds.get(e.id);
@@ -59,6 +60,8 @@ export async function loadPlayerSnapshots(
       direct_freekicks_order: e.direct_freekicks_order,
     };
   });
+
+  if (dryRun) return { table: "player_snapshots", rows: rows.length };
 
   for (const batch of chunk(rows)) {
     await ctx.db`

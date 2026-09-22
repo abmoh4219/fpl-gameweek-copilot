@@ -60,14 +60,29 @@ we publish.
 plans, rate limits), they get **RLS policies and `security_invoker` views**.
 Public football data and per-user data never share a security model.
 
-### Accepted Security Advisor finding
+### Accepted Security Advisor findings
 
-Supabase's Security Advisor flags the six `api` views as **"security definer
-view"**. That finding is **deliberate and accepted** — it is the decision
-above, working as intended.
+Exactly two categories are expected and accepted, because both are this
+design working as intended:
 
-**Those six views are the only advisor findings we accept.** Anything else the
-advisor reports is a real problem and must be fixed, not documented away.
+| Finding | Where | Why it is accepted |
+| --- | --- | --- |
+| **Security Definer View** | the 6 `api.*` views | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
+| **RLS Enabled No Policy** | every `core.*` table | Deliberate deny-all. RLS is on with no policies so nothing but the service role can read a row |
+
+**Anything else the advisor reports is a real problem** and must be fixed, not
+documented away. In particular, a "Security Definer View" on a view that is
+*not* one of those six, or an RLS finding on a future user-scoped table, is a
+bug.
+
+### Deployment facts
+
+- The cloud Data API exposes **`api` only**; extra search path is
+  **`api, extensions`**. This matches `supabase/config.toml`, so local and
+  cloud behave identically.
+- **Supabase's GitHub auto-deploy is OFF.** Migrations are deployed manually
+  with `pnpm supabase db push`. Nothing reaches the cloud database because a
+  commit landed.
 
 ---
 

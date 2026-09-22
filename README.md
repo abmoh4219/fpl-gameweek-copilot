@@ -89,7 +89,9 @@ alert still arrives when the automation layer is the thing that broke.
 | Fixtures (Europe) | football-data.org free tier | Champions League dates for the congestion flag |
 | Delivery | Telegram Bot API | Free, instant, no approval process |
 
-Full limits and the budget arithmetic live in [CLAUDE.md](CLAUDE.md).
+Full limits and the budget arithmetic live in [CLAUDE.md](CLAUDE.md); what
+runs when, and how to recover from a failure, in
+[docs/operations.md](docs/operations.md).
 
 ## How it works
 
@@ -139,7 +141,7 @@ per team ID per gameweek and rate-limited per IP.
 | **0** | Scaffold — repo layout, CLAUDE.md, ADRs, env template ✅ |
 | **1** | API exploration + Zod schemas + recorded samples ✅ |
 | **2** | Database schema + insight views ✅ |
-| **3** | Sync and change detection on GitHub Actions |
+| **3** | Sync and change detection on GitHub Actions ✅ |
 | **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) |
 | **5** | Make: daily report |
 | **6** | Make: gameweek preview with Gemini |

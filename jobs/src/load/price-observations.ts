@@ -30,6 +30,7 @@ export async function loadPriceObservations(
   ctx: LoadContext,
   bootstrap: BootstrapStatic,
   observedAt: Date,
+  dryRun = false,
 ): Promise<PriceObservationLoadResult> {
   const latest = await ctx.db<LatestObservation[]>`
     select distinct on (player_id)
@@ -71,6 +72,8 @@ export async function loadPriceObservations(
         : null,
     });
   }
+
+  if (dryRun) return { table: "price_observations", rows: rows.length, unchanged };
 
   for (const batch of chunk(rows)) {
     await ctx.db`

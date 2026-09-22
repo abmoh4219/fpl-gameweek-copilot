@@ -154,6 +154,7 @@ export async function loadGameweeks(
 export async function loadFixtures(
   ctx: LoadContext,
   fixtures: readonly Fixture[],
+  dryRun = false,
 ): Promise<LoadResult> {
   const rows = fixtures.map((f) => {
     const home = ctx.teamIds.get(f.team_h);
@@ -178,6 +179,8 @@ export async function loadFixtures(
       minutes: f.minutes,
     };
   });
+
+  if (dryRun) return { table: "fixtures", rows: rows.length };
 
   for (const batch of chunk(rows)) {
     await ctx.db`

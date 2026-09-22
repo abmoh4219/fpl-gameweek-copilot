@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { connect, type Db } from "../src/db.ts";
 import { loadSamplesInto } from "../src/load/from-samples.ts";
+import { finishSyncRun, startSyncRun } from "../src/load/sync-runs.ts";
 import { localStack, SAMPLES_DIR, SKIP_MESSAGE } from "./local-supabase.ts";
 
 const stack = localStack();
@@ -50,7 +51,18 @@ describe.skipIf(!stack)(`loaders (${stack ? "local Supabase" : SKIP_MESSAGE})`, 
   });
 
   it("dedupes price observations: an unchanged re-run writes no new rows", async () => {
-    const before = await db`select count(*)::int as n from core.price_observations`;
+    // Start from a known state: live job runs against this same local database
+    // would otherwise leave newer observations to compare against.
+    await db`delete from core.price_observations`;
+
+    await loadSamplesInto(db, {
+      samplesDir: SAMPLES_DIR,
+      snapshotDate: "2026-09-22",
+      observedAt: new Date("2026-09-22T06:00:00Z"),
+    });
+    const before = await db<{ n: number }[]>`
+      select count(*)::int as n from core.price_observations
+    `;
 
     // A later timestamp, but identical telemetry: nothing should be written.
     const outcome = await loadSamplesInto(db, {
@@ -59,17 +71,26 @@ describe.skipIf(!stack)(`loaders (${stack ? "local Supabase" : SKIP_MESSAGE})`, 
       observedAt: new Date("2026-09-22T09:00:00Z"),
     });
 
-    const after = await db`select count(*)::int as n from core.price_observations`;
+    const after = await db<{ n: number }[]>`
+      select count(*)::int as n from core.price_observations
+    `;
 
     expect(outcome.unchangedPrices).toBe(667);
-    expect(after[0]!["n"]).toBe(before[0]!["n"]);
+    expect(after[0]!.n).toBe(before[0]!.n);
   });
 
-  it("records every run in sync_runs, including runs that wrote no price rows", async () => {
-    const [row] = await db<{ n: number }[]>`
-      select count(*)::int as n from core.sync_runs where job_name = 'load-samples'
+  it("records a run in sync_runs even when it writes no price rows", async () => {
+    // This is what makes the price dedup lossless: absence of an observation
+    // row means "unchanged", not "not observed".
+    const runId = await startSyncRun(db, "test-sync-run");
+    await finishSyncRun(db, runId, [{ table: "price_observations", rows: 0 }], []);
+
+    const [row] = await db<{ status: string; row_counts: Record<string, unknown> }[]>`
+      select status, row_counts from core.sync_runs where id = ${runId}
     `;
-    // load-samples has been run at least once by the script or these tests.
-    expect(row!.n).toBeGreaterThanOrEqual(1);
+    expect(row!.status).toBe("success");
+    expect(row!.row_counts["price_observations"]).toBe(0);
+
+    await db`delete from core.sync_runs where id = ${runId}`;
   });
 });

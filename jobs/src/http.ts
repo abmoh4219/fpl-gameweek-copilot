@@ -61,6 +61,20 @@ export function readRateLimit(headers: Headers): RateLimit {
   return { available: toNumber(availableRaw), resetSeconds: toNumber(resetRaw) };
 }
 
+/**
+ * The FPL API goes read-only while a gameweek is being scored, answering 503
+ * with a body like {"details": "The game is being updated."}.
+ *
+ * That is expected operational behaviour, not a failure: a run that hits it
+ * is marked `skipped`, and nobody gets paged.
+ */
+export class FplUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "FplUnavailableError";
+  }
+}
+
 export interface FetchOptions {
   headers?: Record<string, string>;
   /** Send the browser-like User-Agent the FPL API expects. */
@@ -102,6 +116,14 @@ export async function fetchJson(
         continue;
       }
 
+      // 503 during a gameweek update is "come back later", not an error.
+      if (res.status === 503) {
+        const detail = (await res.text()).slice(0, 200);
+        throw new FplUnavailableError(
+          `API unavailable (503) for ${redact(url)}${detail ? `: ${detail}` : ""}`,
+        );
+      }
+
       if (!res.ok) {
         throw new Error(`HTTP ${res.status} ${res.statusText} for ${redact(url)}`);
       }
@@ -110,6 +132,7 @@ export async function fetchJson(
     } catch (error) {
       lastError = error;
       if (attempt === MAX_ATTEMPTS) break;
+      if (error instanceof FplUnavailableError && attempt >= 2) break;
       const backoff = 1000 * 2 ** (attempt - 1);
       console.warn(
         `  attempt ${attempt} failed (${errorMessage(error)}), retrying in ${backoff}ms`,

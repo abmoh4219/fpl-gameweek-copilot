@@ -15,6 +15,7 @@ import { chunk, type LoadContext, type LoadResult } from "./context.ts";
 export async function loadClFixtures(
   ctx: LoadContext,
   matches: FootballDataMatches,
+  dryRun = false,
 ): Promise<LoadResult> {
   const rows = matches.matches.flatMap((match) => {
     const sides = [
@@ -43,6 +44,8 @@ export async function loadClFixtures(
       ];
     });
   });
+
+  if (dryRun) return { table: "cl_fixtures", rows: rows.length };
 
   for (const batch of chunk(rows)) {
     await ctx.db`

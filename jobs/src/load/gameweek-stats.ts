@@ -12,6 +12,7 @@ export async function loadPlayerGameweekStats(
   ctx: LoadContext,
   live: EventLive,
   fplEventId: number,
+  dryRun = false,
 ): Promise<LoadResult> {
   const gameweekId = ctx.gameweekIds.get(fplEventId);
   if (gameweekId === undefined) throw new Error(`Unknown gameweek ${fplEventId}`);
@@ -54,6 +55,8 @@ export async function loadPlayerGameweekStats(
       },
     ];
   });
+
+  if (dryRun) return { table: "player_gameweek_stats", rows: rows.length };
 
   for (const batch of chunk(rows)) {
     await ctx.db`

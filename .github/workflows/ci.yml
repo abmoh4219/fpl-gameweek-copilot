@@ -1,0 +1,46 @@
+name: ci
+
+# Docs-only commits do not need a CI run — this repo has a 600 minute/month
+# self-imposed budget and README edits are frequent.
+on:
+  push:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+
+permissions:
+  contents: read
+
+# CI only: superseded runs on the same ref are cancelled. NEVER do this for
+# the sync workflows, where a cancelled run means lost writes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck
+
+      # Database-backed tests skip themselves when local Supabase is not
+      # running, which it never is here. Unit tests still block the network.
+      - run: pnpm test

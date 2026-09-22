@@ -193,10 +193,12 @@ If a run starts creeping past ~2 minutes, find out why before adding more runs.
   GMT — so 02:30 UTC is safely after the change all year round. GitHub cron
   is **UTC only**; never write a cron expression in UK local time.
 - Extra runs: **only near gameweek deadlines**, not all day.
-- **Phase 3 splits the work into two jobs**, because 3-hourly price tracking at
-  ~2 min a run would eat 480 of the 600-minute ceiling on its own:
-  a light **price-sync** (`bootstrap-static` only, ~30-45s, 8x/day) and one
-  **full daily sync**. Roughly 180 + 60 min/month instead of 480.
+- **Two jobs** (`docs/operations.md`): **price-sync** every 3 hours
+  (`17 */3 * * *`, bootstrap-static only, **measured 1.3 s**) and
+  **daily-sync** once at `37 2 * * *` (**measured 5.1 s**). Actions bills
+  rounded up per run, so checkout and install dominate, not the work: both
+  workflows install with `--filter "@fpl/jobs..."` so `web/` is never built.
+  Budget ~243 + 60 + 80 CI = **~383 min/month** against our 600 ceiling.
 - Runs are cheap on a public repo, but every run costs FPL API politeness and
   Supabase rows. Frequency is a product decision, not a free-for-all.
 
@@ -227,9 +229,12 @@ Full detail in `docs/database.md`; these are the rules that bind every change.
   owner-privileged views. **User-scoped tables (waitlist, auth, plans, rate
   limits) must use RLS policies plus `security_invoker` views** — never an
   owner-privileged view over per-user rows.
-- **Supabase's Security Advisor will flag the six `api` views as "security
-  definer view". That finding is accepted and documented. It is the ONLY
-  finding we accept** — anything else is a real problem.
+- **Exactly two Security Advisor findings are accepted**, both deliberate:
+  the six `api` views flagged as **"Security Definer View"**, and
+  **"RLS Enabled No Policy"** on every `core` table (intentional deny-all).
+  **Anything else the advisor reports is a real problem** and must be fixed.
+- **Migrations deploy manually** with `pnpm supabase db push`. Supabase's
+  GitHub auto-deploy is **off** — a commit never changes the cloud database.
 - **Jobs connect directly to Postgres** (`SUPABASE_DB_URL`), not through the
   Data API, because PostgREST refuses `core` even for the service role
   (ADR-0005).
@@ -245,6 +250,37 @@ Full detail in `docs/database.md`; these are the rules that bind every change.
 - **Storage is a real constraint.** 500 MB including indexes. Season 1 lands at
   ~304 MB and season 2 at ~474 MB, so `player_snapshots` needs its own
   retention rule before a second season starts.
+
+---
+
+## 4b. Job rules
+
+- **price-sync detects status and news changes intraday.** Injury news lands
+  Thursday and Friday afternoons after press conferences and deadlines are
+  often Friday evening, so detecting it only at 02:37 UTC would deliver it
+  after the deadline. Price and ownership changes stay **daily-only** — a
+  price change happens once, at the nightly update.
+- **Dedup key granularity is a product decision.** `type:date:player` for
+  price, ownership and set pieces (one per player per day). Status keys
+  include the **new status** and news keys a **hash of the new text**, because
+  `a -> d` then `d -> i` on the same day are two different pieces of news.
+- **An event is refreshed only while `notified_at` is null.** Once Phase 5 has
+  delivered it, re-running detection must not rewrite what was sent.
+- **Every run writes `core.sync_runs`**, including runs that write no price
+  rows. That is what makes the dedup lossless: no row means "unchanged", not
+  "not observed".
+- **Upstream unavailable is `skipped`, not `failed`.** FPL answers 503 while a
+  gameweek is being scored; off-season means no current gameweek. Neither
+  pages anyone.
+- **`DRY_RUN=true` writes nothing at all**, not even a `sync_runs` row.
+- **Jobs refuse a non-local database** unless `GITHUB_ACTIONS=true` or
+  `--cloud`. The cloud `SUPABASE_DB_URL` lives **only in GitHub Secrets**.
+- **Alerts go straight to Telegram from code**, never through Make — Make is
+  part of what is being monitored. Every message passes through the redactor
+  in `jobs/src/telegram.ts`; a Telegram failure never hides the original error.
+- **Dead man's switch**: price-sync alerts if no `daily-sync` has succeeded in
+  26 hours, with a 6-hour cooldown, cleared by the next success. Seven days of
+  failure pauses the Supabase project.
 
 ---
 
@@ -378,7 +414,7 @@ before taking money:
 | `supabase/migrations/` | Versioned SQL: tables, snapshot schema, read-only views the web app reads |
 | `make/blueprints/` | Exported **sanitised** Make.com scenario JSON, version controlled |
 | `.github/workflows/` | Cron and CI workflow definitions |
-| `docs/` | `decisions.md` (ADRs), runbooks, setup notes |
+| `docs/` | `decisions.md` (ADRs), `database.md`, `data-dictionary.md`, `operations.md` |
 | `samples/` | Recorded API responses for offline development and tests |
 
 > **`samples/fpl/entry.json` and `samples/fpl/entry-picks.json` contain a real

@@ -1,0 +1,57 @@
+name: daily-sync
+
+# Once a day at 02:37 UTC.
+#   37   -> minute 37, off the top of the hour for the same reason as above.
+#   2    -> 02:00 UTC. FPL price changes land at ~01:30 UK, which is 00:30 UTC
+#           during BST and 01:30 UTC during GMT, so 02:37 UTC is safely after
+#           the change all year round. GitHub cron is UTC only — never write
+#           one of these in UK local time.
+#   * * * -> every day, every month, every weekday.
+on:
+  schedule:
+    - cron: "37 2 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and detect, write nothing"
+        type: boolean
+        default: false
+      simulate_failure:
+        description: "Force a failure to test the Telegram alert"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fpl-sync
+  cancel-in-progress: false
+
+jobs:
+  daily-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --filter "@fpl/jobs..." --frozen-lockfile
+
+      - run: pnpm job:daily
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          FOOTBALL_DATA_API_TOKEN: ${{ secrets.FOOTBALL_DATA_API_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_ALERT_CHAT_ID: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SIMULATE_FAILURE: ${{ inputs.simulate_failure }}
+          TZ: Europe/London

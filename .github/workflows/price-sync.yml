@@ -1,0 +1,62 @@
+name: price-sync
+
+# Every 3 hours at :17.
+#   17    -> minute 17. GitHub delays schedules that cluster at the top of the
+#            hour, so an odd off-peak minute starts sooner and more reliably.
+#   */3   -> every third hour from 00: 00:17, 03:17 ... 21:17 UTC (8 runs/day).
+#   * * * -> every day, every month, every weekday.
+#
+# The job is light on purpose (bootstrap-static only, ~1.5s of work) because
+# GitHub bills private-repo minutes ROUNDED UP per run: staying inside one
+# minute end to end is the difference between ~243 and ~487 minutes a month.
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and detect, write nothing"
+        type: boolean
+        default: false
+      simulate_failure:
+        description: "Force a failure to test the Telegram alert"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Shared with daily-sync: the two must never write at the same time.
+# cancel-in-progress is FALSE — a sync that is part way through writing must
+# be allowed to finish.
+concurrency:
+  group: fpl-sync
+  cancel-in-progress: false
+
+jobs:
+  price-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Only the jobs package and what it depends on: web/ is never installed.
+      - run: pnpm install --filter "@fpl/jobs..." --frozen-lockfile
+
+      - run: pnpm job:price
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_ALERT_CHAT_ID: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SIMULATE_FAILURE: ${{ inputs.simulate_failure }}
+          TZ: Europe/London

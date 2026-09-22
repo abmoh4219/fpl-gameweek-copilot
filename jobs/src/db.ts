@@ -25,6 +25,26 @@ export function isLocalDatabase(url: string): boolean {
   return /@(127\.0\.0\.1|localhost|\[::1\])[:/]/.test(url);
 }
 
+/**
+ * Jobs must never write to the hosted database by accident.
+ *
+ * A non-local connection string is allowed only inside GitHub Actions, or
+ * with an explicit --cloud flag typed by a human who meant it. The cloud
+ * SUPABASE_DB_URL lives in GitHub Secrets and must never be put in .env.
+ */
+export function assertDatabaseAllowed(url: string, allowCloud = false): void {
+  if (isLocalDatabase(url)) return;
+  if (process.env["GITHUB_ACTIONS"] === "true") return;
+  if (allowCloud) return;
+
+  throw new Error(
+    "Refusing to run against a non-local database.\n" +
+      "  SUPABASE_DB_URL does not point at 127.0.0.1.\n" +
+      "  Start the local stack with `pnpm db:start`, or pass --cloud if you really mean it.\n" +
+      "  (Inside GitHub Actions this check passes automatically.)",
+  );
+}
+
 export function resolveDbUrl(): string {
   const parsed = DbEnvSchema.safeParse({ SUPABASE_DB_URL: process.env["SUPABASE_DB_URL"] });
   if (!parsed.success) {
