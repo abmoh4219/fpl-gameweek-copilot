@@ -6,3 +6,5 @@ packages:
 # esbuild (via vitest/tsx) needs its postinstall to link the platform binary.
 onlyBuiltDependencies:
   - esbuild
+  # the supabase CLI postinstall downloads its platform binary
+  - supabase

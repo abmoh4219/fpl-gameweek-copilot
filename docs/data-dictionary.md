@@ -243,6 +243,21 @@ apostrophes and accents, then apply aliases for FPL's abbreviations
 **Refresh every run.** Knockout fixtures do not exist until the league stage
 finishes, so a cached "season's fixtures" silently goes stale.
 
+**The window must look backward too, and include `FINISHED`.** The congestion
+flag needs matches that were already played; without them `is_after_cl` can
+never fire and `days_since_cl` is always null. Use
+`status=SCHEDULED,TIMED,IN_PLAY,PAUSED,FINISHED` with a **35-day lookback** and
+a ~45-day forward window, in one request.
+
+**How many rows to expect.** The window decides this, and it is easy to
+misread. In the captured sample the forward window reached matchdays 2, 3 and
+4 only (18 matches each, 54 total). Five Premier League clubs are in the
+competition and each plays once per matchday, so those three matchdays yield
+**15** club-perspective rows, and the 35-day lookback adds matchday 1 (played
+8-10 September) for **20** in total. The full league stage is 8 matchdays, so
+the whole remaining season would be 7 x 5 = **35** rows — that figure describes
+the season, not a 45-day window.
+
 The free tier covers 12 competitions: **Europa League, Conference League and
 domestic cups are not included**, so the congestion flag covers **Champions
 League games only** and the UI must say so.
@@ -260,11 +275,29 @@ these against our own history rather than guessing.
    changes apply only at the nightly update; or a change is suppressed by
    `price_change_locked_until` / `price_change_calibrating`. Until confirmed,
    **crossing 100% is never reported as a confirmed change**.
-2. **Is `price_change_hourly_rate` signed or unsigned?** Manual exploration
-   suggested unsigned activity. The sample says otherwise: range -1,191 to
-   2,700, 340/667 negative, and its sign **disagrees** with
-   `price_change_percent` for 113 players. Until resolved, **direction always
-   comes from `price_change_percent`**, never from the rate.
+2. **What does `price_change_hourly_rate` mean, and why does its sign
+   disagree with the percent?** It is definitely **signed**: range -1,191 to
+   2,700, 340/667 negative, and its sign disagrees with
+   `price_change_percent` for **113 of 667 players**.
+
+   **Working hypothesis:** `price_change_percent` is the **position** toward a
+   change (how far along the player is) and `price_change_hourly_rate` is the
+   **current momentum** (which way they are moving right now). Under that
+   reading a disagreement is meaningful rather than contradictory — a player
+   deep into falling territory whose transfers have turned positive is a
+   reversal in progress, and exactly the case worth alerting on.
+
+   So we **keep the sign** and expose it as `hourly_rate` alongside
+   `hourly_rate_magnitude`, plus a `momentum` column (`with` / `against` /
+   null). `momentum` is **EXPERIMENTAL** and labelled as such in the view
+   comments.
+
+   **The rule is unchanged: direction comes ONLY from
+   `price_change_percent`.** Never from the rate, and never from `momentum`.
+   Confirm or kill the hypothesis by checking whether `against` players
+   actually reverse before their price moves, using the signed `min_rate`,
+   `max_rate` and `close_rate` columns kept forever in
+   `core.price_observation_daily`.
 3. **What is `likelihood`?** A signed integer observed across -5..+5, present
    on all three projections. Sign agrees with `price_change_percent` for all
    but 20 players. Is it a confidence band, a bucketed rate, or something

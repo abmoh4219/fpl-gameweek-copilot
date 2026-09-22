@@ -65,12 +65,17 @@ counts is a badly-solved problem; FPL is telling us directly.
 
 Two rules that follow from observation:
 
-- **Never take direction from `price_change_hourly_rate`.** It was expected
-  to be an unsigned activity level, but the Phase 1 sample shows it **signed**
-  (range -1,191 to 2,700; 340 of 667 negative), and its sign **disagrees**
-  with `price_change_percent` for 113 players. Until that is resolved, treat
-  the rate as magnitude only and **take direction from the sign of
-  `price_change_percent`** (negative = moving toward a fall).
+- **Never take DIRECTION from `price_change_hourly_rate` — but keep its
+  sign.** The rate is signed (range -1,191 to 2,700; 340 of 667 negative) and
+  its sign disagrees with `price_change_percent` for 113 players. Discarding
+  the sign would throw away real information, so we store and expose it.
+  **Direction comes only from `price_change_percent`** (negative = moving
+  toward a fall).
+- **Working hypothesis:** `price_change_percent` is the **position** toward a
+  change and `price_change_hourly_rate` is the **current momentum**, so the
+  two can legitimately disagree when a move is reversing. The `momentum`
+  column in `price_watch` (`with` / `against`) labels that agreement and is
+  **EXPERIMENTAL** — a hypothesis under observation, never a signal to act on.
 - **`price_change_percent` can exceed 100% without a price change**
   (103.8% observed). Never present crossing 100% as a confirmed change.
 
@@ -188,6 +193,10 @@ If a run starts creeping past ~2 minutes, find out why before adding more runs.
   GMT — so 02:30 UTC is safely after the change all year round. GitHub cron
   is **UTC only**; never write a cron expression in UK local time.
 - Extra runs: **only near gameweek deadlines**, not all day.
+- **Phase 3 splits the work into two jobs**, because 3-hourly price tracking at
+  ~2 min a run would eat 480 of the 600-minute ceiling on its own:
+  a light **price-sync** (`bootstrap-static` only, ~30-45s, 8x/day) and one
+  **full daily sync**. Roughly 180 + 60 min/month instead of 480.
 - Runs are cheap on a public repo, but every run costs FPL API politeness and
   Supabase rows. Frequency is a product decision, not a free-for-all.
 
@@ -201,6 +210,41 @@ If a run starts creeping past ~2 minutes, find out why before adding more runs.
 > project pauses after 7 days of inactivity, so if jobs fail for 7 days in a
 > row the project pauses and the site loses its data source. Sync failures
 > alert on Telegram for exactly this reason — treat them as urgent.
+
+---
+
+## 4a. Database rules
+
+Full detail in `docs/database.md`; these are the rules that bind every change.
+
+- **Two schemas.** `core` holds every table and the job-facing views and is
+  **never exposed by the Data API**. `api` holds read-only views and is the
+  **only** exposed schema. RLS is on for every `core` table, with no policies.
+- **`anon` has zero privileges on `core`.** The `api` views are
+  owner-privileged, so each view definition is an explicit allow-list of the
+  columns we publish.
+- **Mixed security model, on purpose.** Public football data uses
+  owner-privileged views. **User-scoped tables (waitlist, auth, plans, rate
+  limits) must use RLS policies plus `security_invoker` views** — never an
+  owner-privileged view over per-user rows.
+- **Supabase's Security Advisor will flag the six `api` views as "security
+  definer view". That finding is accepted and documented. It is the ONLY
+  finding we accept** — anything else is a real problem.
+- **Jobs connect directly to Postgres** (`SUPABASE_DB_URL`), not through the
+  Data API, because PostgREST refuses `core` even for the service role
+  (ADR-0005).
+- **Migrations are immutable once pushed.** Create them with
+  `pnpm supabase migration new <name>`; change shipped behaviour with a NEW
+  migration, never by editing an old one.
+- **Every load is an idempotent upsert** on the table's natural unique key,
+  batched to **one statement per table** — never one query per row.
+- **Types:** money is **integer tenths** (`now_cost 55` = £5.5m); statistics
+  are **`real`**. No `numeric` — nothing here is currency arithmetic.
+- **Development data is loaded by the real loaders** (`pnpm load:samples`), not
+  by `seed.sql`, so local work and tests exercise the production path.
+- **Storage is a real constraint.** 500 MB including indexes. Season 1 lands at
+  ~304 MB and season 2 at ~474 MB, so `player_snapshots` needs its own
+  retention rule before a second season starts.
 
 ---
 
@@ -259,8 +303,17 @@ good citizen: **few requests, cached, snapshotted.**
 - The free tier covers **12 competitions**. Europa League, Conference League
   and domestic cups are **not** included — so the UI must state that the
   congestion flag covers **Champions League games only**.
-- **One request per day**, scoped with `dateFrom` / `dateTo` and
-  `status=SCHEDULED,TIMED`.
+- **One request per day**, scoped with `dateFrom` / `dateTo`.
+- **The window must look BACKWARD as well as forward, and must include
+  `FINISHED` matches.** The congestion flag has to know about a Champions
+  League match that was already played, or `is_after_cl` can never fire and
+  `days_since_cl` is always null.
+  - Statuses: `SCHEDULED,TIMED,IN_PLAY,PAUSED,FINISHED`.
+  - Lookback: **35 days**, not a few. League-stage matchdays are weeks apart —
+    2026/27 matchday 1 ran 8-10 September and matchday 2 not until 13 October,
+    a 33-day gap. A short lookback leaves the "days since" column empty.
+  - Forward: ~45 days, matching how far the fixture ticker looks.
+  - It is still **one request**; a wider window costs nothing extra.
 - **Rate-limit headers: read case-insensitively and support both names.** The
   API actually returns **`x-requests-available-minute`**, not the documented
   `X-RequestsAvailable`, alongside `X-RequestCounter-Reset`. Check both

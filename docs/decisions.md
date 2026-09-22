@@ -199,3 +199,59 @@ typechecker.
   every test run and CI job.
 - **A bundler (tsup/unbuild).** Same cost, plus a dependency, to solve a
   problem the consumers do not have.
+
+---
+
+## ADR-0005 — Jobs write over a direct Postgres connection, not the Data API
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+
+### Context
+
+The security model puts every table in a private `core` schema and exposes
+only `api` (read-only views) through the Data API. Phase 2 was planned around
+`@supabase/supabase-js` for the loaders, on the assumption that the service
+role key would still reach `core` over HTTP.
+
+It does not. PostgREST refuses any schema that is not in the exposed list,
+whoever is asking:
+
+```
+PGRST106  Invalid schema: core
+hint: Only the following schemas are exposed: api
+```
+
+That is the security model working correctly, not a misconfiguration. The
+options were to expose `core` and rely on grants to keep `anon` out, or to stop
+using the Data API for writes.
+
+### Decision
+
+Jobs connect **directly to Postgres** with `postgres` (postgres.js), using
+`SUPABASE_DB_URL`. `core` stays unexposed. The Data API remains read-only and
+public-facing.
+
+### Consequences
+
+- The "core is not reachable over HTTP" property is absolute, and the test
+  suite asserts it for the service role as well as `anon`.
+- Batched multi-row upserts go over one SQL statement per table instead of a
+  PostgREST round trip, which suits a cron job loading ~700 rows a table.
+- A new environment variable, `SUPABASE_DB_URL`, and a new dependency,
+  `postgres`. It replaces `@supabase/supabase-js` in `jobs/`, which is no
+  longer needed there at all.
+- Jobs cannot run anywhere the database is unreachable, so the connection
+  string has to be a GitHub Secret rather than a public URL and anon key.
+- The website still uses the Data API with the anon key, as intended — so the
+  two halves of the system authenticate in completely different ways, which is
+  the point.
+
+### Alternatives considered
+
+- **Expose `core` and rely on grants alone.** Rejected: it makes a REST
+  endpoint exist for every private table, defended only by grants and RLS
+  policies. One mistaken `GRANT` would publish the lot.
+- **A `security definer` RPC per table.** Keeps writes on the Data API, but
+  means hand-writing and maintaining a function per table to do what `INSERT
+  ... ON CONFLICT` already does.

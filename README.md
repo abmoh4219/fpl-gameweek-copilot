@@ -119,21 +119,26 @@ per team ID per gameweek and rate-limited per IP.
 1. Clone the repo, `pnpm install` (Node 22+, pnpm 10+).
 2. Copy `.env.example` to `.env` and fill in your own values.
    Every variable says where it comes from and which part uses it.
-3. Create a Supabase project and apply `supabase/migrations/`.
-4. Import the blueprints from `make/blueprints/` into Make, reconnect Telegram
+3. For local development, `pnpm db:start` (needs Docker) then
+   `pnpm load:samples` to fill the database from the recorded API responses.
+4. For the hosted project: `pnpm supabase login`, `pnpm supabase link
+   --project-ref <ref>`, `pnpm supabase db push`, then set
+   **Project Settings > API > Exposed schemas** to `api` only.
+   See [docs/database.md](docs/database.md).
+5. Import the blueprints from `make/blueprints/` into Make, reconnect Telegram
    and Gemini, and copy the two webhook URLs into your environment.
-5. Add the job secrets to **GitHub Secrets** and the web secrets to **Vercel
+6. Add the job secrets to **GitHub Secrets** and the web secrets to **Vercel
    environment variables**. Nothing real is ever committed to this repo.
-6. Create a Telegram bot with @BotFather and point its webhook at
+7. Create a Telegram bot with @BotFather and point its webhook at
    `/api/telegram` on your deployment, using your webhook secret.
 
 ## Roadmap
 
 | Phase | What |
 | --- | --- |
-| **0** | Scaffold — repo layout, CLAUDE.md, ADRs, env template |
-| **1** | API exploration + Zod schemas + recorded samples |
-| **2** | Database schema + insight views |
+| **0** | Scaffold — repo layout, CLAUDE.md, ADRs, env template ✅ |
+| **1** | API exploration + Zod schemas + recorded samples ✅ |
+| **2** | Database schema + insight views ✅ |
 | **3** | Sync and change detection on GitHub Actions |
 | **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) |
 | **5** | Make: daily report |

@@ -1,0 +1,8 @@
+-- Intentionally minimal.
+--
+-- Development data is loaded by the REAL loader code (`pnpm load:samples`,
+-- jobs/src/load/*), not by this file, so local development and the tests
+-- exercise the same path Phase 3 runs in production. Seeding here would test
+-- a parallel implementation that production never uses.
+--
+-- Only put rows here that must exist before any loader runs.

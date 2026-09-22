@@ -36,15 +36,33 @@ export const LiveStatsSchema = z.object({
   expected_goals_conceded: numericString,
 });
 
+/**
+ * Per-fixture points breakdown. In a double gameweek `explain` has one entry
+ * per fixture, while `stats` is already aggregated across both.
+ */
+export const LiveExplainStatSchema = z.object({
+  identifier: z.string(),
+  points: z.number(),
+  value: z.number(),
+  points_modification: z.number().optional(),
+});
+
+export const LiveExplainSchema = z.object({
+  fixture: z.number(),
+  stats: z.array(LiveExplainStatSchema),
+});
+
 export const LiveElementSchema = z.object({
   id: z.number(),
   stats: LiveStatsSchema,
+  explain: z.array(LiveExplainSchema),
 });
 
 export const EventLiveSchema = z.object({
   elements: z.array(LiveElementSchema),
 });
 
+export type LiveExplain = z.infer<typeof LiveExplainSchema>;
 export type LiveStats = z.infer<typeof LiveStatsSchema>;
 export type LiveElement = z.infer<typeof LiveElementSchema>;
 export type EventLive = z.infer<typeof EventLiveSchema>;

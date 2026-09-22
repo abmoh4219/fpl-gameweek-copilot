@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sample": "tsx --env-file-if-exists=../.env scripts/fetch-samples.ts",
+    "sample": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/fetch-samples.ts",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "load:samples": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/load-samples.ts"
   },
   "dependencies": {
     "@fpl/shared": "workspace:*",
+    "postgres": "^3.4.9",
     "zod": "^4.6.5"
   },
   "devDependencies": {
