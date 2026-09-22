@@ -52,9 +52,14 @@ Actions log shows price-sync billing 2 minutes, change its cron to
 ```bash
 pnpm db:start                 # local stack, needs Docker
 pnpm job:price                # light job
-pnpm job:daily                # full job
+pnpm job:daily                # full job, also builds today's report
+pnpm job:preview              # gameweek preview, manual
+pnpm backfill:gw 1 2 3 4      # per-gameweek stats for named gameweeks
 DRY_RUN=true pnpm job:daily   # fetch + detect, write NOTHING
 ```
+
+A dry run against an **empty** database reports what it *would* create rather
+than failing, so the first thing anyone tries works.
 
 A dry run writes nothing at all — not even a `sync_runs` row — so it leaves no
 trace in history. It prints the change events it *would* have written.
@@ -135,6 +140,10 @@ upsert.
 FPL API only ever serves *today*. Nothing can recover it, and
 `price_changes_daily` will simply compare across the gap. Say so in any report
 rather than pretending the comparison is day-over-day.
+
+**Form looks wrong after seeding a database mid-season.** `player_form` needs
+four finished gameweeks. Use `pnpm backfill:gw 1 2 3 4` to pull them, then
+re-run `pnpm job:daily` to rebuild the report.
 
 **Gameweek stats backlog.** `daily-sync` fetches at most **5 gameweeks** of
 live stats per run (current, plus any finished gameweek FPL has not marked

@@ -24,7 +24,7 @@ import { loadPriceObservations } from "../load/price-observations.ts";
 import { loadPlayerSnapshots } from "../load/snapshots.ts";
 import { runJob, type JobContext } from "../runner.ts";
 import { sendAlert } from "../telegram.ts";
-import { loadIdentity, printDryRunPlan } from "./shared.ts";
+import { loadIdentity, printDryRunPlan, printEmptyDatabasePlan } from "./shared.ts";
 
 /** How stale a successful daily-sync may get before we are told about it. */
 const DAILY_SYNC_MAX_AGE_HOURS = 26;
@@ -35,7 +35,14 @@ export async function priceSync(ctx: JobContext): Promise<void> {
   const bootstrap = await fetchBootstrap();
   const today = ukDate();
 
-  const { ctx: loadCtx } = await loadIdentity(ctx.db, bootstrap, ctx.dryRun);
+  const identity = await loadIdentity(ctx.db, bootstrap, ctx.dryRun);
+  const loadCtx = identity.ctx;
+
+  if (ctx.dryRun && identity.isEmpty) {
+    printEmptyDatabasePlan(bootstrap);
+    return;
+  }
+
   if (!ctx.dryRun) {
     ctx.record({ table: "players", rows: bootstrap.elements.length });
   }

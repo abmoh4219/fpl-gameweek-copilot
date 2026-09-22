@@ -24,8 +24,10 @@ import { loadPriceObservations } from "../load/price-observations.ts";
 import { loadFixtures, loadGameweeks } from "../load/reference.ts";
 import { loadPlayerSnapshots } from "../load/snapshots.ts";
 import { errorMessage } from "../http.ts";
+import { saveReport } from "../load/reports.ts";
+import { buildDailyReportFrom } from "../reports/build.ts";
 import { JobSkipped, runJob, type JobContext } from "../runner.ts";
-import { fetchGameweekIds, loadIdentity, printDryRunPlan } from "./shared.ts";
+import { fetchGameweekIds, loadIdentity, printDryRunPlan, printEmptyDatabasePlan } from "./shared.ts";
 
 /**
  * Cap on live-stat fetches per run. A backlog after an outage catches up over
@@ -47,7 +49,15 @@ export async function dailySync(ctx: JobContext): Promise<void> {
   }
 
   const today = ukDate();
-  const { ctx: loadCtx } = await loadIdentity(ctx.db, bootstrap, ctx.dryRun);
+  const identity = await loadIdentity(ctx.db, bootstrap, ctx.dryRun);
+  const loadCtx = identity.ctx;
+
+  if (ctx.dryRun && identity.isEmpty) {
+    const fixtures = await fetchFixtures();
+    printEmptyDatabasePlan(bootstrap, { fixtures: fixtures.length });
+    return;
+  }
+
   if (!ctx.dryRun) ctx.record({ table: "players", rows: bootstrap.elements.length });
 
   // Gameweeks must land before fixtures, which reference them.
@@ -91,6 +101,21 @@ export async function dailySync(ctx: JobContext): Promise<void> {
 
   // ---- Champions League (optional) -----------------------------------------
   await loadChampionsLeague(ctx, loadCtx);
+
+  // ---- daily report ---------------------------------------------------------
+  // Built AFTER change detection so it reads the events this run just wrote.
+  const report = await buildDailyReportFrom(ctx.db, {
+    date: today,
+    gameweek: current?.id ?? next?.id ?? null,
+  });
+  ctx.record(await saveReport(ctx.db, report, ctx.dryRun));
+  if (ctx.dryRun) {
+    printDryRunPlan("daily report", [
+      report.payload.headline,
+      ...Object.entries(report.payload.summary).map(([k, v]) => `${k}: ${v}`),
+      `X draft (${report.payload.xPost.length} chars): ${report.payload.xPost}`,
+    ]);
+  }
 
   // ---- retention ------------------------------------------------------------
   if (!ctx.dryRun) {

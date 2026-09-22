@@ -142,7 +142,7 @@ per team ID per gameweek and rate-limited per IP.
 | **1** | API exploration + Zod schemas + recorded samples ✅ |
 | **2** | Database schema + insight views ✅ |
 | **3** | Sync and change detection on GitHub Actions ✅ |
-| **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) |
+| **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) ✅ |
 | **5** | Make: daily report |
 | **6** | Make: gameweek preview with Gemini |
 | **7** | Web app + landing page |

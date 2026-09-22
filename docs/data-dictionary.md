@@ -21,6 +21,7 @@ boundary.
 | **TLAs are not unique** | `FCB` is both Barcelona and Bayern Munich; Bodø/Glimt reports `FK`. **Join on the numeric `id` only** — `packages/shared/src/teams.ts`. |
 | **Rate-limit header names differ** | football-data documents `X-RequestsAvailable` but actually sends **`x-requests-available-minute`**, plus `X-RequestCounter-Reset`. Read both, case-insensitively. |
 | **Unknown fields are stripped** | Schemas model only what we use. FPL adding a field is a non-event; FPL removing or retyping a field **we use** fails the parse loudly. |
+| **Per-90 rates need minutes behind them** | `expected_goal_involvements_per_90` is arithmetically true and useless on a tiny sample: a player with **3 season minutes showed 12.9 xGI/90**. Scale any rate by the minutes supporting it before ranking on it |
 | **Personal data in samples** | `fpl/entry.json` and `fpl/entry-picks.json` hold a real manager's team. Replace with anonymised samples before the repo goes public. |
 
 ---
@@ -107,8 +108,10 @@ Optional, non-fatal. Other `property` values may exist — none seen yet.
 | --- | --- | --- |
 | `id`, `code` | number | `id` is season-scoped |
 | `name`, `short_name` | string | e.g. `"Man City"`, `"MCI"` |
-| `strength` | number \| **null** | **Null for all 20 teams in the sample** — do not use |
-| `strength_overall_home/away`, `strength_attack_home/away`, `strength_defence_home/away` | number | Populated; use these |
+| `strength` | number \| **null** | **Null for all 20 teams** — do not use |
+| `strength_overall_home`, `strength_overall_away` | number | **A 1-5 SCALE**, observed range 2-4, mean 3. **Not** the ~1000-1400 scale some FPL guides describe |
+| `strength_attack_home/away` | number | Same 1-5 scale |
+| `strength_defence_home`, `strength_defence_away` | number | **ZERO for all 20 teams.** Unusable; fall back to overall strength as a defensive proxy |
 
 `form` and `team_division` are also null for all 20 teams — not modelled.
 
@@ -309,6 +312,9 @@ these against our own history rather than guessing.
    lock may reset the counter. New signings? Recently changed players?
 6. **Does `price_change_calibrating` ever become true?** `false` for all 667
    here. Likely set for new players with no transfer history.
-7. **Is `elements[].status` enough for injury alerts**, or do we need
+7. **Why is `strength_defence_*` zero for every team**, and does it ever get
+   populated? Until it does, goal threat uses overall strength as the
+   defensive proxy, which conflates a good attack with a good defence.
+8. **Is `elements[].status` enough for injury alerts**, or do we need
    `news` text diffing to catch "return date" changes that leave the status
    unchanged?

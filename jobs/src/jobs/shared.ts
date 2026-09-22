@@ -17,16 +17,31 @@ export function seasonNameFor(bootstrap: BootstrapStatic): string {
  * transfer-window signing is tradeable in our data within 3 hours instead of
  * waiting for the nightly run.
  */
+export interface Identity {
+  ctx: LoadContext;
+  seasonId: number;
+  teamRows: number;
+  playerRows: number;
+  /** True when a dry run found nothing to compare against yet. */
+  isEmpty: boolean;
+}
+
 export async function loadIdentity(
   db: Db,
   bootstrap: BootstrapStatic,
   dryRun: boolean,
-): Promise<{ ctx: LoadContext; seasonId: number; teamRows: number; playerRows: number }> {
+): Promise<Identity> {
   const seasonName = seasonNameFor(bootstrap);
 
   if (dryRun) {
     const ctx = await readOnlyContext(db, seasonName);
-    return { ctx, seasonId: ctx.seasonId, teamRows: 0, playerRows: 0 };
+    return {
+      ctx,
+      seasonId: ctx.seasonId,
+      teamRows: 0,
+      playerRows: 0,
+      isEmpty: ctx.seasonId === 0 || ctx.playerIds.size === 0,
+    };
   }
 
   const seasonId = await loadSeason(db, seasonName);
@@ -43,7 +58,31 @@ export async function loadIdentity(
     seasonId,
     teamRows: teamResult.rows,
     playerRows: playerResult.rows,
+    isEmpty: false,
   };
+}
+
+/**
+ * A dry run against a database with no data yet cannot resolve ids, so there
+ * is nothing to compare or detect. Report what a real run WOULD create.
+ */
+export function printEmptyDatabasePlan(
+  bootstrap: BootstrapStatic,
+  extra: Record<string, number> = {},
+): void {
+  const counts: Record<string, number> = {
+    season: 1,
+    teams: bootstrap.teams.length,
+    players: bootstrap.elements.length,
+    gameweeks: bootstrap.events.length,
+    player_snapshots: bootstrap.elements.length,
+    price_observations: bootstrap.elements.length,
+    ...extra,
+  };
+  printDryRunPlan(
+    `first run against an empty database — would create season ${seasonNameFor(bootstrap)}`,
+    Object.entries(counts).map(([table, rows]) => `${table.padEnd(20)} ${rows} rows`),
+  );
 }
 
 /** A dry run writes nothing, so it reads the id maps that already exist. */
@@ -52,9 +91,9 @@ async function readOnlyContext(db: Db, seasonName: string): Promise<LoadContext>
     select id from core.seasons where name = ${seasonName}
   `;
   if (!season) {
-    throw new Error(
-      `Dry run needs season ${seasonName} to exist already. Run the job for real once first.`,
-    );
+    // An empty database is a legitimate dry run: report what WOULD be created
+    // rather than failing, so the first thing anyone tries works.
+    return { db, seasonId: 0, teamIds: new Map(), playerIds: new Map(), gameweekIds: new Map() };
   }
   const seasonId = Number(season.id);
 

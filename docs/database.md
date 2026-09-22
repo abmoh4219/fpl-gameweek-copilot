@@ -67,12 +67,12 @@ design working as intended:
 
 | Finding | Where | Why it is accepted |
 | --- | --- | --- |
-| **Security Definer View** | the 6 `api.*` views | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
+| **Security Definer View** | the 7 `api.*` views | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
 | **RLS Enabled No Policy** | every `core.*` table | Deliberate deny-all. RLS is on with no policies so nothing but the service role can read a row |
 
 **Anything else the advisor reports is a real problem** and must be fixed, not
 documented away. In particular, a "Security Definer View" on a view that is
-*not* one of those six, or an RLS finding on a future user-scoped table, is a
+*not* one of those seven, or an RLS finding on a future user-scoped table, is a
 bug.
 
 ### Deployment facts
@@ -122,6 +122,7 @@ erDiagram
 | `player_gameweek_stats` | `(player_id, gameweek_id)` | From one `event/{gw}/live` call. Doubles are aggregated; `fixture_detail` keeps the per-fixture breakdown |
 | `change_events` | `dedup_key` | Detected changes. The unique key makes double-sending impossible; `notified_at` is the Make queue |
 | `sync_runs` | `id` | Every run, successful or not. **This is what makes price dedup lossless** |
+| `reports` | `(type, date)` / `(type, gameweek)` | Rendered daily reports and gameweek previews. `payload` is **structured JSON the website renders directly**, `text` is the Telegram message, `payload.xPost` is a manual-publish X draft |
 
 ### Type rules
 
@@ -158,6 +159,10 @@ Six in `core` for jobs, the same six mirrored in `api` for the website.
 | `price_changes_daily` | **Confirmed** risers and fallers, from consecutive daily snapshots |
 | `price_watch` | Latest telemetry per player: percent, signed rate, momentum, strongest likelihood, locked flag. **Estimates only** |
 | `cl_congestion` | For each upcoming PL fixture of a CL club: the gap since the previous CL match **and** until the next one |
+
+Plus `api.latest_reports`, which serves the newest report of each type. It is
+owner-privileged like the rest, so it appears among the accepted "Security
+Definer View" advisor findings — **seven now, not six**.
 
 Three rules the views encode:
 

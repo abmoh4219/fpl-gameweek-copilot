@@ -230,7 +230,7 @@ Full detail in `docs/database.md`; these are the rules that bind every change.
   limits) must use RLS policies plus `security_invoker` views** — never an
   owner-privileged view over per-user rows.
 - **Exactly two Security Advisor findings are accepted**, both deliberate:
-  the six `api` views flagged as **"Security Definer View"**, and
+  the seven `api` views flagged as **"Security Definer View"**, and
   **"RLS Enabled No Policy"** on every `core` table (intentional deny-all).
   **Anything else the advisor reports is a real problem** and must be fixed.
 - **Migrations deploy manually** with `pnpm supabase db push`. Supabase's
@@ -281,6 +281,31 @@ Full detail in `docs/database.md`; these are the rules that bind every change.
 - **Dead man's switch**: price-sync alerts if no `daily-sync` has succeeded in
   26 hours, with a 6-hour cooldown, cleared by the next success. Seven days of
   failure pauses the Supabase project.
+
+---
+
+## 4c. Insight engine rules
+
+- **Every weight, threshold and band lives in
+  `packages/shared/src/insights/config.ts`.** No scoring function may hardcode
+  a number that belongs there.
+- **Insights are pure functions** over view rows — no database, no clock, no
+  network — so every rule is unit-testable against synthetic data.
+- **Reports read the Phase 2 views**, never raw tables.
+- **`momentum` and `hourly_rate` never reach a report.** The hypothesis behind
+  them is unvalidated; a test asserts they are absent from every payload.
+- **Never trust a per-90 rate without minutes behind it.** A player with 3
+  season minutes showed 12.9 xGI/90. Threat is scaled by sample size, which
+  also encodes the obvious point that someone who does not play has no threat.
+- **`strength_overall_*` is a 1-5 scale** (observed 2-4), and
+  **`strength_defence_*` is zero for every team** — goal threat falls back to
+  overall strength. Getting this wrong floored every fixture at "Easy".
+- **Report payloads are structured JSON with typed sections**, because the
+  website renders the same rows the Telegram message is built from. The text
+  is one rendering, not the source of truth.
+- **X drafts are generated, never posted** (ADR-0002), capped at 240
+  characters, and carry concrete numbers from the payload.
+- **Forward-looking output is labelled an estimate**, every time.
 
 ---
 

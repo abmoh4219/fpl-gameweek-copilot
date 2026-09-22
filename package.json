@@ -19,7 +19,9 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "job:price": "pnpm --filter @fpl/jobs run job:price",
-    "job:daily": "pnpm --filter @fpl/jobs run job:daily"
+    "job:daily": "pnpm --filter @fpl/jobs run job:daily",
+    "job:preview": "pnpm --filter @fpl/jobs run job:preview",
+    "backfill:gw": "pnpm --filter @fpl/jobs run backfill:gw"
   },
   "devDependencies": {
     "supabase": "^2.117.0"

@@ -9,7 +9,9 @@
     "test": "vitest run --passWithNoTests",
     "load:samples": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/load-samples.ts",
     "job:price": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/price-sync.ts",
-    "job:daily": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/daily-sync.ts"
+    "job:daily": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/daily-sync.ts",
+    "job:preview": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/preview.ts",
+    "backfill:gw": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/backfill-gameweeks.ts"
   },
   "dependencies": {
     "@fpl/shared": "workspace:*",
