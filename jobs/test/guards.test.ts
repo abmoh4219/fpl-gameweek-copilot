@@ -4,30 +4,58 @@ import { redactSecrets } from "../src/telegram.ts";
 
 const CLOUD_URL = "postgresql://postgres:hunter2@db.abcdefgh.supabase.co:5432/postgres";
 
+/**
+ * GITHUB_ACTIONS is set for real inside CI, and the guard reads it — so every
+ * case below sets it explicitly rather than inheriting whatever the runner
+ * happens to have. Without this the suite passes locally and fails in CI.
+ */
+function withGithubActions<T>(value: string | undefined, fn: () => T): T {
+  const previous = process.env["GITHUB_ACTIONS"];
+  if (value === undefined) delete process.env["GITHUB_ACTIONS"];
+  else process.env["GITHUB_ACTIONS"] = value;
+  try {
+    return fn();
+  } finally {
+    if (previous === undefined) delete process.env["GITHUB_ACTIONS"];
+    else process.env["GITHUB_ACTIONS"] = previous;
+  }
+}
+
 describe("non-local database guard", () => {
   it("always allows a local database", () => {
     expect(isLocalDatabase(LOCAL_DB_URL)).toBe(true);
-    expect(() => assertDatabaseAllowed(LOCAL_DB_URL)).not.toThrow();
+    withGithubActions(undefined, () => {
+      expect(() => assertDatabaseAllowed(LOCAL_DB_URL)).not.toThrow();
+    });
   });
 
   it("refuses a cloud database by default", () => {
     expect(isLocalDatabase(CLOUD_URL)).toBe(false);
-    expect(() => assertDatabaseAllowed(CLOUD_URL)).toThrow(/Refusing to run against a non-local/);
+    withGithubActions(undefined, () => {
+      expect(() => assertDatabaseAllowed(CLOUD_URL)).toThrow(
+        /Refusing to run against a non-local/,
+      );
+    });
   });
 
   it("allows a cloud database with an explicit --cloud", () => {
-    expect(() => assertDatabaseAllowed(CLOUD_URL, true)).not.toThrow();
+    withGithubActions(undefined, () => {
+      expect(() => assertDatabaseAllowed(CLOUD_URL, true)).not.toThrow();
+    });
   });
 
   it("allows a cloud database inside GitHub Actions", () => {
-    const previous = process.env["GITHUB_ACTIONS"];
-    process.env["GITHUB_ACTIONS"] = "true";
-    try {
+    withGithubActions("true", () => {
       expect(() => assertDatabaseAllowed(CLOUD_URL)).not.toThrow();
-    } finally {
-      if (previous === undefined) delete process.env["GITHUB_ACTIONS"];
-      else process.env["GITHUB_ACTIONS"] = previous;
-    }
+    });
+  });
+
+  it("still refuses when GITHUB_ACTIONS is present but not 'true'", () => {
+    withGithubActions("false", () => {
+      expect(() => assertDatabaseAllowed(CLOUD_URL)).toThrow(
+        /Refusing to run against a non-local/,
+      );
+    });
   });
 
   it("recognises localhost and IPv6 loopback too", () => {
