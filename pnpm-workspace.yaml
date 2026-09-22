@@ -3,8 +3,21 @@ packages:
   - "web"
   - "packages/*"
 
-# esbuild (via vitest/tsx) needs its postinstall to link the platform binary.
+# Build-script approvals.
+#
+# pnpm 11 gates dependency build scripts on `allowBuilds` (a map), which is
+# what `pnpm approve-builds` writes. `onlyBuiltDependencies` (a list) is the
+# pnpm 10 key: pnpm 11 still PARSES it — it shows up in `pnpm config list` —
+# but no longer treats it as approval, which is why a clean install failed
+# with ERR_PNPM_IGNORED_BUILDS even though esbuild was listed there.
+#
+# Both keys are kept so the intent is explicit under either major version.
+allowBuilds:
+  # esbuild links its platform binary in a postinstall; tsx and vitest need it
+  esbuild: true
+  # the supabase CLI downloads its platform binary in a postinstall
+  supabase: true
+
 onlyBuiltDependencies:
   - esbuild
-  # the supabase CLI postinstall downloads its platform binary
   - supabase

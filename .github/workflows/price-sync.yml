@@ -38,15 +38,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11
+      # No `version:` on purpose — pnpm/action-setup reads the exact version
+      # from the root package.json "packageManager" field, so CI and local
+      # machines cannot drift apart.
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       # Only the jobs package and what it depends on: web/ is never installed.
