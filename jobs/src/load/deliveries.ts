@@ -30,17 +30,35 @@ export async function recordDelivery(db: Db, row: DeliveryRecord): Promise<void>
   `;
 }
 
-/** Successful deliveries of one kind on one UK date. */
+/**
+ * Deliveries of one kind on one UK date — successful ones only, unless
+ * `includeFailed`: the AI cap counts every attempt, because a call that
+ * failed late may still have spent a Gemini request.
+ */
 export async function countDeliveries(
   db: Db,
   kind: DeliveryKind,
   deliveryDate: string,
+  includeFailed = false,
 ): Promise<number> {
   const [row] = await db<{ n: string }[]>`
     select count(*) as n from core.deliveries
-    where kind = ${kind} and delivery_date = ${deliveryDate}::date and ok
+    where kind = ${kind} and delivery_date = ${deliveryDate}::date
+      and (ok or ${includeFailed})
   `;
   return Number(row?.n ?? 0);
+}
+
+/** Has this gameweek's preview already reached the channel? */
+export async function previewDelivered(db: Db, gameweek: number): Promise<boolean> {
+  const [row] = await db<{ n: string }[]>`
+    select count(*) as n
+    from core.deliveries d
+    join core.reports r on r.id = d.report_id
+    where d.kind = 'preview' and d.ok
+      and r.report_type = 'preview' and r.gameweek = ${gameweek}
+  `;
+  return Number(row?.n ?? 0) > 0;
 }
 
 /**

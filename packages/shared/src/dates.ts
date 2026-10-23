@@ -17,3 +17,21 @@ export function ukDate(instant: Date = new Date()): string {
 export function ukDateMinus(days: number, instant: Date = new Date()): string {
   return ukDate(new Date(instant.getTime() - days * 86_400_000));
 }
+
+/** "Saturday 24 October, 11:00 UK time" — how a manager reads a deadline. */
+export function ukDeadlineLabel(deadlineUtc: string): string {
+  const instant = new Date(deadlineUtc);
+  const day = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(instant);
+  const time = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(instant);
+  return `${day.replace(",", "")}, ${time} UK time`;
+}

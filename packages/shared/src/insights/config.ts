@@ -146,6 +146,28 @@ export const INSIGHT_CONFIG = {
     newsAlertLookbackHours: 24,
     newsAlertMaxItems: 5,
   },
+
+  ai: {
+    /**
+     * Gemini calls allowed per UK day (CLAUDE.md §7). A preview needs one; the
+     * rest is room for a manual re-run. Over the cap, the template ships.
+     */
+    maxCallsPerDay: 3,
+    /** Prose outside these bounds is rejected and the template ships. */
+    minChars: 120,
+    maxChars: 900,
+    /** Make must answer within this, or the template ships. */
+    timeoutMs: 60_000,
+  },
+
+  preview: {
+    /**
+     * Send the preview once a deadline is this close. Deadlines are Friday
+     * evening, Saturday morning or midweek evening; a daily run then always
+     * lands a day or so before, never on the morning of the deadline itself.
+     */
+    sendWithinHours: 36,
+  },
 } as const;
 
 export type InsightConfig = typeof INSIGHT_CONFIG;

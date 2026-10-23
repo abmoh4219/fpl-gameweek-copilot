@@ -1,0 +1,61 @@
+name: preview
+
+# Once a day at 09:47 UTC. The job itself decides whether to do anything:
+# it skips unless the next FPL deadline is within 36 hours and that
+# gameweek's preview has not been delivered yet — so ~25 of ~30 runs a month
+# end in seconds as `skipped`. About 5 previews a month, one Gemini call each.
+#   47   -> minute 47, off the top of the hour (GitHub delays busy minutes)
+#   9    -> 09:00 UTC: a day-time post, a day or so before Friday-evening,
+#           Saturday-morning and midweek deadlines alike
+#   * * * -> every day
+on:
+  schedule:
+    - cron: "47 9 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Ignore the 36-hour window (still sends each gameweek once)"
+        type: boolean
+        default: false
+      dry_run:
+        description: "Build the preview, write nothing, call nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Same group as the syncs: never write at the same time as them.
+concurrency:
+  group: fpl-sync
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      # Exact pnpm version comes from the root package.json "packageManager".
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Only the jobs package and what it depends on: web/ is never installed.
+      - run: pnpm install --filter "@fpl/jobs..." --frozen-lockfile
+
+      - run: pnpm job:preview
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_ALERT_CHAT_ID: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
+          MAKE_WEBHOOK_EVENTS_URL: ${{ secrets.MAKE_WEBHOOK_EVENTS_URL }}
+          MAKE_WEBHOOK_PREVIEW_URL: ${{ secrets.MAKE_WEBHOOK_PREVIEW_URL }}
+          MAKE_WEBHOOK_SECRET: ${{ secrets.MAKE_WEBHOOK_SECRET }}
+          PREVIEW_FORCE: ${{ inputs.force }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          TZ: Europe/London

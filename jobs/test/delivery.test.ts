@@ -4,21 +4,24 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { newsAlertDelivery, type StatusChangeItem } from "@fpl/shared";
 import { connect, type Db } from "../src/db.ts";
 import { deliver } from "../src/deliver.ts";
-import { countDeliveries } from "../src/load/deliveries.ts";
+import { countDeliveries, previewDelivered, recordDelivery } from "../src/load/deliveries.ts";
 import { loadSamplesInto } from "../src/load/from-samples.ts";
-import { postToMake } from "../src/make.ts";
+import { postToMake, requestProse } from "../src/make.ts";
 import type { JobContext } from "../src/runner.ts";
 import { localStack, SAMPLES_DIR, SKIP_MESSAGE } from "./local-supabase.ts";
 
 /** A stand-in for Make's custom webhook: records bodies, answers `status`. */
-async function fakeMake(status = 200): Promise<{ url: string; bodies: unknown[]; server: Server }> {
+async function fakeMake(
+  status = 200,
+  reply = status === 200 ? "Accepted" : "Scenario failed",
+): Promise<{ url: string; bodies: unknown[]; server: Server }> {
   const bodies: unknown[] = [];
   const server = createServer((req: IncomingMessage, res) => {
     let raw = "";
     req.on("data", (chunk) => (raw += chunk));
     req.on("end", () => {
       bodies.push(JSON.parse(raw));
-      res.writeHead(status).end(status === 200 ? "Accepted" : "Scenario failed");
+      res.writeHead(status, { "content-type": "text/plain" }).end(reply);
     });
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -56,6 +59,41 @@ describe("postToMake", () => {
     const result = await postToMake({ url: "http://127.0.0.1:1/hook", secret: "x" }, newsAlertDelivery([item], 1));
     expect(result.ok).toBe(false);
     expect(result.status).toBeNull();
+  });
+});
+
+describe("requestProse (Scenario 2)", () => {
+  const body = { version: 1, gameweek: 9, prompt: "Write the opening paragraph" };
+
+  it("returns the text Make's webhook response sent back", async () => {
+    const make = await fakeMake(200, "Haaland heads the captain options.");
+    const result = await requestProse({ url: make.url, secret: "s3cret-value" }, body, 5_000);
+    make.server.close();
+
+    expect(result).toMatchObject({ ok: true, text: "Haaland heads the captain options." });
+    expect(make.bodies[0]).toMatchObject({ gameweek: 9, prompt: "Write the opening paragraph", secret: "s3cret-value" });
+  });
+
+  it("treats a bare Accepted as a missing Webhook response module", async () => {
+    const make = await fakeMake(200, "Accepted");
+    const result = await requestProse({ url: make.url, secret: "x" }, body, 5_000);
+    make.server.close();
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toMatch(/Webhook response/);
+    expect(result.text).toBeNull();
+  });
+
+  it("gives up after the timeout instead of hanging the job", async () => {
+    const server = createServer(() => {}); // never answers
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const { port } = server.address() as AddressInfo;
+    const result = await requestProse({ url: `http://127.0.0.1:${port}/hook`, secret: "x" }, body, 200);
+    server.closeAllConnections();
+    server.close();
+
+    expect(result.ok).toBe(false);
+    expect(result.text).toBeNull();
   });
 });
 
@@ -100,6 +138,7 @@ describe.skipIf(!stack)(`deliver (${stack ? "local Supabase" : SKIP_MESSAGE})`, 
 
   async function cleanup() {
     await db`delete from core.deliveries where delivery_date = ${ON}::date`;
+    await db`delete from core.reports where report_type = 'preview' and gameweek = 99`;
     await db`delete from core.change_events where occurred_on = ${ON}::date`;
     await db`delete from core.alert_state where key = 'make-delivery-failed'`;
   }
@@ -163,5 +202,34 @@ describe.skipIf(!stack)(`deliver (${stack ? "local Supabase" : SKIP_MESSAGE})`, 
     const [second] = await db<{ notified_at: Date }[]>`select notified_at from core.change_events where id = ${eventId}`;
     expect(second?.notified_at.getTime()).toBe(first?.notified_at.getTime());
     expect(await countDeliveries(db, "news_alert", ON)).toBe(2);
+  });
+
+  it("counts failed AI attempts toward the cap, but not toward delivery counts", async () => {
+    const base = {
+      deliveryDate: ON, httpStatus: null, messageCount: 0, eventCount: 0,
+      reportId: null, syncRunId: null, error: "timeout",
+    };
+    await recordDelivery(db, { ...base, kind: "preview_ai", ok: false });
+    await recordDelivery(db, { ...base, kind: "preview_ai", ok: true, error: null });
+
+    expect(await countDeliveries(db, "preview_ai", ON)).toBe(1);
+    expect(await countDeliveries(db, "preview_ai", ON, true)).toBe(2);
+  });
+
+  it("knows when a gameweek's preview has reached the channel", async () => {
+    const [report] = await db<{ id: string }[]>`
+      insert into core.reports (report_type, report_date, gameweek, payload, text)
+      values ('preview', ${ON}::date, 99, '{}'::jsonb, 'x') returning id
+    `;
+    const base = {
+      kind: "preview" as const, deliveryDate: ON, httpStatus: 500, messageCount: 1,
+      eventCount: 0, reportId: Number(report!.id), syncRunId: null, error: null,
+    };
+
+    await recordDelivery(db, { ...base, ok: false });
+    expect(await previewDelivered(db, 99)).toBe(false);
+
+    await recordDelivery(db, { ...base, ok: true, httpStatus: 200 });
+    expect(await previewDelivered(db, 99)).toBe(true);
   });
 });

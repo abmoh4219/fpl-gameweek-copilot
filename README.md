@@ -7,8 +7,9 @@ fixture difficulty.
 
 Built entirely on free tiers.
 
-> **Status:** Phase 5 — the pipeline syncs, detects, scores and delivers to
-> Telegram through Make. The web app is next.
+> **Status:** Phase 6 — the pipeline syncs, detects, scores and delivers to
+> Telegram through Make, with a Gemini-written preview checked by code. The
+> web app is next.
 
 ---
 
@@ -71,7 +72,7 @@ estimates.
         |
         +-- Scenario 1: events   -> router -> Telegram channel
         |                                  -> X draft to me
-        +-- Scenario 2: preview  -> Gemini -> Telegram -> Supabase
+        +-- Scenario 2: preview  -> Gemini -> back to jobs/ (validated)
 ```
 
 Sync failures skip Make entirely and alert Telegram straight from code, so an
@@ -107,8 +108,10 @@ draft arrives for manual posting. If the job fails, Telegram says so directly.
 **Before each gameweek deadline**
 A second job assembles the facts — captain scores, differentials, fixture
 swings, congestion flags — and sends them to the preview scenario. Gemini
-turns the facts into short prose, Telegram receives it, and it is saved back
-to Supabase so the web app can serve it without another AI call.
+turns the facts into a short opening paragraph and Make hands it straight
+back. Code rejects it if it contains any number that was not in the facts,
+falling back to the template, and only then is the preview stored and sent to
+Telegram — so the web app serves it without another AI call.
 
 **Any time**
 The website reads from Supabase views only. Visitors never trigger an AI call
@@ -146,7 +149,7 @@ per team ID per gameweek and rate-limited per IP.
 | **3** | Sync and change detection on GitHub Actions ✅ |
 | **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) ✅ |
 | **5** | Make: daily report and intraday news alerts ✅ |
-| **6** | Make: gameweek preview with Gemini |
+| **6** | Make: gameweek preview with Gemini, validated by code ✅ |
 | **7** | Web app + landing page |
 | **8** | My-team, Telegram bot, quota guards |
 | **9** | Launch — demo video, X thread |

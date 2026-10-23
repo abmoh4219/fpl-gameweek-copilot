@@ -14,11 +14,12 @@ import type { BuiltReport, StatusChangeItem } from "./types.ts";
  */
 export const DELIVERY_PAYLOAD_VERSION = 1;
 
-export type DeliveryKind = "daily_report" | "news_alert" | "preview";
+/** `preview_ai` is a Scenario 2 call: it carries a prompt, not messages. */
+export type DeliveryKind = "daily_report" | "news_alert" | "preview" | "preview_ai";
 
 export interface DeliveryPayload {
   version: number;
-  kind: DeliveryKind;
+  kind: Exclude<DeliveryKind, "preview_ai">;
   headline: string;
   /** Telegram HTML, one entry per sendMessage call, in order. */
   messages: string[];
@@ -77,5 +78,21 @@ export function newsAlertDelivery(
     messages: splitMessage(blocks, INSIGHT_CONFIG.report.maxMessageChars),
     xDraft: null,
     eventCount,
+  };
+}
+
+/**
+ * The gameweek preview, through the same Scenario 1 as everything else: the
+ * AI step happens BEFORE this, in Scenario 2, and code has already validated
+ * whatever prose it returned (ADR-0007).
+ */
+export function previewDelivery(report: BuiltReport): DeliveryPayload {
+  return {
+    version: DELIVERY_PAYLOAD_VERSION,
+    kind: "preview",
+    headline: report.payload.headline,
+    messages: renderReport(report.payload, { includeXDraft: false }),
+    xDraft: report.payload.xPost || null,
+    eventCount: 0,
   };
 }

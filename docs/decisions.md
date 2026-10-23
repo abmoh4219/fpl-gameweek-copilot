@@ -312,3 +312,63 @@ with `occurred_on = today`, so Friday-afternoon news never reached any report.
   per run to learn something Make's own history already shows.
 - **Deliver news only in the daily report.** Simplest, but news detected on
   Friday afternoon would arrive after a Friday-evening deadline.
+
+---
+
+## ADR-0007 — Gemini prose comes back to code before anything is published
+
+- **Date:** 2026-10-23
+- **Status:** Accepted
+
+### Context
+
+The preview gets a short AI-written opening paragraph (Phase 6). The hard rule
+in CLAUDE.md §2 is that Gemini never calculates, never ranks and never
+introduces a number that was not passed in. The original plan,
+"Scenario 2: preview → Gemini → Telegram → Supabase", would publish the
+model's text before anything could check it, so the rule would be a request
+in a prompt rather than something enforced.
+
+### Decision
+
+- The preview job POSTs the computed facts and a prompt to Scenario 2:
+  *webhook → filter → Gemini → Webhook response*. Make answers the same HTTP
+  request with Gemini's text.
+- Code validates the text in `validateProse()`: length, no links, markdown
+  stripped, and **every number must appear in the facts**. It is
+  HTML-escaped, and a fixed "estimate" label is added by code.
+- Valid prose becomes `payload.prose` and `generated_by = 'ai'`. On any
+  failure, rejection or the daily cap (3 calls), the template preview ships.
+- The finished preview goes out through **Scenario 1**, like every other
+  report.
+- The prompt lives in `packages/shared/src/reports/ai.ts`, versioned and
+  tested, not in a Make module.
+- A daily `preview` workflow sends each gameweek's preview once, when the
+  deadline is within 36 hours.
+
+### Consequences
+
+- The no-invented-numbers rule is enforced by a unit-tested function, not by
+  trusting a model. Invented arithmetic (two facts added together) is
+  rejected too.
+- The check is deliberately strict: prose that writes "top 5" when 5 is not a
+  fact is rejected, and the template ships. A false rejection costs some
+  prose; a false acceptance would publish an invented statistic.
+- Credits per preview rise to ~8 (3 in Scenario 2, ~5 in Scenario 1), about
+  40 a month. The worst case across all scenarios is ~370, under the 400
+  ceiling.
+- Telegram, the X draft and the audit trail stay in one scenario, and the free
+  plan's second scenario slot does nothing but Gemini.
+- Validation checks numbers, not names or claims. A sentence can still be
+  wrong in words ("Arsenal are in great form"), which is why the label calls
+  it AI-written and the computed sections follow it.
+
+### Alternatives considered
+
+- **Gemini → Telegram inside Make** (the original plan). Rejected: nothing
+  can enforce the rule between the model and a public channel.
+- **Call the Gemini API from `jobs/` directly.** Simpler, but it moves the key
+  out of Make and leaves the second scenario unused. The webhook response
+  keeps code in control at the cost of one module.
+- **Validate inside Make with filters.** Make filters cannot extract and
+  compare every number in free text.

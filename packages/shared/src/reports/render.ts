@@ -12,6 +12,9 @@ export function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/** Appended under every AI-written paragraph. */
+export const AI_PROSE_LABEL = "Summary written by AI from the computed numbers below. Every pick is an estimate.";
+
 export interface RenderOptions {
   /**
    * Append the X draft as a final block. True for the stored text; false for
@@ -23,6 +26,10 @@ export interface RenderOptions {
 
 export function renderReport(payload: ReportPayload, options: RenderOptions = {}): string[] {
   const blocks = sectionBlocks(payload.headline, payload.sections);
+  if (payload.prose) {
+    // The label is code, not model output: it is always there.
+    blocks.splice(1, 0, `${escapeHtml(payload.prose)}\n<i>${AI_PROSE_LABEL}</i>`);
+  }
 
   if (payload.xPost && (options.includeXDraft ?? true)) {
     blocks.push(`<b>Draft for X</b>\n<code>${escapeHtml(payload.xPost)}</code>`);

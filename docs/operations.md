@@ -10,6 +10,7 @@ What runs, when, how to check it, and what to do when it breaks.
 | --- | --- | --- | --- |
 | `price-sync` | `17 */3 * * *` — 00:17, 03:17 … 21:17 | 8 | bootstrap-static only: players, price telemetry, **status and news changes** |
 | `daily-sync` | `37 2 * * *` — 02:37 | 1 | everything: fixtures, gameweek stats, Champions League, day-over-day changes, retention |
+| `preview` | `47 9 * * *` — 09:47 | 1 | **skips** unless the next deadline is within 36 h and that gameweek's preview is unsent; then template + Gemini prose (validated), stored and delivered (ADR-0007) |
 | `ci` | on push / PR (skips docs-only) | — | typecheck + tests |
 
 **Why those minutes.** GitHub delays schedules clustered at the top of the
@@ -37,6 +38,7 @@ ceiling is 600.
 | --- | --- | --- | --- |
 | price-sync | ~243 | **1.3 s** | 243 min if the whole run fits in 60 s |
 | daily-sync | ~30 | **5.1 s** | ~60 min |
+| preview | ~30 | seconds (~25 runs skip) | ~30 min |
 | ci | ~40 | — | ~80 min |
 
 The jobs themselves are nowhere near the limit; **checkout, Node setup and
@@ -53,7 +55,8 @@ Actions log shows price-sync billing 2 minutes, change its cron to
 pnpm db:start                 # local stack, needs Docker
 pnpm job:price                # light job
 pnpm job:daily                # full job, also builds today's report
-pnpm job:preview              # gameweek preview, manual
+pnpm job:preview              # gameweek preview; skips outside the 36 h window
+pnpm job:preview -- --force   # ignore the window (still once per gameweek)
 pnpm backfill:gw 1 2 3 4      # per-gameweek stats for named gameweeks
 DRY_RUN=true pnpm job:daily   # fetch + detect, write NOTHING
 ```
@@ -68,10 +71,14 @@ trace in history. It prints the change events it *would* have written.
 `GITHUB_ACTIONS=true` or `--cloud` is passed. The cloud connection string
 lives **only in GitHub Secrets**; it must never be put in `.env`.
 
-From the Actions tab, both workflows offer **Run workflow** with two inputs:
+From the Actions tab, both sync workflows offer **Run workflow** with two inputs:
 
 - `dry_run` — as above
 - `simulate_failure` — forces a failure to prove the Telegram alert works
+
+`preview` offers `dry_run` and `force` instead (`gh workflow run preview -f
+force=true`). A preview is delivered **once per gameweek**: to send it again,
+delete its `kind = 'preview'` row from `core.deliveries` first.
 
 ---
 

@@ -15,15 +15,18 @@ export async function saveReport(
 
   const { payload, messages } = report;
   const text = messages.join("\n\n———\n\n");
+  // Only validated prose ever reaches payload.prose (ADR-0007).
+  const generatedBy = payload.prose ? "ai" : "template";
 
   let rows: { id: string }[];
   if (payload.type === "daily") {
     rows = await db`
       insert into core.reports (report_type, report_date, gameweek, payload, text, generated_by)
       values ('daily', ${payload.date}::date, ${payload.gameweek},
-              ${db.json(payload as never)}, ${text}, 'template')
+              ${db.json(payload as never)}, ${text}, ${generatedBy})
       on conflict (report_type, report_date) where report_type = 'daily'
       do update set payload = excluded.payload, text = excluded.text,
+                    generated_by = excluded.generated_by,
                     gameweek = excluded.gameweek, updated_at = now()
       returning id
     `;
@@ -31,9 +34,10 @@ export async function saveReport(
     rows = await db`
       insert into core.reports (report_type, report_date, gameweek, payload, text, generated_by)
       values ('preview', ${payload.date}::date, ${payload.gameweek},
-              ${db.json(payload as never)}, ${text}, 'template')
+              ${db.json(payload as never)}, ${text}, ${generatedBy})
       on conflict (report_type, gameweek) where report_type = 'preview'
       do update set payload = excluded.payload, text = excluded.text,
+                    generated_by = excluded.generated_by,
                     report_date = excluded.report_date, updated_at = now()
       returning id
     `;

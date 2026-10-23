@@ -1,34 +1,55 @@
 /**
- * Sends ONE sample payload to MAKE_WEBHOOK_EVENTS_URL.
+ * Sends ONE sample payload to a Make scenario (docs/make.md).
  *
- * Use it twice while building Scenario 1 (docs/make.md): first so Make's
- * custom webhook can learn the data structure, then to test the finished
- * scenario end to end. It goes to whatever the scenario is wired to — once
- * the channel module is connected, that means the real channel.
+ *   pnpm make:sample            Scenario 1 (events) — posts to the channel
+ *                               once the channel module is connected
+ *   pnpm make:sample preview    Scenario 2 (preview) — prints Gemini's reply
  *
- *   pnpm make:sample
+ * Use it twice while building a scenario: first so Make's custom webhook can
+ * learn the data structure, then to test the finished scenario end to end.
  */
 import { DELIVERY_PAYLOAD_VERSION, type DeliveryPayload } from "@fpl/shared";
-import { eventsWebhookTarget, postToMake } from "../src/make.ts";
+import { postToMake, requestProse, webhookTarget } from "../src/make.ts";
 
-const target = eventsWebhookTarget();
+const scenario = process.argv.includes("preview") ? "preview" : "events";
+const target = webhookTarget(scenario);
 if ("missing" in target) {
   console.error(`Set ${target.missing.join(" and ")} in .env first.`);
   process.exit(1);
 }
 
-const payload: DeliveryPayload = {
-  version: DELIVERY_PAYLOAD_VERSION,
-  kind: "daily_report",
-  headline: "Test delivery from FPL Gameweek Copilot",
-  messages: [
-    "<b>Test delivery from FPL Gameweek Copilot</b>\n\nIf you can read this, Scenario 1 works.",
-    "<b>Second message</b>\n<i>Long reports arrive as several messages, in order.</i>",
-  ],
-  xDraft: "Test X draft — this one goes to your own chat, never the channel. #FPL",
-  eventCount: 0,
-};
+if (scenario === "preview") {
+  const result = await requestProse(
+    target,
+    {
+      version: 1,
+      gameweek: 0,
+      prompt: "Reply with one short sentence confirming you are ready to write Fantasy Premier League previews.",
+    },
+    60_000,
+  );
+  if (result.ok) {
+    console.log(`Make answered (HTTP ${result.status}). Gemini said:\n\n  ${result.text}\n`);
+  } else {
+    // While Make is only "determining the data structure", no Gemini module
+    // has run yet, so "Accepted" here is expected the first time.
+    console.log(`No prose back: ${result.error}`);
+    process.exitCode = 1;
+  }
+} else {
+  const payload: DeliveryPayload = {
+    version: DELIVERY_PAYLOAD_VERSION,
+    kind: "daily_report",
+    headline: "Test delivery from FPL Gameweek Copilot",
+    messages: [
+      "<b>Test delivery from FPL Gameweek Copilot</b>\n\nIf you can read this, Scenario 1 works.",
+      "<b>Second message</b>\n<i>Long reports arrive as several messages, in order.</i>",
+    ],
+    xDraft: "Test X draft — this one goes to your own chat, never the channel. #FPL",
+    eventCount: 0,
+  };
 
-const result = await postToMake(target, payload);
-console.log(result.ok ? `Make accepted it (HTTP ${result.status}).` : `Failed: ${result.error}`);
-if (!result.ok) process.exitCode = 1;
+  const result = await postToMake(target, payload);
+  console.log(result.ok ? `Make accepted it (HTTP ${result.status}).` : `Failed: ${result.error}`);
+  if (!result.ok) process.exitCode = 1;
+}

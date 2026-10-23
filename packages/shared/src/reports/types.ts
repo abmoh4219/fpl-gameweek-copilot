@@ -78,6 +78,12 @@ export interface ReportPayload {
   summary: Record<string, number>;
   sections: ReportSection[];
   /**
+   * Short AI-written prose around the computed sections (previews only).
+   * Absent on template reports. Validated by code before it is stored: it may
+   * not contain a number that is not in the facts it was given (ADR-0007).
+   */
+  prose?: string;
+  /**
    * Draft post for X, published MANUALLY (ADR-0002). Kept in the payload so
    * the site and Telegram can both surface it for copying.
    */

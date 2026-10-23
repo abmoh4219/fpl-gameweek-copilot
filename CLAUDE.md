@@ -137,7 +137,9 @@ confirmed, every price-watch output is labelled an **estimate**.
         |
         +-- Scenario 1: events   -> router -> Telegram channel
         |                                  -> X draft sent to me
-        +-- Scenario 2: preview  -> Gemini -> Telegram -> back to Supabase
+        +-- Scenario 2: preview  -> Gemini -> webhook response to jobs/,
+                                    which validates it, stores it and
+                                    delivers through Scenario 1 (ADR-0007)
 ```
 
 Sync failures do **not** go through Make. `jobs/` calls the Telegram Bot API
@@ -165,7 +167,10 @@ runs charges for every module inside it. An iterator over N records charges
 N times per downstream module — which is exactly how a free plan dies.
 
 - Daily report: ~30 runs/month x ~4 modules = **~120 credits**
-- Pre-deadline preview: ~5 runs/month x ~5 modules = **~25 credits**
+- Pre-deadline preview: ~5 runs/month x ~8 modules (3 in Scenario 2, ~5 in
+  Scenario 1) = **~40 credits**
+- Intraday news alerts: capped at 2/day x ~3 modules = **at most ~180 credits**
+  (ADR-0006)
 - Budget ceiling: **~400 credits/month**, leaving real headroom inside 1,000
 
 **Rule: one webhook per run, with a batched payload.** Never one webhook call
