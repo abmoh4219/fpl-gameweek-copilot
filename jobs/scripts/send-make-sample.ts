@@ -8,7 +8,7 @@
  * Use it twice while building a scenario: first so Make's custom webhook can
  * learn the data structure, then to test the finished scenario end to end.
  */
-import { DELIVERY_PAYLOAD_VERSION, type DeliveryPayload } from "@fpl/shared";
+import { DELIVERY_PAYLOAD_VERSION, INSIGHT_CONFIG, type DeliveryPayload } from "@fpl/shared";
 import { postToMake, requestProse, webhookTarget } from "../src/make.ts";
 
 const scenario = process.argv.includes("preview") ? "preview" : "events";
@@ -19,6 +19,8 @@ if ("missing" in target) {
 }
 
 if (scenario === "preview") {
+  console.log("Waiting for Gemini (can take a minute or two when it is busy)...");
+  const started = Date.now();
   const result = await requestProse(
     target,
     {
@@ -26,10 +28,11 @@ if (scenario === "preview") {
       gameweek: 0,
       prompt: "Reply with one short sentence confirming you are ready to write Fantasy Premier League previews.",
     },
-    60_000,
+    INSIGHT_CONFIG.ai.timeoutMs,
   );
   if (result.ok) {
-    console.log(`Make answered (HTTP ${result.status}). Gemini said:\n\n  ${result.text}\n`);
+    const seconds = ((Date.now() - started) / 1000).toFixed(1);
+    console.log(`Make answered (HTTP ${result.status}) in ${seconds}s. Gemini said:\n\n  ${result.text}\n`);
   } else {
     // While Make is only "determining the data structure", no Gemini module
     // has run yet, so "Accepted" here is expected the first time.

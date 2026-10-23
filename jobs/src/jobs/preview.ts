@@ -26,6 +26,7 @@ import {
 
 import { deliver } from "../deliver.ts";
 import { fetchBootstrap } from "../fpl.ts";
+import { sleep } from "../http.ts";
 import { countDeliveries, previewDelivered, recordDelivery } from "../load/deliveries.ts";
 import { saveReport } from "../load/reports.ts";
 import { loadGameweeks } from "../load/reference.ts";
@@ -118,19 +119,57 @@ async function addAiProse(
     return template;
   }
 
-  const used = await countDeliveries(ctx.db, "preview_ai", today, true);
-  if (used >= cfg.maxCallsPerDay) {
-    ctx.warn(`AI cap of ${cfg.maxCallsPerDay} calls/day reached, preview ships as template`);
+  // One retry, and only for a Make/Gemini 5xx: Gemini answers 503 when it is
+  // busy, and nothing has been published yet, so trying again is safe. Each
+  // attempt counts toward the cap. A timeout is not retried — it already
+  // waited the full timeoutMs.
+  let result: Awaited<ReturnType<typeof requestProse>> | null = null;
+  for (let attempt = 1; attempt <= cfg.attempts; attempt++) {
+    const used = await countDeliveries(ctx.db, "preview_ai", today, true);
+    if (used >= cfg.maxCallsPerDay) {
+      ctx.warn(`AI cap of ${cfg.maxCallsPerDay} calls/day reached, preview ships as template`);
+      return template;
+    }
+
+    if (attempt > 1) {
+      console.log(`  Scenario 2 failed (${result?.error}), retrying in ${cfg.retryDelayMs / 1000}s`);
+      await sleep(cfg.retryDelayMs);
+    }
+
+    result = await requestProse(
+      target,
+      { version: 1, gameweek: template.payload.gameweek ?? 0, prompt },
+      cfg.timeoutMs,
+    );
+    if (result.text !== null) break;
+
+    await recordAttempt(ctx, today, result, null);
+    if (result.status === null || result.status < 500) break;
+  }
+
+  if (!result || result.text === null) {
+    ctx.warn(`Scenario 2 failed (${result?.error}), preview ships as template`);
     return template;
   }
 
-  const result = await requestProse(
-    target,
-    { version: 1, gameweek: template.payload.gameweek ?? 0, prompt },
-    cfg.timeoutMs,
-  );
-  const check = result.text === null ? null : validateProse(result.text, facts);
+  const check = validateProse(result.text, facts);
+  await recordAttempt(ctx, today, result, check);
 
+  if (!check.ok) {
+    ctx.warn(`AI prose rejected (${check.reason}), preview ships as template`);
+    return template;
+  }
+
+  ctx.record({ table: "ai_prose", rows: 1 });
+  return withProse(template, check.prose);
+}
+
+async function recordAttempt(
+  ctx: JobContext,
+  today: string,
+  result: Awaited<ReturnType<typeof requestProse>>,
+  check: ReturnType<typeof validateProse> | null,
+): Promise<void> {
   await recordDelivery(ctx.db, {
     kind: "preview_ai",
     deliveryDate: today,
@@ -142,18 +181,6 @@ async function addAiProse(
     syncRunId: ctx.syncRunId,
     error: result.error ?? (check && !check.ok ? `rejected: ${check.reason}` : null),
   });
-
-  if (!check) {
-    ctx.warn(`Scenario 2 failed (${result.error}), preview ships as template`);
-    return template;
-  }
-  if (!check.ok) {
-    ctx.warn(`AI prose rejected (${check.reason}), preview ships as template`);
-    return template;
-  }
-
-  ctx.record({ table: "ai_prose", rows: 1 });
-  return withProse(template, check.prose);
 }
 
 await runJob("preview", preview);

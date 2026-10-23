@@ -156,8 +156,18 @@ export const INSIGHT_CONFIG = {
     /** Prose outside these bounds is rejected and the template ships. */
     minChars: 120,
     maxChars: 900,
-    /** Make must answer within this, or the template ships. */
-    timeoutMs: 60_000,
+    /**
+     * Make must answer within this, or the template ships. Thinking models
+     * under load took over 60 s (observed 2026-10-23); Make itself holds a
+     * webhook response for about 3 minutes, so 150 s stays inside that.
+     */
+    timeoutMs: 150_000,
+    /**
+     * Gemini answers 503 "high demand" when busy (observed 2026-10-23). One
+     * retry after a pause, only for a 5xx; both attempts count toward the cap.
+     */
+    attempts: 2,
+    retryDelayMs: 20_000,
   },
 
   preview: {

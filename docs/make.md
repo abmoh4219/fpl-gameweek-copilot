@@ -172,6 +172,11 @@ it is versioned and tested with the rest of the code. Make only passes it on.
    - **Temperature:** `0.3` or lower if offered. Lower means fewer liberties
      with the facts.
    - **Max output tokens:** `400` if offered.
+   - **Thinking level / budget:** the lowest available (*Low*, *Minimal* or
+     `0`). A three-sentence summary of computed facts needs no deep reasoning,
+     and thinking is what made busy-hour responses take over a minute.
+   - **Google Search Grounding** and **URL Context:** **No**. The model must
+     not pull in facts from the web.
 5. **Add the secret filter** on the link between the webhook and Gemini:
    label `secret ok`, condition `secret`, *Text operators: Equal to*, then the
    same secret as Scenario 1.
@@ -203,7 +208,7 @@ The free plan allows **two active scenarios**, and this uses the second.
 
 ### What happens when Gemini misbehaves
 
-Nothing reaches the channel unchecked. If Scenario 2 is off, slow (over 60 s)
+Nothing reaches the channel unchecked. If Scenario 2 is off, slow (over 150 s)
 or errors, or if the prose fails validation (wrong length, a link, **any
 number not in the facts**), the job logs a warning and ships the template
 preview instead. Each attempt is a `preview_ai` row in `core.deliveries`, with
