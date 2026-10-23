@@ -21,7 +21,8 @@
     "job:price": "pnpm --filter @fpl/jobs run job:price",
     "job:daily": "pnpm --filter @fpl/jobs run job:daily",
     "job:preview": "pnpm --filter @fpl/jobs run job:preview",
-    "backfill:gw": "pnpm --filter @fpl/jobs run backfill:gw"
+    "backfill:gw": "pnpm --filter @fpl/jobs run backfill:gw",
+    "make:sample": "pnpm --filter @fpl/jobs run make:sample"
   },
   "devDependencies": {
     "supabase": "^2.117.0"

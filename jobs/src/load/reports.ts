@@ -10,31 +10,34 @@ export async function saveReport(
   db: Db,
   report: BuiltReport,
   dryRun = false,
-): Promise<LoadResult> {
-  if (dryRun) return { table: `reports(${report.payload.type})`, rows: 1 };
+): Promise<LoadResult & { id: number | null }> {
+  if (dryRun) return { table: `reports(${report.payload.type})`, rows: 1, id: null };
 
   const { payload, messages } = report;
   const text = messages.join("\n\n———\n\n");
 
+  let rows: { id: string }[];
   if (payload.type === "daily") {
-    await db`
+    rows = await db`
       insert into core.reports (report_type, report_date, gameweek, payload, text, generated_by)
       values ('daily', ${payload.date}::date, ${payload.gameweek},
               ${db.json(payload as never)}, ${text}, 'template')
       on conflict (report_type, report_date) where report_type = 'daily'
       do update set payload = excluded.payload, text = excluded.text,
                     gameweek = excluded.gameweek, updated_at = now()
+      returning id
     `;
   } else {
-    await db`
+    rows = await db`
       insert into core.reports (report_type, report_date, gameweek, payload, text, generated_by)
       values ('preview', ${payload.date}::date, ${payload.gameweek},
               ${db.json(payload as never)}, ${text}, 'template')
       on conflict (report_type, gameweek) where report_type = 'preview'
       do update set payload = excluded.payload, text = excluded.text,
                     report_date = excluded.report_date, updated_at = now()
+      returning id
     `;
   }
 
-  return { table: `reports(${payload.type})`, rows: 1 };
+  return { table: `reports(${payload.type})`, rows: 1, id: rows[0] ? Number(rows[0].id) : null };
 }

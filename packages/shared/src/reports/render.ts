@@ -12,19 +12,33 @@ export function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-export function renderReport(payload: ReportPayload): string[] {
-  const blocks: string[] = [`<b>${escapeHtml(payload.headline)}</b>`];
+export interface RenderOptions {
+  /**
+   * Append the X draft as a final block. True for the stored text; false for
+   * the public channel, where the draft would be noise (ADR-0002 sends it to
+   * the owner's chat instead).
+   */
+  includeXDraft?: boolean;
+}
 
-  for (const section of payload.sections) {
-    const rendered = renderSection(section);
-    if (rendered) blocks.push(rendered);
-  }
+export function renderReport(payload: ReportPayload, options: RenderOptions = {}): string[] {
+  const blocks = sectionBlocks(payload.headline, payload.sections);
 
-  if (payload.xPost) {
+  if (payload.xPost && (options.includeXDraft ?? true)) {
     blocks.push(`<b>Draft for X</b>\n<code>${escapeHtml(payload.xPost)}</code>`);
   }
 
   return splitMessage(blocks, INSIGHT_CONFIG.report.maxMessageChars);
+}
+
+/** Headline plus every non-empty section, as Telegram HTML blocks. */
+export function sectionBlocks(headline: string, sections: readonly ReportSection[]): string[] {
+  const blocks: string[] = [`<b>${escapeHtml(headline)}</b>`];
+  for (const section of sections) {
+    const rendered = renderSection(section);
+    if (rendered) blocks.push(rendered);
+  }
+  return blocks;
 }
 
 function renderSection(section: ReportSection): string | null {

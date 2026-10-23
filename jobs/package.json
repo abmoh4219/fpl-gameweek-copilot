@@ -11,7 +11,8 @@
     "job:price": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/price-sync.ts",
     "job:daily": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/daily-sync.ts",
     "job:preview": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/jobs/preview.ts",
-    "backfill:gw": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/backfill-gameweeks.ts"
+    "backfill:gw": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/backfill-gameweeks.ts",
+    "make:sample": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local scripts/send-make-sample.ts"
   },
   "dependencies": {
     "@fpl/shared": "workspace:*",

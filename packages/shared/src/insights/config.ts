@@ -127,6 +127,25 @@ export const INSIGHT_CONFIG = {
     topPriceChanges: 8,
     topStatusChanges: 6,
   },
+
+  delivery: {
+    /**
+     * Intraday news alerts from price-sync (ADR-0006). 90 lets through a
+     * worsening status for anyone above ~6% owned, a recovery above ~20%, and a
+     * bare news-text edit only above ~25% — the injuries people act on before
+     * a deadline, not every press-conference footnote.
+     */
+    newsAlertMinImportance: 90,
+    /**
+     * Hard cap per UK day. Each alert costs ~3 Make credits, so 2/day is at
+     * most ~180 credits a month. Anything held back lands in the next daily
+     * report instead of being lost.
+     */
+    newsAlertMaxPerDay: 2,
+    /** Older undelivered news is stale: the daily report already covered it. */
+    newsAlertLookbackHours: 24,
+    newsAlertMaxItems: 5,
+  },
 } as const;
 
 export type InsightConfig = typeof INSIGHT_CONFIG;

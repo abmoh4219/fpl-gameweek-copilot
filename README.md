@@ -7,7 +7,8 @@ fixture difficulty.
 
 Built entirely on free tiers.
 
-> **Status:** Phase 0 — scaffolding. No application code yet.
+> **Status:** Phase 5 — the pipeline syncs, detects, scores and delivers to
+> Telegram through Make. The web app is next.
 
 ---
 
@@ -127,8 +128,9 @@ per team ID per gameweek and rate-limited per IP.
    --project-ref <ref>`, `pnpm supabase db push`, then set
    **Project Settings > API > Exposed schemas** to `api` only.
    See [docs/database.md](docs/database.md).
-5. Import the blueprints from `make/blueprints/` into Make, reconnect Telegram
-   and Gemini, and copy the two webhook URLs into your environment.
+5. Build the Make scenarios by following [docs/make.md](docs/make.md), or
+   import the blueprints from `make/blueprints/`. Then reconnect Telegram and
+   Gemini, and copy the webhook URLs into your environment.
 6. Add the job secrets to **GitHub Secrets** and the web secrets to **Vercel
    environment variables**. Nothing real is ever committed to this repo.
 7. Create a Telegram bot with @BotFather and point its webhook at
@@ -143,7 +145,7 @@ per team ID per gameweek and rate-limited per IP.
 | **2** | Database schema + insight views ✅ |
 | **3** | Sync and change detection on GitHub Actions ✅ |
 | **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) ✅ |
-| **5** | Make: daily report |
+| **5** | Make: daily report and intraday news alerts ✅ |
 | **6** | Make: gameweek preview with Gemini |
 | **7** | Web app + landing page |
 | **8** | My-team, Telegram bot, quota guards |

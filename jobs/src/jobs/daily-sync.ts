@@ -6,7 +6,9 @@
  * League congestion data, day-over-day change detection, and retention.
  */
 import {
+  dailyReportDelivery,
   detectDailyChanges,
+  isDailyReportWorthSending,
   detectStateChanges,
   toPlayerState,
   ukDate,
@@ -15,7 +17,9 @@ import {
 } from "@fpl/shared";
 
 import { fetchBootstrap, fetchClMatches, fetchEventLive, fetchFixtures } from "../fpl.ts";
+import { deliver } from "../deliver.ts";
 import { clearAlert } from "../load/alerts.ts";
+import { countDeliveries } from "../load/deliveries.ts";
 import { writeChangeEvents } from "../load/change-events.ts";
 import { loadClFixtures } from "../load/cl-fixtures.ts";
 import { loadPlayerGameweekStats } from "../load/gameweek-stats.ts";
@@ -108,7 +112,8 @@ export async function dailySync(ctx: JobContext): Promise<void> {
     date: today,
     gameweek: current?.id ?? next?.id ?? null,
   });
-  ctx.record(await saveReport(ctx.db, report, ctx.dryRun));
+  const saved = await saveReport(ctx.db, report, ctx.dryRun);
+  ctx.record(saved);
   if (ctx.dryRun) {
     printDryRunPlan("daily report", [
       report.payload.headline,
@@ -127,6 +132,36 @@ export async function dailySync(ctx: JobContext): Promise<void> {
 
   // A successful run clears the dead man's switch immediately.
   if (!ctx.dryRun) await clearAlert(ctx.db, "daily-sync-stale");
+
+  // ---- delivery (last: it can never fail the run) ---------------------------
+  await deliverDailyReport(ctx, report, saved.id, today);
+}
+
+/**
+ * One webhook, only when something changed, and only once per day — a
+ * manual re-run must not post the same report to the channel twice.
+ */
+async function deliverDailyReport(
+  ctx: JobContext,
+  report: Awaited<ReturnType<typeof buildDailyReportFrom>>,
+  reportId: number | null,
+  today: string,
+): Promise<void> {
+  if (!isDailyReportWorthSending(report)) {
+    console.log("  daily report: nothing changed, not delivered (no Make credits used)");
+    return;
+  }
+  if (!ctx.dryRun && (await countDeliveries(ctx.db, "daily_report", today)) > 0) {
+    console.log(`  daily report: already delivered for ${today}, not sent again`);
+    return;
+  }
+  await deliver(ctx, {
+    jobName: "daily-sync",
+    date: today,
+    payload: dailyReportDelivery(report, report.eventIds.length),
+    eventIds: report.eventIds,
+    reportId,
+  });
 }
 
 /**

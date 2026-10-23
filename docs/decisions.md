@@ -255,3 +255,60 @@ public-facing.
 - **A `security definer` RPC per table.** Keeps writes on the Data API, but
   means hand-writing and maintaining a function per table to do what `INSERT
   ... ON CONFLICT` already does.
+
+---
+
+## ADR-0006 — Delivery: pre-rendered batches to Make, intraday news alerts with a cap
+
+- **Date:** 2026-10-23
+- **Status:** Accepted
+
+### Context
+
+Phase 5 connects the stored reports to Telegram through Make. Make's free plan
+is 1,000 credits a month, charged per module execution, and our own ceiling is
+~400 (CLAUDE.md §4). Separately, price-sync already detects injury news
+intraday, but nothing delivered it — and the daily report read only events
+with `occurred_on = today`, so Friday-afternoon news never reached any report.
+
+### Decision
+
+- `jobs/` renders and splits every Telegram message, and POSTs **one** JSON
+  payload per delivery: `messages[]`, `xDraft`, and a shared `secret` that
+  Make's first filter checks. Make routes only: webhook → filter → router →
+  (iterator → channel) and (X draft → owner's chat).
+- The daily report is delivered only when it has a price or status change,
+  at most once per UK day.
+- price-sync sends a **news alert** for undelivered status and news events
+  with importance ≥ 90, at most **2 per UK day**, newest 24 hours only.
+- The daily report covers status and news events detected **since the
+  previous daily report**, so it is a complete recap whether or not an alert
+  went out.
+- `notified_at` is set when Make answers 2xx. Every attempt is logged in
+  `core.deliveries`, which also backs the cap.
+
+### Consequences
+
+- Credits: daily report ~4-5 a run (~150/month), news alerts ~3 each with a
+  hard ceiling of ~180/month, preview ~25. Worst case ~355, under 400.
+- Make never loops over players, so a busy night costs the same as a quiet one
+  apart from one extra message per 4,000 characters.
+- A news alert's players reappear in the next daily recap. Deliberate: the
+  recap is the record of the day, and the website renders it.
+- "Accepted" means Make queued the run, not that Telegram delivered it. A Make
+  failure after that point is visible in Make's history but not in ours.
+- No retry on a failed POST — a timeout after success would double-post to a
+  public channel. Undelivered events wait for the next run instead.
+- Delivery failures never fail the run (the data is stored; failing would trip
+  the dead man's switch) but alert Telegram directly, with a 6-hour cooldown.
+
+### Alternatives considered
+
+- **Send to Telegram from code and drop Make.** Fewer moving parts, but the
+  architecture keeps Make as the routing layer (ADR-0001), and Scenario 2
+  needs it for Gemini anyway.
+- **One webhook per event.** Rejected outright: credits scale with players.
+- **Confirm delivery with a Make webhook-response module.** One more credit
+  per run to learn something Make's own history already shows.
+- **Deliver news only in the daily report.** Simplest, but news detected on
+  Friday afternoon would arrive after a Friday-evening deadline.

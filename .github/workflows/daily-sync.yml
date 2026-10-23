@@ -54,6 +54,8 @@ jobs:
           FOOTBALL_DATA_API_TOKEN: ${{ secrets.FOOTBALL_DATA_API_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_ALERT_CHAT_ID: ${{ secrets.TELEGRAM_ALERT_CHAT_ID }}
+          MAKE_WEBHOOK_EVENTS_URL: ${{ secrets.MAKE_WEBHOOK_EVENTS_URL }}
+          MAKE_WEBHOOK_SECRET: ${{ secrets.MAKE_WEBHOOK_SECRET }}
           DRY_RUN: ${{ inputs.dry_run }}
           SIMULATE_FAILURE: ${{ inputs.simulate_failure }}
           TZ: Europe/London

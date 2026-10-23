@@ -4,24 +4,36 @@
  * Fetches bootstrap-static and nothing else, so it stays inside the 45-second
  * target that keeps GitHub Actions billing at one minute a run.
  *
- * It does three things:
+ * It does four things:
  *   1. keeps players current, so a new signing is tradeable within 3 hours
  *   2. writes deduped price telemetry
  *   3. detects STATUS and NEWS changes intraday
+ *   4. delivers the important ones as a news alert, capped per day
  *
- * Point 3 is the reason this job matters. Injury news lands on Thursday and
+ * Points 3 and 4 are the reason this job matters. Injury news lands on Thursday and
  * Friday afternoons after press conferences, and deadlines are often Friday
  * evening — detecting it only at 02:37 UTC would deliver it after the
  * deadline, which is worth nothing.
  */
-import { detectStateChanges, toPlayerState, ukDate, type DetectedChange } from "@fpl/shared";
+import {
+  INSIGHT_CONFIG,
+  detectStateChanges,
+  newsAlertDelivery,
+  selectNewsAlertItems,
+  toPlayerState,
+  ukDate,
+  type DetectedChange,
+} from "@fpl/shared";
 
+import { deliver } from "../deliver.ts";
 import { fetchBootstrap } from "../fpl.ts";
 import { clearAlert, lastSuccessfulRun, shouldSendAlert } from "../load/alerts.ts";
 import { writeChangeEvents } from "../load/change-events.ts";
+import { countDeliveries } from "../load/deliveries.ts";
 import { fetchLatestPlayerStates } from "../load/player-states.ts";
 import { loadPriceObservations } from "../load/price-observations.ts";
 import { loadPlayerSnapshots } from "../load/snapshots.ts";
+import { fetchNewsAlertRows, groupStatusRows, loadEngineInputs } from "../reports/build.ts";
 import { runJob, type JobContext } from "../runner.ts";
 import { sendAlert } from "../telegram.ts";
 import { loadIdentity, printDryRunPlan, printEmptyDatabasePlan } from "./shared.ts";
@@ -77,6 +89,49 @@ export async function priceSync(ctx: JobContext): Promise<void> {
   ctx.record(await writeChangeEvents(loadCtx, changes, ctx.syncRunId, ctx.dryRun));
 
   await deadMansSwitch(ctx);
+
+  await deliverNewsAlert(ctx, today);
+}
+
+/**
+ * Intraday news alert (ADR-0006): undelivered injury and availability news
+ * above the importance threshold, at most newsAlertMaxPerDay times a UK day.
+ * Anything held back by the threshold or the cap lands in the daily report.
+ *
+ * In a dry run nothing was written, so the candidates are whatever earlier
+ * runs left undelivered.
+ */
+async function deliverNewsAlert(ctx: JobContext, today: string): Promise<void> {
+  const rows = await fetchNewsAlertRows(ctx.db);
+  if (rows.length === 0) return;
+
+  const sentToday = await countDeliveries(ctx.db, "news_alert", today);
+  if (sentToday >= INSIGHT_CONFIG.delivery.newsAlertMaxPerDay) {
+    console.log(
+      `  news alert: ${rows.length} event(s) waiting, daily cap of ` +
+        `${INSIGHT_CONFIG.delivery.newsAlertMaxPerDay} reached — left for the daily report`,
+    );
+    return;
+  }
+
+  // Cards only now: most runs have no qualifying news and skip this query.
+  const { cardsByPlayerId } = await loadEngineInputs(ctx.db);
+  const groups = groupStatusRows(rows, cardsByPlayerId);
+  const selected = selectNewsAlertItems([...groups.values()].map((g) => g.item));
+  if (selected.length === 0) return;
+
+  const selectedIds = new Set(selected.map((item) => item.fplId));
+  const eventIds = [...groups.values()]
+    .filter((g) => selectedIds.has(g.item.fplId))
+    .flatMap((g) => g.eventIds);
+
+  await deliver(ctx, {
+    jobName: "price-sync",
+    date: today,
+    payload: newsAlertDelivery(selected, eventIds.length),
+    eventIds,
+    reportId: null,
+  });
 }
 
 /**

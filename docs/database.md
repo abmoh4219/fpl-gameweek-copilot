@@ -106,6 +106,8 @@ erDiagram
     players ||--o{ player_gameweek_stats : "per gameweek"
     players ||--o{ change_events : "what changed"
     sync_runs ||--o{ change_events : detected
+    sync_runs ||--o{ deliveries : sent
+    reports ||--o{ deliveries : delivered
 ```
 
 | Table | Natural key | What it is for |
@@ -123,6 +125,8 @@ erDiagram
 | `change_events` | `dedup_key` | Detected changes. The unique key makes double-sending impossible; `notified_at` is the Make queue |
 | `sync_runs` | `id` | Every run, successful or not. **This is what makes price dedup lossless** |
 | `reports` | `(type, date)` / `(type, gameweek)` | Rendered daily reports and gameweek previews. `payload` is **structured JSON the website renders directly**, `text` is the Telegram message, `payload.xPost` is a manual-publish X draft |
+| `deliveries` | `id` | Every Make webhook attempt, ok or not (ADR-0006). Audit trail, and the counter behind the daily news alert cap |
+| `alert_state` | `key` | When an operational alert last fired, so a persistent condition does not page every run |
 
 ### Type rules
 

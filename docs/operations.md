@@ -112,6 +112,22 @@ redactor that strips connection strings, bot tokens, Supabase keys and JWTs.
 | --- | --- | --- | --- |
 | **sync failed** | any unhandled error | the run wrote nothing useful | open the linked Actions run; check `sync_runs.error` |
 | **daily-sync is stale** | no successful `daily-sync` in **26 h** | reports are not being produced | see below — this is the urgent one |
+| **delivery failed** | Make did not answer 2xx | the report or news alert is stored but not posted; the run itself succeeded | check the webhook URL and secret, and that Scenario 1 is ON; 6-hour cooldown, cleared by the next success |
+
+### Delivery to Make
+
+Each run sends **at most one** webhook (ADR-0006, [make.md](make.md)):
+
+- **daily-sync** delivers the daily report when it has a price or status
+  change, **once per UK day**. A manual re-run does not post it again.
+- **price-sync** delivers a **news alert** when undelivered status/news events
+  score **importance ≥ 90**, at most **2 a day**. Anything held back appears
+  in the next daily report.
+- Without `MAKE_WEBHOOK_EVENTS_URL` and `MAKE_WEBHOOK_SECRET`, both jobs log a
+  warning and skip delivery. `DRY_RUN=true` prints the payload and sends
+  nothing.
+- Every attempt is a row in `core.deliveries`; a delivered event has
+  `change_events.notified_at` set and is never rewritten afterwards.
 
 ### The dead man's switch
 
