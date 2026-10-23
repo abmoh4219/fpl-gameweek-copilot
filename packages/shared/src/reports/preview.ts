@@ -8,6 +8,7 @@ import {
   type PlayerCard,
   type TeamStrength,
 } from "../insights/index.ts";
+import { ukDeadlineLabel } from "../dates.ts";
 import { renderReport } from "./render.ts";
 import { buildXPost } from "./x-post.ts";
 import {
@@ -71,7 +72,11 @@ export function buildPreviewReport(input: PreviewReportInput): BuiltReport {
     },
   ];
 
-  const headline = `Gameweek ${input.gameweek} preview`;
+  // The deadline lives in the headline, written by code, so neither the
+  // template nor the AI paragraph has to restate it.
+  const headline = input.deadlineUtc
+    ? `Gameweek ${input.gameweek} preview — deadline ${ukDeadlineLabel(input.deadlineUtc)}`
+    : `Gameweek ${input.gameweek} preview`;
   const payload = {
     version: REPORT_PAYLOAD_VERSION,
     type: "preview" as const,

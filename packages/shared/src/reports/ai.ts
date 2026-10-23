@@ -84,20 +84,35 @@ export function previewPrompt(facts: PreviewFacts): string {
   const { maxChars } = INSIGHT_CONFIG.ai;
   return [
     `Write the opening paragraph of a Fantasy Premier League preview for gameweek ${facts.gameweek}.`,
+    "Sound like a sharp FPL analyst talking to managers: natural, specific, no filler.",
     "",
     "Rules:",
-    `- 3 to 5 sentences, under ${maxChars - 150} characters, in British English.`,
+    `- 3 to 4 sentences, under ${maxChars - 300} characters, in British English.`,
     "- Plain text only: no markdown, no bullet points, no emoji, no hashtags, no links.",
     "- Use ONLY the facts below. Do not add any player, team, statistic or prediction that is not in them.",
     "- Every number you write must appear in the facts exactly as given. Do not calculate, total, average or compare numbers.",
     "- The lists are already ranked. Do not re-rank them; the first captain option is the top one.",
-    "- Mention the top captain option, at least one differential and the most notable fixture run.",
-    "- Mention Champions League congestion only if it is listed.",
+    "- Cover the top captain option, one differential and the most notable fixture run. Mention Champions League congestion only if it is listed, in a few words.",
+    "- Never write the JSON field names. Say \"6.5% owned\", not \"ownershipPercent\" or \"6.5 ownership percent\".",
+    "- Do not copy the fixture lists; name at most the first opponent of a run.",
+    "- Do not mention the deadline; the report's headline already shows it.",
     "- These are estimates. Never call a pick certain, guaranteed or a lock.",
     "",
     "Facts (JSON):",
     JSON.stringify(facts),
   ].join("\n");
+}
+
+/** Every key the facts use, so a leaked field name can be caught. */
+function factKeys(value: unknown, keys = new Set<string>()): Set<string> {
+  if (Array.isArray(value)) for (const item of value) factKeys(item, keys);
+  else if (value && typeof value === "object") {
+    for (const [key, inner] of Object.entries(value)) {
+      keys.add(key);
+      factKeys(inner, keys);
+    }
+  }
+  return keys;
 }
 
 export type ProseCheck = { ok: true; prose: string } | { ok: false; reason: string };
@@ -127,6 +142,10 @@ export function validateProse(raw: string, facts: PreviewFacts): ProseCheck {
   if (prose.length < minChars) return { ok: false, reason: `too short (${prose.length} chars)` };
   if (prose.length > maxChars) return { ok: false, reason: `too long (${prose.length} chars)` };
   if (/https?:\/\/|www\./i.test(prose)) return { ok: false, reason: "contains a link" };
+
+  // "3 daysBeforeChampionsLeague" was observed: the model echoing the JSON.
+  const leaked = [...factKeys(facts)].filter((key) => /[A-Z]/.test(key) && prose.includes(key));
+  if (leaked.length > 0) return { ok: false, reason: `leaks field names: ${leaked.join(", ")}` };
 
   const allowed = allowedNumbers(facts);
   // "125,000" is one number: commas are thousands separators, never decimals.

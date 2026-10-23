@@ -87,6 +87,8 @@ describe("preview facts", () => {
     expect(prompt).toContain(JSON.stringify(facts));
     expect(prompt).toMatch(/Every number you write must appear in the facts/);
     expect(prompt).toMatch(/estimates/i);
+    expect(prompt).toMatch(/Never write the JSON field names/);
+    expect(prompt).toMatch(/Do not mention the deadline/);
   });
 });
 
@@ -117,6 +119,11 @@ describe("prose validation", () => {
   it("strips markdown and wrapping quotes instead of publishing them", () => {
     const result = validateProse(`"**${good}**"`, facts);
     expect(result).toEqual({ ok: true, prose: good });
+  });
+
+  it("rejects prose that echoes the JSON field names", () => {
+    const result = validateProse(`${good} AVL and LIV face 3 daysBeforeChampionsLeague.`, facts);
+    expect(result).toEqual({ ok: false, reason: "leaks field names: daysBeforeChampionsLeague" });
   });
 
   it("rejects prose that is too short, too long, or carries a link", () => {
