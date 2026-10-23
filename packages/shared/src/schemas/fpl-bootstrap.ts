@@ -140,13 +140,18 @@ export const EventSchema = z.object({
   is_previous: z.boolean(),
   is_current: z.boolean(),
   is_next: z.boolean(),
-  average_entry_score: z.number(),
+  /**
+   * Both observed null for future gameweeks on 2026-10-20..22 after being
+   * numbers in the Phase 1 sample. A strict number here failed every run for
+   * ~40 hours over a field nothing reads.
+   */
+  average_entry_score: z.number().nullable(),
   highest_score: z.number().nullable(),
   most_selected: z.number().nullable(),
   most_captained: z.number().nullable(),
   most_transferred_in: z.number().nullable(),
   top_element: z.number().nullable(),
-  transfers_made: z.number(),
+  transfers_made: z.number().nullable(),
 });
 
 export const ElementTypeSchema = z.object({

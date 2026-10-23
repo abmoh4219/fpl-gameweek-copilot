@@ -124,7 +124,7 @@ Optional, non-fatal. Other `property` values may exist — none seen yet.
 | `finished`, `data_checked` | boolean | `data_checked` means bonus and stats are final |
 | `is_previous`, `is_current`, `is_next` | boolean | The current gameweek; all three can be false mid-transition |
 | `highest_score`, `most_selected`, `most_captained`, `most_transferred_in`, `top_element` | number \| null | **Null for future gameweeks** (33/38 in the sample) |
-| `average_entry_score`, `transfers_made` | number | |
+| `average_entry_score`, `transfers_made` | number \| null | Numbers in the Phase 1 sample, but **null for future gameweeks from 2026-10-20 to 22**, which failed every run until the schema allowed it |
 
 ---
 
