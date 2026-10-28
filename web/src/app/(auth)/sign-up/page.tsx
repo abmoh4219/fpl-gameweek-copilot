@@ -18,7 +18,7 @@ export default async function SignUp() {
       <h1 className="auth-title">
         Create your <em>free account</em>
       </h1>
-      <p className="auth-sub">Ten co-pilot questions a day, free while we&apos;re in early access. No FPL password, ever.</p>
+      <p className="auth-sub">Five co-pilot questions included, free. Your squad view and player cards are unlimited. No FPL password, ever.</p>
       <AuthForm mode="sign-up" next="/onboarding" />
     </div>
   );

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { AgentEvent, AgentTurn, Squad } from "@fpl/shared";
+import type { AgentEvent, AgentTurn, Squad, TeamPlan } from "@fpl/shared";
 
 /**
  * Talking to the agent service (ADR-0009). Server-only: the service URL and
@@ -38,6 +38,8 @@ export async function callAgent(input: {
   squad: Squad;
   question: string;
   history: AgentTurn[];
+  /** The plan the manager applied in Armband, so the co-pilot continues from it. */
+  plan?: TeamPlan | null;
   caller: string;
 }): Promise<AgentCall> {
   if (!AGENT_URL || !AGENT_SECRET) return { ok: false, message: "The co-pilot isn't switched on yet. Your squad view still works." };
@@ -50,6 +52,7 @@ export async function callAgent(input: {
         teamId: input.squad.entryId,
         question: input.question,
         history: input.history,
+        plan: input.plan ?? null,
         squad: input.squad,
         visitor: input.caller,
       }),

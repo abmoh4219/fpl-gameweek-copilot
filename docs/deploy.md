@@ -25,8 +25,9 @@ These migrations exist only locally so far. Push them first:
 | Migration | What it adds |
 | --- | --- |
 | `site_views_team_code` | the club `code` for official kits |
-| `accounts` | profiles, the connected team, the daily question counter |
+| `accounts` | profiles, the connected team, the question counter |
 | `delete_account` | self-service account deletion (ADR-0011) |
+| `lifetime_questions` | 5 questions per account for life (ADR-0012) |
 
 ```bash
 pnpm supabase db push
@@ -176,9 +177,9 @@ On your phone, on the production URL:
    **Yes** → your dugout.
 3. Tap a player → their card opens. Ask *Who should I captain this week?* →
    the lookups appear, the answer streams in, players light up, and the
-   counter reads **9 of 10**.
-4. Settings → *1 of 10 questions used today*. Sign out, then log in with
-   Google.
+   counter reads **4 of 5 questions left**. Then ask *Pick my best XI* → the
+   pitch redraws with **Apply / Revert**.
+4. Settings → *2 of 5 questions used*. Sign out, then log in with Google.
 5. **Warm up the demo:** open `/demo` and click each of the four questions
    once.
    - Those four clicks are the demo's only agent runs **for this gameweek**.
@@ -196,11 +197,11 @@ share anything.
 
 | Guard | Value | Where |
 | --- | --- | --- |
-| Questions per account per UK day | 10, counted only when an answer completes | `api.consume_question()` and `AGENT_LIMITS` |
+| Questions per account | **5, for life**, counted only when an answer completes; off-topic questions are free | `api.consume_question()` and `AGENT_LIMITS.questionsPerAccount` |
 | Backstop per caller in the agent service | 10 per UK day | `AGENT_LIMITS.questionsPerCallerPerDay` |
 | Demo | 4 runs per gameweek, replayed to everyone | `web/src/app/api/demo/route.ts` |
 | Service spend per UK day | $0.50, across everyone | `AGENT_LIMITS.dailyBudgetUsd` |
-| Spend per question | $0.03 | `AGENT_LIMITS.perQuestionBudgetUsd` |
+| Spend per question | $0.02, at most 6 model turns | `AGENT_LIMITS.perQuestionBudgetUsd`, `maxTurns` |
 | Hard ceiling | the key's own spend limit | Anthropic Console (key owner) |
 
 Anonymous visitors never start a run.
@@ -209,7 +210,7 @@ Anonymous visitors never start a run.
 
 1. Edit `AGENT_LIMITS` in `packages/shared/src/agent-protocol.ts`.
 2. For the account limit, also add a **new migration** changing
-   `daily_limit` in `api.consume_question()`. A test checks the two match.
+   `lifetime_limit` in `api.consume_question()`. A test checks the two match.
 3. Rebuild and re-upload the Space's `server.mjs`.
 4. Redeploy Vercel.
 

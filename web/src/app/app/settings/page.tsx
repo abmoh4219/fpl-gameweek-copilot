@@ -13,11 +13,11 @@ export default async function Settings() {
   if (!viewer?.profile) return null;
   const supabase = await createAuthClient();
   const [{ data: usage }, { data: since }] = await Promise.all([
-    supabase.from("my_usage_today").select("questions").limit(1),
+    supabase.from("my_usage_total").select("questions").limit(1),
     supabase.from("my_profile").select("created_at").limit(1),
   ]);
   const used = (usage?.[0] as { questions: number } | undefined)?.questions ?? 0;
-  const limit = AGENT_LIMITS.questionsPerAccountPerDay;
+  const limit = AGENT_LIMITS.questionsPerAccount;
   const created = (since?.[0] as { created_at: string } | undefined)?.created_at;
 
   return (
@@ -89,11 +89,11 @@ export default async function Settings() {
       <section className="setting">
         <div className="setting-label">
           <h2>Co-pilot</h2>
-          <p>Questions reset at midnight UK time.</p>
+          <p>Every account includes {limit} questions. They don&apos;t reset — the demo and your squad view stay free.</p>
         </div>
         <div className="usage">
           <div className="usage-top">
-            <b>{used}</b> of {limit} questions used today
+            <b>{Math.min(used, limit)}</b> of {limit} questions used
           </div>
           <div className="usage-bar" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={Math.min(used, limit)}>
             <i style={{ width: `${Math.min(100, (used / limit) * 100)}%` }} />

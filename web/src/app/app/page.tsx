@@ -2,7 +2,7 @@ import { AGENT_LIMITS, type Squad } from "@fpl/shared";
 import { Dugout } from "@/components/copilot/Dugout";
 import { SquadCheck } from "@/components/copilot/SquadCheck";
 import { createAuthClient, getViewer } from "@/lib/auth/server";
-import { DEMO_QUESTIONS } from "@/lib/demo";
+import { LIVE_SUGGESTIONS } from "@/lib/demo";
 import { FplUnavailableError, TeamNotFoundError } from "@/lib/fpl";
 import { loadSquad } from "@/lib/squad";
 
@@ -30,9 +30,9 @@ export default async function MyTeam({ searchParams }: { searchParams: Promise<{
   const supabase = await createAuthClient();
   const [result, { data: usage }] = await Promise.all([
     squadOrError(teamId),
-    supabase.from("my_usage_today").select("questions").limit(1),
+    supabase.from("my_usage_total").select("questions").limit(1),
   ]);
-  const limit = AGENT_LIMITS.questionsPerAccountPerDay;
+  const limit = AGENT_LIMITS.questionsPerAccount;
   const used = (usage?.[0] as { questions: number } | undefined)?.questions ?? 0;
   const first = (viewer.name ?? viewer.profile?.manager_name ?? "").split(" ")[0];
 
@@ -74,7 +74,7 @@ export default async function MyTeam({ searchParams }: { searchParams: Promise<{
         <div className="notice error">{result.error}</div>
       ) : (
         <>
-          <Dugout squad={result.squad} mode="live" suggestions={DEMO_QUESTIONS} remaining={Math.max(limit - used, 0)} limit={limit} />
+          <Dugout squad={result.squad} mode="live" suggestions={LIVE_SUGGESTIONS} remaining={Math.max(limit - used, 0)} limit={limit} />
           <SquadCheck squad={result.squad} />
         </>
       )}

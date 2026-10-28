@@ -86,17 +86,35 @@ describe.skipIf(!stack)(`accounts (${stack ? "local Supabase" : SKIP_MESSAGE})`,
     expect((await rpc("connect_team", stack!.anonKey, { p_team_id: 1, p_team_name: "x", p_manager_name: "x" })).ok).toBe(false);
   });
 
-  it("counts questions per account and stops at the daily limit", async () => {
+  it("counts questions per account and stops at the lifetime limit", async () => {
     const bob = users[1]!;
     const results: { allowed: boolean; used: number; remaining: number }[] = [];
-    for (let i = 0; i < AGENT_LIMITS.questionsPerAccountPerDay + 1; i++) {
+    for (let i = 0; i < AGENT_LIMITS.questionsPerAccount + 1; i++) {
       const [row] = (await (await rpc("consume_question", bob.token)).json()) as typeof results;
       results.push(row!);
     }
-    expect(results[0]).toEqual({ allowed: true, used: 1, remaining: AGENT_LIMITS.questionsPerAccountPerDay - 1 });
+    expect(results[0]).toEqual({ allowed: true, used: 1, remaining: AGENT_LIMITS.questionsPerAccount - 1 });
     expect(results.at(-2)).toMatchObject({ allowed: true, remaining: 0 });
     // The SQL limit and AGENT_LIMITS must agree: one past the limit is refused.
-    expect(results.at(-1)).toMatchObject({ allowed: false, used: AGENT_LIMITS.questionsPerAccountPerDay + 1 });
+    expect(results.at(-1)).toMatchObject({ allowed: false, used: AGENT_LIMITS.questionsPerAccount + 1 });
+  });
+
+  it("never resets: questions from earlier days count towards the same lifetime allowance", async () => {
+    const carl = { email: `carl-${stamp}@accounts-test.dev`, ...(await signUp(`carl-${stamp}@accounts-test.dev`)) };
+    const db: Db = connect(stack!.dbUrl);
+    try {
+      // Pretend Carl used all but one of his questions last week.
+      await db`insert into app.agent_usage (user_id, day, questions)
+               values (${carl.id}, current_date - 7, ${AGENT_LIMITS.questionsPerAccount - 1})`;
+    } finally {
+      await db.end({ timeout: 5 });
+    }
+    const total = (await (await fetch(rest("my_usage_total?select=questions"), { headers: as(carl.token) })).json()) as { questions: number }[];
+    expect(total[0]!.questions).toBe(AGENT_LIMITS.questionsPerAccount - 1);
+    const [last] = (await (await rpc("consume_question", carl.token)).json()) as { allowed: boolean; remaining: number }[];
+    expect(last).toMatchObject({ allowed: true, remaining: 0 });
+    const [over] = (await (await rpc("consume_question", carl.token)).json()) as { allowed: boolean }[];
+    expect(over!.allowed).toBe(false);
   });
 
   it("keeps each account's counter separate", async () => {

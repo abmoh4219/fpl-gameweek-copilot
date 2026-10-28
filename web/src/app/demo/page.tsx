@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Explore a real FPL squad with the Armband co-pilot — no account needed.",
 };
 
-// The squad comes from FPL through our cache; the answers are recorded per day.
+// The squad comes from FPL through our cache; the answers are recorded once a gameweek.
 export const revalidate = 900;
 
 export default async function Demo() {

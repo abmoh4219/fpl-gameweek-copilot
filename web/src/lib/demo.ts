@@ -5,9 +5,18 @@
  * month — no matter how many people try it. The agent key is small; this is
  * the line that protects it.
  */
+/** Chosen to show the co-pilot ACTING: it picks, rates and transfers on the pitch. */
 export const DEMO_QUESTIONS = [
-  "Who should I captain this week?",
+  "Pick my best XI and captain for this gameweek",
+  "Rate my lineup out of 10",
+  "Make one transfer to improve my team",
   "Is anyone in my squad injured or doubtful?",
-  "Who is my weakest starter, and who could replace them within my budget?",
-  "Which of my players have the hardest next five fixtures?",
+] as const;
+
+/** Suggestions in the live co-pilot: the same mix of actions and questions. */
+export const LIVE_SUGGESTIONS = [
+  "Pick my best XI and captain for this gameweek",
+  "Rate my lineup out of 10",
+  "Make one transfer to improve my team",
+  "Who should I captain this week?",
 ] as const;

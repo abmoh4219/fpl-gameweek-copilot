@@ -31,12 +31,13 @@ interface CardProps {
   compact: boolean;
   picked: boolean;
   tone: { tone: HighlightTone; note: string } | undefined;
+  mark: string | undefined;
   onSelect: ((p: SquadPlayer) => void) | undefined;
 }
 
-function Card({ p, value, compact, picked, tone, onSelect }: CardProps) {
+function Card({ p, value, compact, picked, tone, mark, onSelect }: CardProps) {
   const s = status(p);
-  const className = `fpl-card${compact ? " compact" : ""}${picked ? " is-pick" : ""}${tone ? ` hl hl-${tone.tone}` : ""}${onSelect ? " tappable" : ""}`;
+  const className = `fpl-card${compact ? " compact" : ""}${picked ? " is-pick" : ""}${tone ? ` hl hl-${tone.tone}` : ""}${mark && !tone ? " marked" : ""}${onSelect ? " tappable" : ""}`;
   const inner = (
     <>
       {(p.isCaptain || p.isViceCaptain) && <span className="fpl-badge">{p.isCaptain ? "C" : "V"}</span>}
@@ -45,7 +46,7 @@ function Card({ p, value, compact, picked, tone, onSelect }: CardProps) {
           !
         </span>
       )}
-      {tone && <span className="fpl-hl">{TONE_LABEL[tone.tone]}</span>}
+      {tone ? <span className="fpl-hl">{TONE_LABEL[tone.tone]}</span> : mark ? <span className="fpl-mark">{mark}</span> : null}
       <Kit
         teamCode={p.teamCode}
         isKeeper={p.position === "GKP"}
@@ -84,6 +85,7 @@ export function FplPitch({
   compact = false,
   highlight,
   highlights,
+  marks,
   onSelect,
 }: {
   squad: Squad;
@@ -93,6 +95,8 @@ export function FplPitch({
   highlight?: number;
   /** Players the co-pilot is talking about, by FPL id. */
   highlights?: Map<number, { tone: HighlightTone; note: string }>;
+  /** Short labels for players a plan changes: "In", "Start", "C". */
+  marks?: Map<number, string>;
   /** Makes each player a button that opens their card. */
   onSelect?: (p: SquadPlayer) => void;
 }) {
@@ -115,7 +119,7 @@ export function FplPitch({
               {squad.starters
                 .filter((p) => p.position === pos)
                 .map((p) => (
-                  <Card key={p.fplId} p={p} value={value} compact={compact} picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} onSelect={onSelect} />
+                  <Card key={p.fplId} p={p} value={value} compact={compact} picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} mark={marks?.get(p.fplId)} onSelect={onSelect} />
                 ))}
             </div>
           ))}
@@ -124,7 +128,7 @@ export function FplPitch({
       <div className="fpl-bench">
         <span className="fpl-bench-label">Substitutes</span>
         {squad.bench.map((p) => (
-          <Card key={p.fplId} p={p} value={value} compact picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} onSelect={onSelect} />
+          <Card key={p.fplId} p={p} value={value} compact picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} mark={marks?.get(p.fplId)} onSelect={onSelect} />
         ))}
       </div>
     </div>

@@ -32,19 +32,28 @@ export function captainPicks(cards: readonly PlayerCard[]): RankedPick[] {
     .filter((c) => c.minutesRisk.score <= cfg.maxMinutesRisk)
     .filter((c) => c.form.minutes >= cfg.minMinutesLast4)
     .filter((c) => c.fixtures.fixtures.some((f) => !f.isBlank))
-    .map((card) => {
-      const ease = 5 - card.fixtures.adjustedDifficulty;
-      const home = card.goalThreat.isHome ? 1 : 0;
-      const score =
-        card.epNext * cfg.weights.epNext +
-        card.goalThreat.score * cfg.weights.goalThreat +
-        ease * cfg.weights.fixtureEase +
-        home * cfg.weights.home;
-
-      return toPick(card, score, captainReason(card));
-    })
+    .map((card) => toPick(card, captainScore(card), captainReason(card)))
     .sort((a, b) => b.score - a.score)
     .slice(0, cfg.topN);
+}
+
+/** The captain score for one card: shared by the ranked picks and the lineup picker. */
+export function captainScore(card: PlayerCard): number {
+  const cfg = INSIGHT_CONFIG.captain;
+  const ease = 5 - card.fixtures.adjustedDifficulty;
+  const home = card.goalThreat.isHome ? 1 : 0;
+  return (
+    card.epNext * cfg.weights.epNext +
+    card.goalThreat.score * cfg.weights.goalThreat +
+    ease * cfg.weights.fixtureEase +
+    home * cfg.weights.home
+  );
+}
+
+/** Whether a card is eligible to captain at all: likely to play, and actually playing. */
+export function canCaptain(card: PlayerCard): boolean {
+  const cfg = INSIGHT_CONFIG.captain;
+  return card.minutesRisk.score <= cfg.maxMinutesRisk && card.form.minutes >= cfg.minMinutesLast4;
 }
 
 function captainReason(card: PlayerCard): string {

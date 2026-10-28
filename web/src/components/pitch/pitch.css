@@ -339,3 +339,28 @@ button.fpl-card:focus-visible {
   width: 100%;
   height: auto;
 }
+
+/* a player the co-pilot's plan moves: a flare dashed ring and a short label */
+.fpl-card.marked {
+  box-shadow: 0 0 0 2px var(--accent);
+  animation: hl-in 0.5s var(--ease-out) backwards;
+}
+
+.fpl-mark {
+  position: absolute;
+  z-index: 1;
+  top: -9px;
+  left: 50%;
+  translate: -50% 0;
+  padding: 0 8px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 16px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: skewX(var(--skew));
+}

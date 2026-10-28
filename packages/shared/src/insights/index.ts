@@ -6,3 +6,4 @@ export * from "./fixture-run.ts";
 export * from "./goal-threat.ts";
 export * from "./player-card.ts";
 export * from "./selections.ts";
+export * from "./lineup.ts";

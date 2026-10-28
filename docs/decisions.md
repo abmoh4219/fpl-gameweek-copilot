@@ -538,3 +538,50 @@ cannot do: until now nothing user-facing ran with elevated rights (ADR-0008).
 - **Soft delete** (clear the profile, keep the login). Breaks the FAQ's promise,
   and a kept login with a fresh profile would let someone reset their daily
   question count.
+
+## ADR-0012 — The co-pilot acts on a plan; five questions per account, for life
+
+### Context
+
+The co-pilot could only look things up and explain. Managers expect a
+manager: "pick my XI", "captain Salah", "bring in a midfielder" should change
+the team, not produce advice to copy by hand. At the same time the agent key
+is small, so a daily allowance of 10 per account was more than it can carry.
+
+### Decision
+
+- **Action tools change a DRAFT, never FPL.** `pick_best_xi`, `change_lineup`
+  and `make_transfer` edit a team plan (`packages/shared/src/plan.ts`):
+  lineup, bench order, captaincy and transfers relative to the real squad.
+  Armband still only reads FPL and never asks for a password.
+- **Code decides what is legal and what is best.** The XI is chosen by an
+  exhaustive search over legal formations on FPL's expected points; the
+  lineup rating out of 10 is the XI's expected points against the best XI the
+  same 15 can field (`insights/lineup.ts`). Every change is validated by
+  `lineupProblems` and `checkTransfer` before it reaches the pitch. The model
+  decides *which* action to take and explains it; it computes nothing.
+- **The pitch shows the plan with Apply / Revert.** An applied plan is kept in
+  the browser per team and gameweek, and sent with the next question so the
+  co-pilot continues from it. The manager makes the changes in the FPL app.
+- **Five questions per account, for life** (`api.consume_question()`), counted
+  only when an answer completes. Questions outside FPL get one fixed reply
+  (`OFF_TOPIC_REPLY`) with no tools, and are never counted.
+- **Cheaper questions:** the squad snapshot travels with the question (no
+  lookup turn), at most 6 turns and $0.02 per question, answers under 120
+  words, and 4 earlier turns of history.
+
+### Consequences
+
+- The demo shows the agent acting: its four questions pick an XI, rate the
+  lineup, make a transfer and check injuries, recorded once per gameweek.
+- A plan lives in one browser. Moving it across devices would need a table;
+  not worth it until accounts ask for it.
+- Anyone can make several accounts for more questions. The service-wide daily
+  spend cap and the key's own limit bound the total.
+
+### Alternatives considered
+
+- **Writing to FPL.** Needs the manager's FPL password; never.
+- **Letting the model pick the XI.** Cheaper to build, but it would be the
+  model computing a number — the one thing it may not do.
+- **A daily allowance.** Fairer to heavy users, but unaffordable on this key.

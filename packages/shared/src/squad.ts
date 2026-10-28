@@ -70,6 +70,42 @@ export interface CardRow {
 
 export const POSITION_BY_TYPE = { 1: "GKP", 2: "DEF", 3: "MID", 4: "FWD" } as const;
 
+/**
+ * A squad player built from a published card alone — for a player who is not
+ * (yet) in the manager's FPL team, such as a transfer the co-pilot proposes.
+ * Starts on the bench with no captaincy; a plan places them.
+ */
+export function squadPlayerFromCard(card: SiteCard, teamCode: number): SquadPlayer {
+  const position = (["GKP", "DEF", "MID", "FWD"] as const).find((p) => p === card.position) ?? "MID";
+  return {
+    fplId: card.fplId,
+    webName: card.webName,
+    team: card.team,
+    teamCode,
+    position,
+    slot: 15,
+    isStarter: false,
+    isCaptain: false,
+    isViceCaptain: false,
+    multiplier: 0,
+    priceM: card.priceM,
+    ownership: card.ownership,
+    status: card.status,
+    news: card.news,
+    chanceOfPlayingNextRound: card.chanceOfPlayingNextRound,
+    eventPoints: 0,
+    pickPoints: 0,
+    seasonPoints: card.totalPoints,
+    formPoints: card.form.points,
+    xgiPer90: card.xgiPer90,
+    minutesRisk: card.minutesRisk.band,
+    goalThreat: card.goalThreat.band,
+    fixtureBand: card.fixturesLong.band,
+    fixtures: card.fixturesLong.fixtures,
+    kit: kitFor(teamCode, position),
+  };
+}
+
 export function buildSquad(input: {
   entry: Entry;
   picks: EntryPicks;

@@ -26,9 +26,10 @@ async function view<T>(path: string): Promise<T> {
   return value;
 }
 
-export async function allCards(): Promise<SiteCard[]> {
-  const rows = await view<{ card: SiteCard }[]>("player_cards?select=card");
-  return rows.map((r) => r.card).filter((c) => c?.version === 1);
+export async function allCards(): Promise<{ cards: SiteCard[]; teamCodes: Map<number, number> }> {
+  const rows = await view<{ card: SiteCard; team_code: number }[]>("player_cards?select=card,team_code");
+  const valid = rows.filter((r) => r.card?.version === 1);
+  return { cards: valid.map((r) => r.card), teamCodes: new Map(valid.map((r) => [r.card.fplId, r.team_code])) };
 }
 
 export async function allTeamRuns(): Promise<TeamRun[]> {

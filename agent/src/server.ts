@@ -2,13 +2,13 @@ import { mkdirSync } from "node:fs";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { timingSafeEqual } from "node:crypto";
 import { query } from "@anthropic-ai/claude-agent-sdk";
-import { AGENT_LIMITS, AgentRequestSchema, type AgentEvent, type Squad } from "@fpl/shared";
+import { AGENT_LIMITS, AgentRequestSchema, applyPlan, describePlan, OFF_TOPIC_REPLY, type AgentEvent, type Squad } from "@fpl/shared";
 import { z } from "zod";
 import { config } from "./config.ts";
 import { allCards, allTeamRuns } from "./data.ts";
 import { admit, recordSpend, refund, usageToday } from "./limits.ts";
-import { buildPrompt, SYSTEM_PROMPT } from "./prompt.ts";
-import { buildToolServer } from "./tools.ts";
+import { buildPrompt, squadSnapshot, SYSTEM_PROMPT } from "./prompt.ts";
+import { buildToolServer, startDraft } from "./tools.ts";
 
 /**
  * The agent service (docs/agent-plan.md §3): one HTTP endpoint, POST /chat,
@@ -92,12 +92,21 @@ async function chat(req: IncomingMessage, res: ServerResponse): Promise<void> {
 
   let finished = false;
   try {
-    const [cards, runs] = await Promise.all([allCards(), allTeamRuns()]);
-    const server = buildToolServer({ squad: input.squad, cards, runs, emit });
+    const [{ cards, teamCodes }, runs] = await Promise.all([allCards(), allTeamRuns()]);
+    const cardsById = new Map(cards.map((c) => [c.fplId, c]));
+    const draft = startDraft(input.squad, input.plan, cardsById, teamCodes);
+    const server = buildToolServer({ squad: input.squad, cards, teamCodes, runs, plan: input.plan, emit }, draft);
+    const snapshot = squadSnapshot(
+      applyPlan(input.squad, draft.plan, draft.incoming) ?? input.squad,
+      cardsById,
+      describePlan(input.squad, draft.plan, draft.incoming),
+    );
     let streamedText = false;
+    let answer = "";
+    let usedTools = false;
 
     for await (const message of query({
-      prompt: buildPrompt(input.question, input.history.slice(-AGENT_LIMITS.historyTurns)),
+      prompt: buildPrompt(input.question, input.history.slice(-AGENT_LIMITS.historyTurns), snapshot),
       options: {
         model: config.model,
         systemPrompt: SYSTEM_PROMPT,
@@ -122,8 +131,10 @@ async function chat(req: IncomingMessage, res: ServerResponse): Promise<void> {
         const event = message.event;
         if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
           streamedText = true;
+          answer += event.delta.text;
           emit({ type: "text", delta: event.delta.text });
         }
+        if (event.type === "content_block_start" && event.content_block.type === "tool_use") usedTools = true;
         if (event.type === "content_block_start" && event.content_block.type === "tool_use" && streamedText) {
           // Text written before a tool call is a preamble; keep it apart from the answer.
           emit({ type: "text", delta: "\n\n" });
@@ -132,7 +143,16 @@ async function chat(req: IncomingMessage, res: ServerResponse): Promise<void> {
         recordSpend(message.total_cost_usd);
         finished = true;
         if (message.subtype === "success" && !message.is_error) {
-          emit({ type: "done", costUsd: message.total_cost_usd, turns: message.num_turns, remainingToday: admission.remainingAfter });
+          // A declined off-topic question is never counted, here or by the website.
+          const offTopic = !usedTools && answer.trim().startsWith(OFF_TOPIC_REPLY.slice(0, 40));
+          if (offTopic) refund(input.visitor);
+          emit({
+            type: "done",
+            costUsd: message.total_cost_usd,
+            turns: message.num_turns,
+            remaining: offTopic ? admission.remainingAfter + 1 : admission.remainingAfter,
+            ...(offTopic ? { offTopic: true } : {}),
+          });
         } else if (message.subtype === "error_max_budget_usd" || message.subtype === "error_max_turns") {
           if (!streamedText) {
             emit({
@@ -140,7 +160,7 @@ async function chat(req: IncomingMessage, res: ServerResponse): Promise<void> {
               delta: "I hit my per-question limit before finishing. Try a narrower question — about one player or one position.",
             });
           }
-          emit({ type: "done", costUsd: message.total_cost_usd, turns: message.num_turns, remainingToday: admission.remainingAfter });
+          emit({ type: "done", costUsd: message.total_cost_usd, turns: message.num_turns, remaining: admission.remainingAfter });
         } else {
           if (!streamedText) refund(input.visitor);
           emit({ type: "error", code: "failed", message: "The agent could not answer that one. Try again in a moment." });

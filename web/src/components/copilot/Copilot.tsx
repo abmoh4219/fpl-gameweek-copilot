@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { AgentEvent, AgentTurn, HighlightTone } from "@fpl/shared";
+import type { AgentEvent, AgentTurn, HighlightTone, TeamPlan } from "@fpl/shared";
 
 export type Highlight = { id: number; tone: HighlightTone; note: string };
+export type PlanEvent = Extract<AgentEvent, { type: "plan" }>;
 
 interface TraceRow {
   id: string;
@@ -19,6 +20,10 @@ interface Turn {
   answer: string;
   state: "running" | "done" | "error";
   error?: string;
+  /** The co-pilot changed the team in this turn. */
+  acted?: boolean;
+  /** Declined as off-topic: not counted. */
+  offTopic?: boolean;
 }
 
 /** Minimal, safe rendering: paragraphs, bullet lists and **bold**. Never HTML. */
@@ -77,6 +82,9 @@ type Props =
       pending: string | null;
       onPendingConsumed: () => void;
       onHighlight: (h: Highlight[]) => void;
+      onPlan: (e: PlanEvent) => void;
+      /** The plan the manager applied, sent with each question so the co-pilot continues from it. */
+      appliedPlan: TeamPlan | null;
     }
   | {
       mode: "demo";
@@ -84,6 +92,7 @@ type Props =
       pending: number | null;
       onPendingConsumed: () => void;
       onHighlight: (h: Highlight[]) => void;
+      onPlan: (e: PlanEvent) => void;
     };
 
 export function Copilot(props: Props) {
@@ -94,7 +103,8 @@ export function Copilot(props: Props) {
   const logRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const busy = turns.some((t) => t.state === "running");
-  const { onHighlight, onPendingConsumed } = props;
+  const { onHighlight, onPendingConsumed, onPlan } = props;
+  const appliedPlan = props.mode === "live" ? props.appliedPlan : null;
 
   const patchLast = (fn: (t: Turn) => Turn) => setTurns((ts) => ts.map((t, i) => (i === ts.length - 1 ? fn(t) : t)));
 
@@ -114,12 +124,16 @@ export function Copilot(props: Props) {
         case "highlight":
           onHighlight(event.players);
           break;
+        case "plan":
+          onPlan(event);
+          patchLast((t) => ({ ...t, acted: true }));
+          break;
         case "text":
           patchLast((t) => ({ ...t, answer: t.answer + event.delta }));
           break;
         case "done":
-          if (event.remainingToday !== null) setRemaining(event.remainingToday);
-          patchLast((t) => ({ ...t, state: "done" }));
+          if (event.remaining !== null) setRemaining(event.remaining);
+          patchLast((t) => ({ ...t, state: "done", ...(event.offTopic ? { offTopic: true } : {}) }));
           break;
         case "error":
           if (event.code === "rate_limited") setRemaining(0);
@@ -127,7 +141,7 @@ export function Copilot(props: Props) {
           break;
       }
     },
-    [onHighlight],
+    [onHighlight, onPlan],
   );
 
   const start = (question: string) => {
@@ -160,7 +174,7 @@ export function Copilot(props: Props) {
         const res = await fetch("/api/agent", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ question: q, history }),
+          body: JSON.stringify({ question: q, history, plan: appliedPlan }),
         });
         await readEvents(res, apply);
         finish();
@@ -168,7 +182,7 @@ export function Copilot(props: Props) {
         fail(error);
       }
     },
-    [apply, busy, turns],
+    [apply, busy, turns, appliedPlan],
   );
 
   /** Demo: fetch the day's recording and replay it at the pace of a live answer. */
@@ -225,7 +239,7 @@ export function Copilot(props: Props) {
         <span className="on-air">Co-pilot</span>
         {live ? (
           <span className={`copilot-left${out ? " out" : ""}`}>
-            <b>{Math.max(remaining, 0)}</b> of {props.limit} left today
+            <b>{Math.max(remaining, 0)}</b> of {props.limit} questions left
           </span>
         ) : (
           <span className="copilot-left">Demo · recorded this gameweek</span>
@@ -235,10 +249,10 @@ export function Copilot(props: Props) {
       <div className="copilot-log" ref={logRef} aria-live="polite">
         {turns.length === 0 && (
           <div className="copilot-empty">
-            <h3>{live ? "Ask about your squad" : "Pick a question"}</h3>
+            <h3>{live ? "Your co-pilot, on duty" : "Give it a job"}</h3>
             <p>
-              The co-pilot looks things up before it answers — every lookup appears here as it happens, and the players
-              it talks about light up on the pitch.
+              Ask it to pick your XI, rate your lineup, make a transfer or choose a captain — it makes the changes on your
+              pitch for you to apply or revert, with the numbers behind every call.
             </p>
             {live && (
               <div className="copilot-chips">
@@ -283,16 +297,31 @@ export function Copilot(props: Props) {
               </div>
             )}
             {t.state === "error" && <div className="notice error">{t.error}</div>}
-            {t.state === "done" && (
-              <div className="turn-meta">
-                <span>Numbers from {t.trace.length} lookup{t.trace.length === 1 ? "" : "s"}</span>
-                <span className="est">Forward-looking = estimate</span>
-              </div>
-            )}
+            {t.state === "done" &&
+              (t.offTopic ? (
+                <div className="turn-meta">
+                  <span>Not counted towards your questions</span>
+                </div>
+              ) : (
+                <div className="turn-meta">
+                  {t.acted && <span className="acted">Changes on your pitch ↑</span>}
+                  <span>Numbers from {t.trace.length} lookup{t.trace.length === 1 ? "" : "s"}</span>
+                  <span className="est">Forward-looking = estimate</span>
+                </div>
+              ))}
           </article>
         ))}
       </div>
 
+      {live && turns.length > 0 && !out && (
+        <div className="chip-row" aria-label="Suggestions">
+          {props.suggestions.map((s) => (
+            <button key={s} type="button" className="q-mini" onClick={() => void askLive(s)} disabled={busy}>
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
       {live ? (
         <form
           className="composer"
@@ -306,7 +335,7 @@ export function Copilot(props: Props) {
             maxLength={500}
             value={input}
             disabled={out}
-            placeholder={out ? "That's today's questions — back at midnight UK time" : "Ask about captaincy, transfers, fixtures…"}
+            placeholder={out ? `You've used your ${props.limit} questions` : "Pick my XI, captain Salah, bring in a midfielder…"}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -336,8 +365,8 @@ export function Copilot(props: Props) {
             ))}
           </div>
           <p className="demo-note">
-            Demo answers are recorded once a gameweek for this team. <Link href="/sign-up">Create a free account</Link> to ask
-            about yours.
+            Recorded once a gameweek for this team. <Link href="/sign-up">Create a free account</Link> and the co-pilot
+            manages yours — 5 questions included.
           </p>
         </div>
       )}

@@ -31,18 +31,18 @@ async function record(q: number): Promise<AgentEvent[]> {
       // A torn line: ignore it; the completeness check below decides.
     }
   }
-  // Only a complete, successful answer is worth keeping for a day. Throwing
+  // Only a complete, successful answer is worth keeping for a gameweek. Throwing
   // means nothing is cached and the next visitor tries again.
   const done = events.some((e) => e.type === "done");
   const answered = events.some((e) => e.type === "text");
   if (!done || !answered || events.some((e) => e.type === "error")) throw new NotRecorded("incomplete answer");
   // Spend is internal; the browser never sees it.
-  return events.map((e) => (e.type === "done" ? { ...e, costUsd: null, remainingToday: null } : e));
+  return events.map((e) => (e.type === "done" ? { ...e, costUsd: null, remaining: null } : e));
 }
 
 // One shared cache entry per (gameweek, question). The gameweek in the key is
 // what rolls the answers over; the long revalidate is only a safety net.
-const recorded = unstable_cache(async (_gameweek: number, q: number) => record(q), ["demo-answer-v2"], {
+const recorded = unstable_cache(async (_gameweek: number, q: number) => record(q), ["demo-answer-v4"], {
   revalidate: 60 * 60 * 24 * 8,
 });
 

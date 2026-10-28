@@ -106,6 +106,20 @@ export const INSIGHT_CONFIG = {
     topN: 5,
   },
 
+  lineup: {
+    /** FPL's legal formations: outfield counts for the ten non-keepers. */
+    formation: { DEF: { min: 3, max: 5 }, MID: { min: 2, max: 5 }, FWD: { min: 1, max: 3 } },
+    /** Availability statuses that mean "will not play": expected points 0. */
+    outStatuses: ["i", "s", "u", "n"] as readonly string[],
+    /**
+     * Rating = 10 x (your XI's expected points / the best XI your 15 can field),
+     * captain counted twice. Below `floorRatio` the rating is 0.
+     */
+    floorRatio: 0.5,
+    /** A starter or captain choice this many expected points below the best is worth naming. */
+    noticeGapPoints: 0.5,
+  },
+
   differentials: {
     maxOwnership: 10,
     minMinutesLast4: 180,

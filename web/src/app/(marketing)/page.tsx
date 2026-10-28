@@ -163,8 +163,8 @@ const FEATURES = [
   },
   {
     art: <TraceArt />,
-    title: "It shows its working",
-    body: "Ask in plain English. Every lookup — your squad, player form, fixture runs — appears as it happens, before the answer arrives.",
+    title: "It acts like a manager",
+    body: "Ask it to pick your XI, rate your lineup, make a transfer or choose a captain. It makes the changes on your pitch — with every lookup shown — and you apply or revert them.",
   },
   {
     art: <WatchArt />,
@@ -187,13 +187,14 @@ const STEPS = [
 
 const FAQ: [string, string][] = [
   ["What is Armband?", "A co-pilot for Fantasy Premier League managers. It shows your squad with the numbers that matter — form, expected goal involvement, minutes risk, fixture difficulty — and answers your questions about captaincy, transfers and fixtures, explaining every recommendation with figures you can check."],
-  ["Is it free?", "Yes, while we are in early access. Every account gets ten co-pilot questions a day; the squad view, player cards and fixtures are unlimited."],
+  ["Is it free?", "Yes. Every account includes five co-pilot questions, and the squad view, player cards, fixtures and demo are unlimited."],
+  ["Does it change my real FPL team?", "No — Armband only reads your team and never asks for your FPL password. When the co-pilot picks your XI, makes a transfer or changes your captain, it shows the plan on your pitch. You apply or revert it in Armband, then make the changes in the FPL app."],
   ["Do I need to give you my FPL password?", "No. We only ever need your public FPL team ID — the number in your Points page address. We read your team; we cannot make transfers or change anything."],
   ["Where does the data come from?", "From Fantasy Premier League's public data, refreshed every three hours, plus Champions League fixture dates for fixture congestion. Our own pipeline computes every metric from it."],
   ["Can the co-pilot make things up?", "It is built not to. It may only use figures that came back from a lookup in that conversation, and you see every lookup on screen. If it does not have a number, it says so instead of guessing."],
   ["What does \"estimate\" mean?", "Anything about the future — fixture difficulty, goal threat, price rises and falls — is our best computed estimate, never a guarantee. We label it every time."],
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
-  ["Why is there a daily question limit?", "Each answer takes real computing work. A daily allowance keeps the co-pilot fast and free for everyone."],
+  ["Why only five questions?", "Each answer takes real computing work, and we keep Armband free. Questions that aren't about FPL are declined and never counted."],
   ["Is this the official FPL app?", "No. Armband is an independent project, not affiliated with, endorsed by or connected to the Premier League or Fantasy Premier League. It uses public data only; the club kits on the pitch belong to their clubs."],
   ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your profile, your connected team and your usage history."],
 ];
