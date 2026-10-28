@@ -72,8 +72,21 @@ design working as intended:
 
 **Anything else the advisor reports is a real problem** and must be fixed, not
 documented away. In particular, a "Security Definer View" on a view that is
-*not* one of those seven, or an RLS finding on a future user-scoped table, is a
+*not* one of those ten, or an RLS finding on a future user-scoped table, is a
 bug.
+
+### Performance Advisor
+
+- **Policies wrap `auth.uid()` as `(select auth.uid())`**, so it is computed once
+  per statement rather than once per row (`auth_rls_initplan`). Every new
+  user-scoped policy must do the same.
+- **Every foreign key has an index on its referencing column**
+  (`unindexed_foreign_keys`).
+- **"Unused index" notices are expected** and left alone: those indexes serve
+  the retention job and history queries that run rarely or have not run yet.
+
+Supabase's checks are open source ([splinter](https://github.com/supabase/splinter)),
+so they can be run against the local database before anything is pushed.
 
 ### Deployment facts
 
