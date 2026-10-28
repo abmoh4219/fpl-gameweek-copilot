@@ -429,8 +429,9 @@ the pipeline; the website and bot read what the pipeline already produced.
 Not blockers for building, but blockers for charging. Revisit all of these
 before taking money:
 
-- **No official Premier League or FPL logos, no club badges, no player
-  photos.** Use our own branding and generic visuals throughout.
+- **Official kits and club badges are loaded from source for now (ADR-0010)
+  and must be replaced with our own artwork before charging.** Never any
+  Premier League or FPL logos or player photos; our own branding throughout.
 - **Vercel Hobby is non-commercial** — a commercial plan is required before
   charging.
 - **The Gemini free tier may use our inputs** — check the terms before

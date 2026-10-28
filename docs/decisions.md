@@ -464,3 +464,40 @@ model call, which CLAUDE.md §7 otherwise forbids.
   the challenge required the Agent SDK.
 - **Agent SDK on Vercel.** The binary alone exceeds the function size limit.
 - **Render / Koyeb free tiers.** 512 MB RAM, below the hosting guidance.
+
+---
+
+## ADR-0010 — Official kits and club badges, loaded from source, until monetisation
+
+- **Date:** 2026-10-28
+- **Status:** Accepted
+
+### Context
+
+CLAUDE.md §8 said: no official Premier League or FPL logos, no club badges,
+no player photos — our own visuals only. The owner wants the squad view to
+look like the FPL app, with real kits, and club badges next to fixtures and
+the table. Both are club and league artwork.
+
+### Decision
+
+- Kits load from FPL's own image server
+  (`fantasy.premierleague.com/dist/img/shirts/standard/shirt_{code}-110.webp`,
+  keepers `shirt_{code}_1-…`), keyed by the stable team `code`.
+- Crests load from football-data.org's crest URLs.
+- **Never copied into the repo or our storage.** Our own SVG shirt is the
+  fallback when an image fails.
+- Still no Premier League or FPL logos and no player photos; the product keeps
+  its own name and branding.
+
+### Consequences
+
+- The squad view matches what managers know from the FPL app.
+- If FPL or football-data block hotlinking or rename files, the fallback shirt
+  shows — nothing breaks.
+- **Must be replaced before charging money** (CLAUDE.md §8 now says so).
+
+### Alternatives considered
+
+- **Own artwork only.** Safe forever, less authentic; kept as the fallback.
+- **Download and self-host.** Redistributes the artwork; worse than loading it.

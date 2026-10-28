@@ -37,6 +37,8 @@ export type AgentTurn = z.infer<typeof TurnSchema>;
 
 /** Questions per visitor per UK day, and the service-wide daily spend cap. */
 export const AGENT_LIMITS = {
+  /** Mirrors `daily_limit` in api.consume_question() — a test asserts they match. */
+  questionsPerAccountPerDay: 10,
   questionsPerVisitorPerDay: 5,
   dailyBudgetUsd: 0.5,
   perQuestionBudgetUsd: 0.03,
