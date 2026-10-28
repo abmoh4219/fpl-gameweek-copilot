@@ -453,7 +453,7 @@
   white-space: nowrap;
 }
 
-/* fixture difficulty grid: FPL's 1-5 scale, home fixtures upper case */
+/* fixture difficulty grid: FPL's 1-5 scale; home or away is in each cell's tooltip */
 .fdr {
   display: grid;
   gap: 3px;

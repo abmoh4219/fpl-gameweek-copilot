@@ -115,7 +115,7 @@ export function SquadCheck({ squad }: { squad: Squad }) {
                     className={`fdr-cell d${f.isBlank ? "x" : (f.difficulty ?? 3)}`}
                     title={f.isBlank ? "Blank gameweek" : `${f.opponent ?? "?"} ${f.isHome ? "home" : "away"} · difficulty ${f.difficulty ?? "?"}`}
                   >
-                    {f.isBlank ? "—" : f.isHome ? (f.opponent ?? "?") : (f.opponent ?? "?").toLowerCase()}
+                    {f.isBlank ? "—" : (f.opponent ?? "?")}
                     {f.isDouble && <sup>2</sup>}
                   </span>
                 ))}
