@@ -1,23 +1,19 @@
 /**
- * Our mark: a slanted flare plate with a pass curling onto target — the
- * co-pilot's job in one line. Our own artwork; no league or FPL logo.
+ * Our mark: a captain's armband — a slanted flare band with a "C". The
+ * captaincy call is the decision FPL managers sweat most; that is the job.
+ * Our own artwork; no league or FPL logo.
  */
 export function Mark({ size = 30 }: { size?: number }) {
   return (
     <svg width={Math.round(size * 1.12)} height={size} viewBox="0 0 36 32" aria-hidden="true" className="mark-svg">
-      <path d="M9 2.5 H33.5 L27 29.5 H2.5 Z" fill="var(--accent)" stroke="var(--accent)" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M9.5 22.5 Q13.5 9.5 25 10" fill="none" stroke="var(--accent-ink)" strokeWidth="2.6" strokeLinecap="round" />
-      <path d="M21.6 6.6 L25.6 10 L21.9 13.6" fill="none" stroke="var(--accent-ink)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="9.5" cy="22.8" r="2.7" fill="var(--accent-ink)" />
+      <path d="M7 6 H34.5 L29.5 26 H2 Z" fill="var(--accent)" stroke="var(--accent)" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M5.8 10.2 H33 M3.6 21.8 H30.6" stroke="var(--accent-ink)" strokeWidth="1.3" opacity="0.4" />
+      <path d="M21.6 12.4 A5 5 0 1 0 21.6 19.6" fill="none" stroke="var(--accent-ink)" strokeWidth="2.8" strokeLinecap="round" />
     </svg>
   );
 }
 
-/** The wordmark: condensed, italic, "Copilot" in flare. */
+/** The wordmark: condensed and italic, like a name on a shirt. */
 export function Wordmark() {
-  return (
-    <span className="wordmark">
-      Gameweek<b>Copilot</b>
-    </span>
-  );
+  return <span className="wordmark">Armband</span>;
 }

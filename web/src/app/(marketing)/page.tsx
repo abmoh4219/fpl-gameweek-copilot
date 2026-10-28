@@ -208,7 +208,7 @@ const STEPS = [
 ];
 
 const FAQ: [string, string][] = [
-  ["What is Gameweek Copilot?", "A co-pilot for Fantasy Premier League managers. It shows your squad with the numbers that matter — form, expected goal involvement, minutes risk, fixture difficulty — and answers your questions about captaincy, transfers and fixtures, explaining every recommendation with figures you can check."],
+  ["What is Armband?", "A co-pilot for Fantasy Premier League managers. It shows your squad with the numbers that matter — form, expected goal involvement, minutes risk, fixture difficulty — and answers your questions about captaincy, transfers and fixtures, explaining every recommendation with figures you can check."],
   ["Is it free?", "Yes, while we are in early access. Every account gets ten co-pilot questions a day; the squad view, player cards and fixtures are unlimited."],
   ["Do I need to give you my FPL password?", "No. We only ever need your public FPL team ID — the number in your Points page address. We read your team; we cannot make transfers or change anything."],
   ["Where does the data come from?", "From Fantasy Premier League's public data, refreshed every three hours, plus Champions League fixture dates for fixture congestion. Our own pipeline computes every metric from it."],
@@ -216,7 +216,7 @@ const FAQ: [string, string][] = [
   ["What does \"estimate\" mean?", "Anything about the future — fixture difficulty, goal threat, price rises and falls — is our best computed estimate, never a guarantee. We label it every time."],
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
   ["Why is there a daily question limit?", "Each answer takes real computing work. A daily allowance keeps the co-pilot fast and free for everyone."],
-  ["Is this the official FPL app?", "No. Gameweek Copilot is an independent project, not affiliated with or endorsed by the Premier League or Fantasy Premier League. Club kits belong to their clubs."],
+  ["Is this the official FPL app?", "No. Armband is an independent project, not affiliated with, endorsed by or connected to the Premier League or Fantasy Premier League. It uses public data only; the club kits on the pitch belong to their clubs."],
   ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your profile, your connected team and your usage history."],
 ];
 
@@ -470,7 +470,7 @@ export default async function Landing() {
       <section className="block" id="faq">
         <div className="wrap split faq">
           <div>
-            <SectionHead index="05" label="FAQ" title={<>Questions, <em>answered.</em></>} sub="The short version of how Gameweek Copilot works." />
+            <SectionHead index="05" label="FAQ" title={<>Questions, <em>answered.</em></>} sub="The short version of how Armband works." />
             <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="text-link">
               Ask us on Telegram <Arrow />
             </a>

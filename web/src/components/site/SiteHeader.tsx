@@ -16,7 +16,7 @@ export function SiteHeader() {
   return (
     <header className="site-header" data-scrolled={scrolled}>
       <div className="wrap">
-        <Link href="/" className="mark" aria-label="Gameweek Copilot home">
+        <Link href="/" className="mark" aria-label="Armband home">
           <Mark />
           <Wordmark />
         </Link>

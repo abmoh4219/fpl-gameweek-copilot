@@ -17,11 +17,11 @@ const SITE = process.env["NEXT_PUBLIC_SITE_URL"] ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: { default: "Gameweek Copilot — your FPL team, with a co-pilot", template: "%s · Gameweek Copilot" },
+  title: { default: "Armband — the FPL co-pilot that does the homework", template: "%s · Armband" },
   description:
     "Connect your Fantasy Premier League team. See your squad, then ask a co-pilot about captaincy, transfers and fixtures — every answer backed by numbers you can check.",
   openGraph: {
-    title: "Gameweek Copilot",
+    title: "Armband",
     description: "Your FPL team, with a co-pilot that does the homework.",
     type: "website",
   },

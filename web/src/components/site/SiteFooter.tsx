@@ -39,12 +39,17 @@ export function SiteFooter() {
             </ul>
           </div>
         </div>
+        <p className="footer-legal">
+          Armband is an independent project. Not affiliated with, endorsed by or connected to the Premier League or
+          Fantasy Premier League. Uses public data only, with its own visuals — the club kits shown on the pitch belong
+          to their clubs. Fixture runs, goal threat, captain picks and price movements are estimates, never guarantees.
+        </p>
         <div className="footer-giant" aria-hidden="true">
-          Gameweek<b>Copilot</b>
+          Armband
         </div>
         <div className="footer-base">
-          <span>© {new Date().getFullYear()} Gameweek Copilot. An independent project.</span>
-          <span>Not affiliated with the Premier League or Fantasy Premier League. Kits belong to their clubs.</span>
+          <span>© {new Date().getFullYear()} Armband</span>
+          <span>Data refreshed every three hours</span>
         </div>
       </div>
     </footer>
