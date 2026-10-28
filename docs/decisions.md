@@ -372,3 +372,95 @@ in a prompt rather than something enforced.
   keeps code in control at the cost of one module.
 - **Validate inside Make with filters.** Make filters cannot extract and
   compare every number in free text.
+
+---
+
+## ADR-0008 — The website renders published data; user rows live in an `app` schema
+
+- **Date:** 2026-10-28
+- **Status:** Accepted
+
+### Context
+
+The website needs player cards and fixture runs computed by the insight
+engine, and its first user-scoped table (the waitlist). CLAUDE.md requires
+that code computes every number in one place, that visitors never trigger
+expensive work, that `anon` has zero privileges on `core`, and that per-user
+rows use RLS policies with `security_invoker` views.
+
+### Decision
+
+- `price-sync` and `daily-sync` publish every player card (`core.player_cards`)
+  and every team's 3- and 5-gameweek run (`core.team_runs`), upserted each run.
+  The site reads them through owner-privileged views `api.player_cards`,
+  `api.team_runs` and `api.previews`, and never runs the engine itself.
+- User-scoped tables live in a third schema, **`app`**: RLS policies,
+  column-level grants, and `security_invoker` views in `api`. The waitlist is
+  INSERT-only for `anon` and can never be read back over the Data API.
+
+### Consequences
+
+- The site, Telegram and the agent can never disagree about a number.
+- ~700 rows / ~0.7 MB, overwritten each run; no growth.
+- Owner-privileged `api` views: now **ten** (the accepted Security Advisor
+  finding). `api.waitlist` is `security_invoker` and must never be flagged.
+- `core` keeps its "anon has nothing" property; tests assert it, and assert
+  the waitlist rules from outside over HTTP.
+
+### Alternatives considered
+
+- **Compute cards in the website.** Needs team-strength views, duplicates the
+  engine's inputs, and makes every page build a computation.
+- **Waitlist in `core` with a grant for anon.** Breaks the zero-privilege rule
+  that the whole security model rests on.
+
+---
+
+## ADR-0009 — The agent: Claude Agent SDK in a container, reached through the website
+
+- **Date:** 2026-10-28
+- **Status:** Accepted
+
+### Context
+
+A one-day challenge required an agent built with the **Claude Agent SDK**, on
+a small demo API key, deployed publicly. The SDK runs the Claude Code native
+binary as a subprocess (294 MB unpacked on linux-x64) and Anthropic's hosting
+guide asks for ~1 GiB RAM per agent in a container. A Vercel function is
+capped at 250 MB. This is also the first time a visitor can trigger a paid
+model call, which CLAUDE.md §7 otherwise forbids.
+
+### Decision
+
+- The agent is its own workspace package, `agent/`, deployed as a **Docker
+  Hugging Face Space** (free: 2 vCPU, 16 GB). Only a bundle — one JS file,
+  `package.json`, `Dockerfile`, README — is uploaded; never this repo.
+- The SDK runs with **`tools: []`** (no shell, files or web),
+  `settingSources: []`, `persistSession: false`, auto memory off, our own
+  system prompt, and nine read-only tools in an in-process MCP server. Tool
+  logic is pure and tested in `packages/shared`.
+- Model **Claude Haiku 5.5**. Caps: 5 questions per visitor per UK day, a
+  $0.50/day service cap, `maxBudgetUsd` and `maxTurns` per question, and the
+  key's own spend limit as the hard ceiling.
+- The browser talks only to the website's `/api/agent`, which attaches the
+  squad, hashes the visitor's IP, and forwards with a shared secret. The
+  agent's URL and the Anthropic key never reach a browser.
+- Every tool call is streamed to the UI as it happens (NDJSON), with a
+  one-line summary written by code.
+
+### Consequences
+
+- Visitors CAN now spend money — bounded per visitor, per day and per
+  question, with the key's spend limit behind all three. An exception to
+  CLAUDE.md §7, deliberately scoped to this feature.
+- Usage counters are in memory: correct for the single Space container, reset
+  on restart. The key's spend limit is the backstop.
+- A free Space sleeps after ~48 h idle and cold-starts in ~30 s; the UI says
+  so if the agent does not answer.
+
+### Alternatives considered
+
+- **Tool runner in `@anthropic-ai/sdk` on Vercel.** Lighter and simpler, but
+  the challenge required the Agent SDK.
+- **Agent SDK on Vercel.** The binary alone exceeds the function size limit.
+- **Render / Koyeb free tiers.** 512 MB RAM, below the hosting guidance.

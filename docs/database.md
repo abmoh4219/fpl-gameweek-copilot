@@ -67,7 +67,7 @@ design working as intended:
 
 | Finding | Where | Why it is accepted |
 | --- | --- | --- |
-| **Security Definer View** | the 7 `api.*` views | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
+| **Security Definer View** | the 10 owner-privileged `api.*` views (not `api.waitlist`) | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
 | **RLS Enabled No Policy** | every `core.*` table | Deliberate deny-all. RLS is on with no policies so nothing but the service role can read a row |
 
 **Anything else the advisor reports is a real problem** and must be fixed, not
@@ -126,6 +126,9 @@ erDiagram
 | `sync_runs` | `id` | Every run, successful or not. **This is what makes price dedup lossless** |
 | `reports` | `(type, date)` / `(type, gameweek)` | Rendered daily reports and gameweek previews. `payload` is **structured JSON the website renders directly**, `text` is the Telegram message, `payload.xPost` is a manual-publish X draft |
 | `deliveries` | `id` | Every Make webhook attempt, ok or not (ADR-0006). Audit trail, and the counter behind the daily news alert cap |
+| `player_cards` | `player_id` | Latest computed card per player, published by price-sync and daily-sync (ADR-0008) |
+| `team_runs` | `team_id` | Latest 3- and 5-gameweek fixture run per team (ADR-0008) |
+| `app.waitlist` | `lower(email)` | Landing-page signups. **`app` schema**: RLS policy, INSERT-only for anon through `security_invoker` `api.waitlist`, never readable over the Data API |
 | `alert_state` | `key` | When an operational alert last fired, so a persistent condition does not page every run |
 
 ### Type rules

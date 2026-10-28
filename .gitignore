@@ -43,3 +43,6 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Built agent bundle for the Hugging Face Space (agent/scripts/build-space.mjs)
+agent/space/
