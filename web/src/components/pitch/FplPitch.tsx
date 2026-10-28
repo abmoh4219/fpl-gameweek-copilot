@@ -1,4 +1,4 @@
-import type { Squad, SquadPlayer } from "@fpl/shared";
+import type { HighlightTone, Squad, SquadPlayer } from "@fpl/shared";
 import { Kit } from "./Kit";
 import "./pitch.css";
 
@@ -23,16 +23,29 @@ function status(p: SquadPlayer): "ok" | "doubt" | "out" {
   return p.status === "d" ? "doubt" : "out";
 }
 
-function Card({ p, value, compact, picked }: { p: SquadPlayer; value: PlateValue; compact: boolean; picked: boolean }) {
+const TONE_LABEL: Record<HighlightTone, string> = { buy: "Buy", sell: "Sell", keep: "Keep", watch: "Watch" };
+
+interface CardProps {
+  p: SquadPlayer;
+  value: PlateValue;
+  compact: boolean;
+  picked: boolean;
+  tone: { tone: HighlightTone; note: string } | undefined;
+  onSelect: ((p: SquadPlayer) => void) | undefined;
+}
+
+function Card({ p, value, compact, picked, tone, onSelect }: CardProps) {
   const s = status(p);
-  return (
-    <div className={`fpl-card${compact ? " compact" : ""}${picked ? " is-pick" : ""}`} data-fpl-id={p.fplId}>
+  const className = `fpl-card${compact ? " compact" : ""}${picked ? " is-pick" : ""}${tone ? ` hl hl-${tone.tone}` : ""}${onSelect ? " tappable" : ""}`;
+  const inner = (
+    <>
       {(p.isCaptain || p.isViceCaptain) && <span className="fpl-badge">{p.isCaptain ? "C" : "V"}</span>}
       {s !== "ok" && (
         <span className={`fpl-flag ${s}`} title={p.news || (s === "out" ? "Unavailable" : "Doubtful")}>
           !
         </span>
       )}
+      {tone && <span className="fpl-hl">{TONE_LABEL[tone.tone]}</span>}
       <Kit
         teamCode={p.teamCode}
         isKeeper={p.position === "GKP"}
@@ -42,6 +55,25 @@ function Card({ p, value, compact, picked }: { p: SquadPlayer; value: PlateValue
       />
       <div className={`fpl-name${s === "ok" ? "" : ` ${s}`}`}>{p.webName}</div>
       <div className="fpl-sub">{value === "points" ? (p.isStarter ? p.pickPoints : p.eventPoints) : nextFixture(p)}</div>
+    </>
+  );
+  if (onSelect) {
+    return (
+      <button
+        type="button"
+        className={className}
+        data-fpl-id={p.fplId}
+        onClick={() => onSelect(p)}
+        title={tone?.note}
+        aria-label={`${p.webName}, ${p.team} ${p.position}${tone ? `, ${TONE_LABEL[tone.tone]}: ${tone.note}` : ""}. Open player card`}
+      >
+        {inner}
+      </button>
+    );
+  }
+  return (
+    <div className={className} data-fpl-id={p.fplId}>
+      {inner}
     </div>
   );
 }
@@ -51,12 +83,18 @@ export function FplPitch({
   value = "fixture",
   compact = false,
   highlight,
+  highlights,
+  onSelect,
 }: {
   squad: Squad;
   value?: PlateValue;
   compact?: boolean;
   /** One player to spotlight, e.g. the co-pilot's pick. */
   highlight?: number;
+  /** Players the co-pilot is talking about, by FPL id. */
+  highlights?: Map<number, { tone: HighlightTone; note: string }>;
+  /** Makes each player a button that opens their card. */
+  onSelect?: (p: SquadPlayer) => void;
 }) {
   return (
     <div className="fpl">
@@ -77,7 +115,7 @@ export function FplPitch({
               {squad.starters
                 .filter((p) => p.position === pos)
                 .map((p) => (
-                  <Card key={p.fplId} p={p} value={value} compact={compact} picked={p.fplId === highlight} />
+                  <Card key={p.fplId} p={p} value={value} compact={compact} picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} onSelect={onSelect} />
                 ))}
             </div>
           ))}
@@ -86,7 +124,7 @@ export function FplPitch({
       <div className="fpl-bench">
         <span className="fpl-bench-label">Substitutes</span>
         {squad.bench.map((p) => (
-          <Card key={p.fplId} p={p} value={value} compact picked={p.fplId === highlight} />
+          <Card key={p.fplId} p={p} value={value} compact picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} onSelect={onSelect} />
         ))}
       </div>
     </div>

@@ -1,0 +1,129 @@
+import { kitImageUrl, type Squad, type SquadPlayer } from "@fpl/shared";
+
+function Kit({ p, size = 36 }: { p: SquadPlayer; size?: number }) {
+  return <img src={kitImageUrl(p.teamCode, p.position === "GKP", 66)} alt="" width={size} height={size} referrerPolicy="no-referrer" />;
+}
+
+function nextFixture(p: SquadPlayer): string {
+  const f = p.fixtures[0];
+  if (!f || f.isBlank || !f.opponent) return "no fixture";
+  return `${f.opponent} (${f.isHome ? "H" : "A"})`;
+}
+
+/** Everything in the squad check is computed from the squad: no opinions, no model. */
+export function SquadCheck({ squad }: { squad: Squad }) {
+  const all = [...squad.starters, ...squad.bench];
+  const captain = squad.starters.find((p) => p.isCaptain) ?? null;
+  const flagged = all.filter((p) => p.status !== "a");
+  const hardRuns = squad.starters.filter((p) => p.status === "a" && p.fixtureBand === "Hard");
+  const gameweeks = captain?.fixtures.map((f) => f.gameweek) ?? all[0]?.fixtures.map((f) => f.gameweek) ?? [];
+
+  return (
+    <div className="check-row">
+      {captain && (
+        <section className="panel captain">
+          <div className="panel-head">
+            <span className="on-air">Captain</span>
+            <span className="panel-meta">GW{squad.gameweek + 1}</span>
+          </div>
+          <div className="captain-body">
+            <Kit p={captain} size={64} />
+            <div>
+              <div className="captain-name">{captain.webName}</div>
+              <div className="muted small">
+                {captain.team} · {captain.position} · next {nextFixture(captain)}
+              </div>
+            </div>
+          </div>
+          <dl className="stat-row">
+            <div>
+              <dt>xGI / 90</dt>
+              <dd>{captain.xgiPer90.toFixed(2)}</dd>
+            </div>
+            <div>
+              <dt>Last 4</dt>
+              <dd>{captain.formPoints} pts</dd>
+            </div>
+            <div>
+              <dt>Minutes risk</dt>
+              <dd>{captain.minutesRisk}</dd>
+            </div>
+            <div>
+              <dt>
+                Run <span className="est-dot" title="Estimate" />
+              </dt>
+              <dd>{captain.fixtureBand}</dd>
+            </div>
+          </dl>
+        </section>
+      )}
+
+      <section className="panel">
+        <div className="panel-head">
+          <h2>Needs a look</h2>
+          <span className="panel-meta">{flagged.length + hardRuns.length || "all clear"}</span>
+        </div>
+        {flagged.length + hardRuns.length === 0 && <p className="panel-empty">Everyone is fit, and no starter faces a hard run.</p>}
+        {flagged.map((p) => (
+          <div className="look-row" key={`f${p.fplId}`}>
+            <Kit p={p} />
+            <div className="look-text">
+              <b>{p.webName}</b>
+              <small>{p.news || (p.status === "d" ? "Doubtful" : "Unavailable")}</small>
+            </div>
+            <span className={`chance ${p.status === "d" ? "d" : "x"}`}>
+              {p.status === "d" ? `${p.chanceOfPlayingNextRound ?? 50}%` : "Out"}
+            </span>
+          </div>
+        ))}
+        {hardRuns.map((p) => (
+          <div className="look-row" key={`h${p.fplId}`}>
+            <Kit p={p} />
+            <div className="look-text">
+              <b>{p.webName}</b>
+              <small>Hard fixture run ahead (estimate)</small>
+            </div>
+            <span className="chance hard">Hard</span>
+          </div>
+        ))}
+      </section>
+
+      {gameweeks.length > 0 && (
+        <section className="panel">
+          <div className="panel-head">
+            <h2>Next {gameweeks.length} gameweeks</h2>
+            <span className="panel-meta">FPL difficulty</span>
+          </div>
+          <div className="fdr" role="table" aria-label="Fixture difficulty for each player">
+            <div className="fdr-row head" role="row">
+              <span role="columnheader">Player</span>
+              {gameweeks.map((gw) => (
+                <span role="columnheader" key={gw}>
+                  GW{gw}
+                </span>
+              ))}
+            </div>
+            {all.map((p) => (
+              <div className={`fdr-row${p.isStarter ? "" : " is-bench"}`} role="row" key={p.fplId}>
+                <span role="cell" className="fdr-name">
+                  {p.webName}
+                </span>
+                {p.fixtures.map((f) => (
+                  <span
+                    role="cell"
+                    key={f.gameweek}
+                    className={`fdr-cell d${f.isBlank ? "x" : (f.difficulty ?? 3)}`}
+                    title={f.isBlank ? "Blank gameweek" : `${f.opponent ?? "?"} ${f.isHome ? "home" : "away"} · difficulty ${f.difficulty ?? "?"}`}
+                  >
+                    {f.isBlank ? "—" : f.isHome ? (f.opponent ?? "?") : (f.opponent ?? "?").toLowerCase()}
+                    {f.isDouble && <sup>2</sup>}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}

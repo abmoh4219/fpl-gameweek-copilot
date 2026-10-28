@@ -1,0 +1,69 @@
+import { unstable_cache } from "next/cache";
+import type { AgentEvent } from "@fpl/shared";
+import { DEMO_TEAM_ID } from "@/components/site/links";
+import { callAgent, callerId, failure, NDJSON_HEADERS } from "@/lib/agent";
+import { DEMO_QUESTIONS, ukDay } from "@/lib/demo";
+import { loadSquad } from "@/lib/squad";
+
+/**
+ * GET /api/demo?q=0..3 — the recorded answer to one demo question, as the
+ * full list of agent events. The browser replays them with the timing of a
+ * live answer. Visitors never trigger a run: the first request of the UK day
+ * records it, every later one is served from the cache (CLAUDE.md §7).
+ */
+export const runtime = "nodejs";
+export const maxDuration = 120;
+
+class NotRecorded extends Error {}
+
+async function record(q: number): Promise<AgentEvent[]> {
+  const squad = await loadSquad(DEMO_TEAM_ID);
+  const call = await callAgent({ squad, question: DEMO_QUESTIONS[q]!, history: [], caller: callerId("demo") });
+  if (!call.ok) throw new NotRecorded(call.message);
+
+  const text = await new Response(call.body).text();
+  const events: AgentEvent[] = [];
+  for (const raw of text.split("\n")) {
+    if (!raw.trim()) continue;
+    try {
+      events.push(JSON.parse(raw) as AgentEvent);
+    } catch {
+      // A torn line: ignore it; the completeness check below decides.
+    }
+  }
+  // Only a complete, successful answer is worth keeping for a day. Throwing
+  // means nothing is cached and the next visitor tries again.
+  const done = events.some((e) => e.type === "done");
+  const answered = events.some((e) => e.type === "text");
+  if (!done || !answered || events.some((e) => e.type === "error")) throw new NotRecorded("incomplete answer");
+  // Spend is internal; the browser never sees it.
+  return events.map((e) => (e.type === "done" ? { ...e, costUsd: null, remainingToday: null } : e));
+}
+
+// One shared cache entry per (day, question). Revalidation is a safety net;
+// the day in the key is what rolls the answers over at midnight UK time.
+const recorded = unstable_cache(async (_day: string, q: number) => record(q), ["demo-answer-v1"], {
+  revalidate: 60 * 60 * 26,
+});
+
+// Within one server instance, concurrent first visitors share one recording.
+const inFlight = new Map<string, Promise<AgentEvent[]>>();
+
+export async function GET(request: Request): Promise<Response> {
+  const q = Number(new URL(request.url).searchParams.get("q"));
+  if (!Number.isInteger(q) || q < 0 || q >= DEMO_QUESTIONS.length) return failure("bad_request", "Unknown demo question.", 400);
+
+  const day = ukDay();
+  const key = `${day}:${q}`;
+  let pending = inFlight.get(key);
+  if (!pending) {
+    pending = recorded(day, q).finally(() => inFlight.delete(key));
+    inFlight.set(key, pending);
+  }
+  try {
+    const events = await pending;
+    return new Response(events.map((e) => `${JSON.stringify(e)}\n`).join(""), { headers: NDJSON_HEADERS });
+  } catch {
+    return failure("unavailable", "This demo answer isn't ready right now. Try another question, or come back in a minute.");
+  }
+}

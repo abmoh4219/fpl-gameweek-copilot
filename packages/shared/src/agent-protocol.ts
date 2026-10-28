@@ -18,7 +18,7 @@ export type AgentEvent =
   /** Streamed answer text. */
   | { type: "text"; delta: string }
   | { type: "done"; costUsd: number | null; turns: number; remainingToday: number | null }
-  | { type: "error"; code: "rate_limited" | "budget" | "unavailable" | "bad_request" | "failed"; message: string };
+  | { type: "error"; code: "rate_limited" | "budget" | "unavailable" | "bad_request" | "failed" | "sign_in"; message: string };
 
 const TurnSchema = z.object({
   role: z.enum(["user", "assistant"]),
@@ -39,7 +39,12 @@ export type AgentTurn = z.infer<typeof TurnSchema>;
 export const AGENT_LIMITS = {
   /** Mirrors `daily_limit` in api.consume_question() — a test asserts they match. */
   questionsPerAccountPerDay: 10,
-  questionsPerVisitorPerDay: 5,
+  /**
+   * The agent service's own backstop per caller. Callers are accounts (the
+   * website enforces the account limit first) and the daily demo recorder;
+   * anonymous visitors never reach the agent.
+   */
+  questionsPerCallerPerDay: 10,
   dailyBudgetUsd: 0.5,
   perQuestionBudgetUsd: 0.03,
   maxTurns: 8,

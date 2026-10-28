@@ -8,7 +8,8 @@ const config: NextConfig = {
   // No third-party scripts, no tracking pixels: a strict, simple header set.
   // /demo becomes its own page in phase C4; until then it opens the demo team.
   async redirects() {
-    return [{ source: "/demo", destination: "/team/7653564", permanent: false }];
+    // The old public team page ran the agent for anyone; it is now the demo.
+    return [{ source: "/team/:id", destination: "/demo", permanent: false }];
   },
   async headers() {
     return [

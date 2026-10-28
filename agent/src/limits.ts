@@ -2,7 +2,8 @@ import { AGENT_LIMITS } from "@fpl/shared";
 
 /**
  * Spending guards (docs/agent-plan.md §6), enforced before every run:
- *   - a per-visitor question limit per UK day (visitor = salted IP hash)
+ *   - a per-caller question limit per UK day (caller = salted hash of an
+ *     account id, or of "demo" for the daily demo recording)
  *   - a service-wide daily USD cap, summed from each run's reported cost
  *
  * In memory: the Space runs as ONE container, so one process sees every
@@ -41,15 +42,15 @@ export function admit(visitor: string): Admission {
     };
   }
   const asked = questions.get(visitor) ?? 0;
-  if (asked >= AGENT_LIMITS.questionsPerVisitorPerDay) {
+  if (asked >= AGENT_LIMITS.questionsPerCallerPerDay) {
     return {
       ok: false,
       code: "rate_limited",
-      message: `That's your ${AGENT_LIMITS.questionsPerVisitorPerDay} questions for today. They reset at midnight UK time.`,
+      message: `That's your ${AGENT_LIMITS.questionsPerCallerPerDay} questions for today. They reset at midnight UK time.`,
     };
   }
   questions.set(visitor, asked + 1);
-  return { ok: true, remainingAfter: AGENT_LIMITS.questionsPerVisitorPerDay - asked - 1 };
+  return { ok: true, remainingAfter: AGENT_LIMITS.questionsPerCallerPerDay - asked - 1 };
 }
 
 /** Give the question back when a run failed before producing an answer. */

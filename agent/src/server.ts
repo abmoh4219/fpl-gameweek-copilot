@@ -173,7 +173,7 @@ const server = createServer((req, res) => {
   }
   if (req.method === "GET" && (req.url === "/" || req.url === "/health")) {
     res.writeHead(200, { "content-type": "application/json" });
-    res.end(JSON.stringify({ ok: true, service: "gameweek-copilot-agent", model: config.model, keyLoaded: config.hasAnthropicKey, today: usageToday() }));
+    res.end(JSON.stringify({ ok: true, service: "armband-agent", model: config.model, keyLoaded: config.hasAnthropicKey, today: usageToday() }));
     return;
   }
   res.writeHead(404).end();
