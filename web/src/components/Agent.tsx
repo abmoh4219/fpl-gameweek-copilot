@@ -179,7 +179,7 @@ export function Agent({
           </span>
           <div>
             Copilot agent
-            <div className="agent-sub">Claude Agent SDK · Haiku 5.5 · 8 read-only tools</div>
+            <div className="agent-sub">Answers from your squad and live FPL data</div>
           </div>
         </div>
         <span className="tag">{remaining === null ? "5 / day" : `${remaining} left today`}</span>

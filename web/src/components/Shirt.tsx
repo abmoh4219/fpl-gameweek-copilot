@@ -2,7 +2,7 @@ import type { Kit } from "@fpl/shared";
 
 /**
  * Our own shirt drawing, coloured from the kit table (packages/shared/src/kits.ts).
- * Never an official kit image (CLAUDE.md §8).
+ * The fallback when an official kit image fails to load (ADR-0010).
  */
 const BODY =
   "M30 6 L22 9 L10 15 L3 30 L14 35 L17 28 L17 72 Q17 76 21 76 L79 76 Q83 76 83 72 L83 28 L86 35 L97 30 L90 15 L78 9 L70 6 Q66 13 50 14 Q34 13 30 6 Z";

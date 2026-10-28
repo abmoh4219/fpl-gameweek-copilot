@@ -6,6 +6,10 @@ const config: NextConfig = {
   // Do not write an AGENTS.md into the repo on every `next dev`.
   agentRules: false,
   // No third-party scripts, no tracking pixels: a strict, simple header set.
+  // /demo becomes its own page in phase C4; until then it opens the demo team.
+  async redirects() {
+    return [{ source: "/demo", destination: "/team/7653564", permanent: false }];
+  },
   async headers() {
     return [
       {

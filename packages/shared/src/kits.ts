@@ -51,3 +51,11 @@ export function kitFor(teamCode: number, position: string): Kit {
   if (position === "GKP") return KEEPER_KIT;
   return KITS[teamCode] ?? UNKNOWN_KIT;
 }
+
+/**
+ * The official kit image on FPL's own server (ADR-0010) — loaded from source,
+ * never copied. Keepers have their own kit (`_1`). Sizes FPL serves: 66, 110, 220.
+ */
+export function kitImageUrl(teamCode: number, isKeeper: boolean, size: 66 | 110 | 220 = 110): string {
+  return `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${teamCode}${isKeeper ? "_1" : ""}-${size}.webp`;
+}

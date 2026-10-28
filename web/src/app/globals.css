@@ -1,53 +1,72 @@
 /*
  * Gameweek Copilot — design system.
  *
- * One dark surface, hairline structure, monospace for data, a single
- * pitch-green accent. Every colour is a token here; components never invent
- * one. FPL difficulty uses its own 1-5 scale, also tokens.
+ * "Matchnight": a floodlit night match seen through a broadcast. Midnight
+ * surfaces, chalk text, one flare accent, mint and rose for up and down,
+ * condensed display type for anything that should feel like a scoreboard.
+ * Every colour is a token here; components never invent one. FPL difficulty
+ * uses its own 1-5 scale, also tokens.
  */
 
 :root {
   color-scheme: dark;
 
-  --bg: #000;
-  --bg-1: #060606;
-  --bg-2: #0c0c0c;
-  --bg-3: #141414;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-2: rgba(255, 255, 255, 0.14);
-  --line-3: rgba(255, 255, 255, 0.24);
-  --text: #ededed;
-  --muted: #a1a1a1;
-  --faint: #6b6b6b;
+  /* surfaces: midnight navy, the sky above the floodlights */
+  --bg: #070a14;
+  --bg-1: #0b0f1d;
+  --bg-2: #10152a;
+  --bg-3: #171d36;
+  --line: rgba(190, 205, 255, 0.08);
+  --line-2: rgba(190, 205, 255, 0.14);
+  --line-3: rgba(190, 205, 255, 0.24);
 
-  --accent: #3dffa2;
-  --accent-ink: #00140a;
-  --accent-soft: rgba(61, 255, 162, 0.1);
-  --accent-line: rgba(61, 255, 162, 0.35);
-  --warn: #ffb547;
-  --warn-soft: rgba(255, 181, 71, 0.12);
-  --danger: #ff5a64;
-  --danger-soft: rgba(255, 90, 100, 0.12);
+  /* chalk, as on a tactics board */
+  --text: #f4efe6;
+  --muted: #a4a8bd;
+  --faint: #686d86;
+
+  /* one accent: flare */
+  --accent: #ff6a3d;
+  --accent-ink: #1c0a03;
+  --accent-soft: rgba(255, 106, 61, 0.12);
+  --accent-line: rgba(255, 106, 61, 0.42);
+
+  /* data: up, down, careful, and the floodlight's cold blue */
+  --up: #3ee6a8;
+  --up-soft: rgba(62, 230, 168, 0.12);
+  --warn: #ffc145;
+  --warn-soft: rgba(255, 193, 69, 0.12);
+  --danger: #ff4d6d;
+  --danger-soft: rgba(255, 77, 109, 0.12);
+  --flood: #9db8ff;
 
   /* FPL fixture difficulty, 1 (easiest) to 5 (hardest) */
   --fdr-1: #0d7a49;
   --fdr-2: #26b56a;
-  --fdr-3: #3a3a40;
+  --fdr-3: #3a3d52;
   --fdr-4: #d9435a;
   --fdr-5: #8e1b30;
 
+  /* the in-app pitch (FPL-style, bright) */
+  --grass-1: #03a249;
+  --grass-2: #04ad4f;
+  --grass-line: rgba(255, 255, 255, 0.85);
   --pitch-1: #04120a;
   --pitch-2: #071a0f;
   --pitch-line: rgba(255, 255, 255, 0.1);
 
-  --radius: 10px;
-  --radius-sm: 6px;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --pill: 999px;
+  --skew: -12deg;
   --rail: 40px;
-  --max: 1320px;
+  --max: 1200px;
   --hatch: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255, 255, 255, 0.07) 6px 7px);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: var(--font-barlow), "Arial Narrow", sans-serif-condensed, var(--font-sans);
 }
 
 *,
@@ -320,25 +339,41 @@ textarea {
 /* -------------------------------------------------------------- buttons -- */
 
 .btn {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 44px;
-  padding: 0 18px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius);
-  background: var(--bg-2);
-  font-size: 14px;
-  font-weight: 500;
+  height: 46px;
+  padding: 0 24px;
+  border: 0;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.15s;
   white-space: nowrap;
+  transition: color 0.2s, transform 0.2s var(--ease-out);
 }
 
-.btn:hover {
-  border-color: var(--line-3);
-  background: var(--bg-3);
+/* the plate behind the label is slanted; the label itself stays upright */
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid var(--line-3);
+  border-radius: 4px;
+  transform: skewX(var(--skew));
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.25s;
+}
+
+.btn:hover::before {
+  border-color: var(--text);
+  background: rgba(244, 239, 230, 0.06);
 }
 
 .btn:active {
@@ -346,25 +381,36 @@ textarea {
 }
 
 .btn-primary {
-  border-color: transparent;
-  background: var(--text);
-  color: #000;
+  color: var(--bg);
 }
 
-.btn-primary:hover {
-  background: #fff;
+.btn-primary::before,
+.btn-primary:hover::before {
   border-color: transparent;
+  background: var(--text);
 }
 
 .btn-accent {
-  border-color: transparent;
-  background: var(--accent);
   color: var(--accent-ink);
 }
 
-.btn-accent:hover {
-  background: #6bffbb;
+.btn-accent::before {
   border-color: transparent;
+  background: var(--accent);
+}
+
+.btn-accent:hover::before {
+  border-color: transparent;
+  background: #ff8257;
+  box-shadow: 0 10px 34px -10px rgba(255, 106, 61, 0.75);
+}
+
+.btn .arrow {
+  transition: transform 0.2s var(--ease-out);
+}
+
+.btn:hover .arrow {
+  transform: translateX(3px);
 }
 
 .btn[disabled] {
