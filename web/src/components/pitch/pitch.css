@@ -332,3 +332,10 @@ button.fpl-card:focus-visible {
     display: none;
   }
 }
+
+/* our drawn shirt, when an official kit image fails to load */
+.kit svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

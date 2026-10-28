@@ -415,7 +415,7 @@ the pipeline; the website and bot read what the pipeline already produced.
   question runs a Claude Haiku 5.5 agent — 10 per account per UK day, counted
   only when an answer completes — under a service-wide daily budget and the
   key's own spend limit. Anonymous visitors never trigger a run: `/demo`
-  replays four answers recorded once per UK day.
+  replays four answers recorded once per gameweek.
 - **`/my-team` is the only live FPL call.** Cached per team ID per gameweek,
   and rate-limited per IP.
 - **Personal reports use templates, not AI.**

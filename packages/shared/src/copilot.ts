@@ -158,6 +158,7 @@ export function squadFacts(squad: Squad) {
     status: STATUS[p.status] ?? p.status,
     chanceOfPlaying: p.chanceOfPlayingNextRound,
     gameweekPoints: p.pickPoints,
+    seasonPoints: p.seasonPoints,
     pointsLast4: p.formPoints,
     minutesRisk: p.minutesRisk,
     fixtureRun: p.fixtureBand,

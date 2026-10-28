@@ -228,7 +228,7 @@ export function Copilot(props: Props) {
             <b>{Math.max(remaining, 0)}</b> of {props.limit} left today
           </span>
         ) : (
-          <span className="copilot-left">Demo · recorded today</span>
+          <span className="copilot-left">Demo · recorded this gameweek</span>
         )}
       </header>
 
@@ -336,7 +336,7 @@ export function Copilot(props: Props) {
             ))}
           </div>
           <p className="demo-note">
-            Demo answers are recorded once a day for this team. <Link href="/sign-up">Create a free account</Link> to ask
+            Demo answers are recorded once a gameweek for this team. <Link href="/sign-up">Create a free account</Link> to ask
             about yours.
           </p>
         </div>

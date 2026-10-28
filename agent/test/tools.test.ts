@@ -34,7 +34,7 @@ const cherki = card(3, "Cherki", "MCI", "MID", 8.0);
 const player = (c: SiteCard, slot: number, captain = false) => ({
   fplId: c.fplId, webName: c.webName, team: c.team, teamCode: 43, position: c.position as "FWD", slot, isStarter: true,
   isCaptain: captain, isViceCaptain: false, multiplier: captain ? 2 : 1, priceM: c.priceM, ownership: 10, status: "a", news: "",
-  chanceOfPlayingNextRound: null, eventPoints: 8, pickPoints: captain ? 16 : 8, formPoints: 20, xgiPer90: 0.5,
+  chanceOfPlayingNextRound: null, eventPoints: 8, pickPoints: captain ? 16 : 8, seasonPoints: 60, formPoints: 20, xgiPer90: 0.5,
   minutesRisk: "Low", goalThreat: "High", fixtureBand: "Medium", fixtures: [fx],
   kit: { primary: "#000", secondary: "#fff", pattern: "solid" as const, ink: "#fff" },
 });

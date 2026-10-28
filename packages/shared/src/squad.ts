@@ -33,6 +33,8 @@ export interface SquadPlayer {
   eventPoints: number;
   /** What the player contributes to the manager's total: points x multiplier. */
   pickPoints: number;
+  /** Season total so far, straight from FPL. */
+  seasonPoints: number;
   formPoints: number;
   xgiPer90: number;
   minutesRisk: string;
@@ -73,6 +75,8 @@ export function buildSquad(input: {
   picks: EntryPicks;
   cards: ReadonlyMap<number, CardRow>;
   eventPoints: ReadonlyMap<number, number>;
+  /** Season totals by FPL id; missing means 0. */
+  seasonPoints?: ReadonlyMap<number, number>;
 }): Squad {
   const { entry, picks } = input;
   const players: SquadPlayer[] = [];
@@ -107,6 +111,7 @@ export function buildSquad(input: {
       chanceOfPlayingNextRound: card.chanceOfPlayingNextRound,
       eventPoints,
       pickPoints: eventPoints * pick.multiplier,
+      seasonPoints: input.seasonPoints?.get(pick.element) ?? 0,
       formPoints: card.form.points,
       xgiPer90: card.xgiPer90,
       minutesRisk: card.minutesRisk.band,

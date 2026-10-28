@@ -62,6 +62,10 @@ export function PlayerSheet({
 
         <dl className="sheet-stats">
           <div>
+            <dt>Season points</dt>
+            <dd>{p.seasonPoints}</dd>
+          </div>
+          <div>
             <dt>GW points</dt>
             <dd>
               {p.pickPoints}
@@ -86,11 +90,8 @@ export function PlayerSheet({
             </dt>
             <dd>{p.goalThreat}</dd>
           </div>
-          <div>
-            <dt>Owned by</dt>
-            <dd>{p.ownership.toFixed(1)}%</dd>
-          </div>
         </dl>
+        <p className="sheet-owned">Owned by {p.ownership.toFixed(1)}% of managers</p>
 
         <div className="sheet-section">
           Next five · <b>{p.fixtureBand}</b> run <span className="est">estimate</span>

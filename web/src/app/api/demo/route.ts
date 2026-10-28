@@ -2,13 +2,13 @@ import { unstable_cache } from "next/cache";
 import type { AgentEvent } from "@fpl/shared";
 import { DEMO_TEAM_ID } from "@/components/site/links";
 import { callAgent, callerId, failure, NDJSON_HEADERS } from "@/lib/agent";
-import { DEMO_QUESTIONS, ukDay } from "@/lib/demo";
+import { DEMO_QUESTIONS } from "@/lib/demo";
 import { loadSquad } from "@/lib/squad";
 
 /**
  * GET /api/demo?q=0..3 — the recorded answer to one demo question, as the
  * full list of agent events. The browser replays them with the timing of a
- * live answer. Visitors never trigger a run: the first request of the UK day
+ * live answer. Visitors never trigger a run: the first request of a gameweek
  * records it, every later one is served from the cache (CLAUDE.md §7).
  */
 export const runtime = "nodejs";
@@ -40,10 +40,10 @@ async function record(q: number): Promise<AgentEvent[]> {
   return events.map((e) => (e.type === "done" ? { ...e, costUsd: null, remainingToday: null } : e));
 }
 
-// One shared cache entry per (day, question). Revalidation is a safety net;
-// the day in the key is what rolls the answers over at midnight UK time.
-const recorded = unstable_cache(async (_day: string, q: number) => record(q), ["demo-answer-v1"], {
-  revalidate: 60 * 60 * 26,
+// One shared cache entry per (gameweek, question). The gameweek in the key is
+// what rolls the answers over; the long revalidate is only a safety net.
+const recorded = unstable_cache(async (_gameweek: number, q: number) => record(q), ["demo-answer-v2"], {
+  revalidate: 60 * 60 * 24 * 8,
 });
 
 // Within one server instance, concurrent first visitors share one recording.
@@ -53,11 +53,16 @@ export async function GET(request: Request): Promise<Response> {
   const q = Number(new URL(request.url).searchParams.get("q"));
   if (!Number.isInteger(q) || q < 0 || q >= DEMO_QUESTIONS.length) return failure("bad_request", "Unknown demo question.", 400);
 
-  const day = ukDay();
-  const key = `${day}:${q}`;
+  let gameweek: number;
+  try {
+    gameweek = (await loadSquad(DEMO_TEAM_ID)).gameweek;
+  } catch {
+    return failure("unavailable", "FPL isn't answering right now. Try the demo again in a few minutes.");
+  }
+  const key = `${gameweek}:${q}`;
   let pending = inFlight.get(key);
   if (!pending) {
-    pending = recorded(day, q).finally(() => inFlight.delete(key));
+    pending = recorded(gameweek, q).finally(() => inFlight.delete(key));
     inFlight.set(key, pending);
   }
   try {
