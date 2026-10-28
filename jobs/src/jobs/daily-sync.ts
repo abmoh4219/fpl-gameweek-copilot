@@ -29,7 +29,8 @@ import { loadFixtures, loadGameweeks } from "../load/reference.ts";
 import { loadPlayerSnapshots } from "../load/snapshots.ts";
 import { errorMessage } from "../http.ts";
 import { saveReport } from "../load/reports.ts";
-import { buildDailyReportFrom } from "../reports/build.ts";
+import { publishSiteData } from "../load/site-data.ts";
+import { buildDailyReportFrom, loadEngineInputs } from "../reports/build.ts";
 import { JobSkipped, runJob, type JobContext } from "../runner.ts";
 import { fetchGameweekIds, loadIdentity, printDryRunPlan, printEmptyDatabasePlan } from "./shared.ts";
 
@@ -121,6 +122,11 @@ export async function dailySync(ctx: JobContext): Promise<void> {
       `X draft (${report.payload.xPost.length} chars): ${report.payload.xPost}`,
     ]);
   }
+
+  // ---- website data (ADR-0008) ----------------------------------------------
+  // After fixtures, live stats and CL data, so cards reflect all of today's.
+  const engine = await loadEngineInputs(ctx.db, current?.id ?? next?.id);
+  for (const result of await publishSiteData(loadCtx, engine, ctx.dryRun)) ctx.record(result);
 
   // ---- retention ------------------------------------------------------------
   if (!ctx.dryRun) {

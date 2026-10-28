@@ -4,11 +4,12 @@
  * Fetches bootstrap-static and nothing else, so it stays inside the 45-second
  * target that keeps GitHub Actions billing at one minute a run.
  *
- * It does four things:
+ * It does five things:
  *   1. keeps players current, so a new signing is tradeable within 3 hours
  *   2. writes deduped price telemetry
  *   3. detects STATUS and NEWS changes intraday
  *   4. delivers the important ones as a news alert, capped per day
+ *   5. republishes the website's player cards and fixture runs (ADR-0008)
  *
  * Points 3 and 4 are the reason this job matters. Injury news lands on Thursday and
  * Friday afternoons after press conferences, and deadlines are often Friday
@@ -33,7 +34,13 @@ import { countDeliveries } from "../load/deliveries.ts";
 import { fetchLatestPlayerStates } from "../load/player-states.ts";
 import { loadPriceObservations } from "../load/price-observations.ts";
 import { loadPlayerSnapshots } from "../load/snapshots.ts";
-import { fetchNewsAlertRows, groupStatusRows, loadEngineInputs } from "../reports/build.ts";
+import { publishSiteData } from "../load/site-data.ts";
+import {
+  fetchNewsAlertRows,
+  groupStatusRows,
+  loadEngineInputs,
+  type EngineInputs,
+} from "../reports/build.ts";
 import { runJob, type JobContext } from "../runner.ts";
 import { sendAlert } from "../telegram.ts";
 import { loadIdentity, printDryRunPlan, printEmptyDatabasePlan } from "./shared.ts";
@@ -90,7 +97,15 @@ export async function priceSync(ctx: JobContext): Promise<void> {
 
   await deadMansSwitch(ctx);
 
-  await deliverNewsAlert(ctx, today);
+  // Computed once, after this run's snapshots: the site gets fresh statuses
+  // every 3 hours, and the news alert reads the same cards.
+  // Same gameweek rule as daily-sync, so both jobs publish identical cards.
+  const gameweek =
+    bootstrap.events.find((e) => e.is_current)?.id ?? bootstrap.events.find((e) => e.is_next)?.id;
+  const engine = await loadEngineInputs(ctx.db, gameweek);
+  for (const result of await publishSiteData(loadCtx, engine, ctx.dryRun)) ctx.record(result);
+
+  await deliverNewsAlert(ctx, today, engine);
 }
 
 /**
@@ -101,7 +116,11 @@ export async function priceSync(ctx: JobContext): Promise<void> {
  * In a dry run nothing was written, so the candidates are whatever earlier
  * runs left undelivered.
  */
-async function deliverNewsAlert(ctx: JobContext, today: string): Promise<void> {
+async function deliverNewsAlert(
+  ctx: JobContext,
+  today: string,
+  engine: EngineInputs,
+): Promise<void> {
   const rows = await fetchNewsAlertRows(ctx.db);
   if (rows.length === 0) return;
 
@@ -114,9 +133,7 @@ async function deliverNewsAlert(ctx: JobContext, today: string): Promise<void> {
     return;
   }
 
-  // Cards only now: most runs have no qualifying news and skip this query.
-  const { cardsByPlayerId } = await loadEngineInputs(ctx.db);
-  const groups = groupStatusRows(rows, cardsByPlayerId);
+  const groups = groupStatusRows(rows, engine.cardsByPlayerId);
   const selected = selectNewsAlertItems([...groups.values()].map((g) => g.item));
   if (selected.length === 0) return;
 

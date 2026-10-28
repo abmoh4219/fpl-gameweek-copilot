@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
+import { connect } from "../src/db.ts";
 import { localStack, SKIP_MESSAGE } from "./local-supabase.ts";
 
 const stack = localStack();
@@ -35,6 +36,9 @@ describe.skipIf(!stack)(`Data API security (${stack ? "local Supabase" : SKIP_ME
     "price_changes_daily",
     "cl_congestion",
     "player_form",
+    "player_cards",
+    "team_runs",
+    "previews",
   ])("anon CAN read api.%s", async (view) => {
     const res = await fetch(url(`${view}?select=*&limit=1`), { headers: anonHeaders });
     expect(res.status).toBe(200);
@@ -89,5 +93,63 @@ describe.skipIf(!stack)(`Data API security (${stack ? "local Supabase" : SKIP_ME
       },
     });
     expect(res.ok).toBe(false);
+  });
+});
+
+/**
+ * The waitlist is the first user-scoped table (ADR-0008): app schema, RLS
+ * policy, security_invoker view. Anyone may join; nobody may read it back.
+ */
+describe.skipIf(!stack)(`waitlist security (${stack ? "local Supabase" : SKIP_MESSAGE})`, () => {
+  const url = (path: string) => `${stack?.apiUrl ?? ""}/rest/v1/${path}`;
+  const headers = (): Record<string, string> => ({
+    apikey: stack?.anonKey ?? "",
+    Authorization: `Bearer ${stack?.anonKey ?? ""}`,
+    "Content-Type": "application/json",
+    Prefer: "return=minimal",
+  });
+  const email = `security-test-${Date.now()}@example.com`;
+  const join = (body: unknown) =>
+    fetch(url("waitlist"), { method: "POST", headers: headers(), body: JSON.stringify(body) });
+
+  afterAll(async () => {
+    const db = connect(stack!.dbUrl);
+    await db`delete from app.waitlist where email ilike 'security-test-%'`;
+    await db.end({ timeout: 5 });
+  });
+
+  it("anon CAN join", async () => {
+    expect((await join({ email, source: "test" })).status).toBe(201);
+  });
+
+  it("rejects the same address twice, whatever its case", async () => {
+    expect((await join({ email: email.toUpperCase() })).status).toBe(409);
+  });
+
+  it("rejects a malformed address at the RLS policy", async () => {
+    expect((await join({ email: "not-an-email" })).ok).toBe(false);
+  });
+
+  it("does not let the caller set any other column", async () => {
+    expect((await join({ email: `x${email}`, created_at: "2000-01-01" })).ok).toBe(false);
+  });
+
+  it("anon CANNOT read the list back", async () => {
+    const res = await fetch(url("waitlist?select=email"), { headers: headers() });
+    expect(res.ok).toBe(false);
+  });
+
+  it("anon CANNOT change or delete a signup", async () => {
+    const target = url(`waitlist?email=eq.${encodeURIComponent(email)}`);
+    expect((await fetch(target, { method: "PATCH", headers: headers(), body: '{"email":"x@y.zz"}' })).ok).toBe(false);
+    expect((await fetch(target, { method: "DELETE", headers: headers() })).ok).toBe(false);
+  });
+
+  it("the app schema is not exposed at all", async () => {
+    const res = await fetch(url("waitlist?select=email"), {
+      headers: { ...headers(), "Accept-Profile": "app" },
+    });
+    expect(res.ok).toBe(false);
+    expect(((await res.json()) as { message?: string }).message ?? "").toMatch(/schema/i);
   });
 });
