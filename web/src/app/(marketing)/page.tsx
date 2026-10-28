@@ -12,17 +12,32 @@ export const revalidate = 900;
 
 // ------------------------------------------------------------------- data --
 
+/** Who is flagged right now, most-owned first: the ticker's fallback on a quiet night. */
+interface FlaggedRow {
+  fpl_id: number;
+  team_code: number;
+  webName: string;
+  position: string;
+  status: string;
+  chance: number | null;
+}
+
 async function landingData() {
-  const [squad, reports, teams] = await Promise.all([
+  const [squad, reports, teams, flagged] = await Promise.all([
     loadSquad(DEMO_TEAM_ID).catch(() => null),
     readView<{ report_type: string; payload: ReportPayload; created_at: string }>(
       "latest_reports",
       "select=report_type,payload,created_at&report_type=eq.daily",
     ).catch(() => []),
     readView<{ team_short_name: string; team_code: number }>("team_runs", "select=team_short_name,team_code").catch(() => []),
+    readView<FlaggedRow>(
+      "player_cards",
+      "select=fpl_id,team_code,webName:card->>webName,position:card->>position,status:card->>status,chance:card->chanceOfPlayingNextRound" +
+        "&card->>status=neq.a&order=card->ownership.desc.nullslast&limit=10",
+    ).catch(() => []),
   ]);
   const codes = new Map(teams.map((t) => [t.team_short_name, t.team_code]));
-  return { squad, daily: reports[0] ?? null, codes };
+  return { squad, daily: reports[0] ?? null, codes, flagged };
 }
 
 type Of<K extends ReportSection["kind"]> = Extract<ReportSection, { kind: K }>;
@@ -273,7 +288,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
 // ------------------------------------------------------------------ page --
 
 export default async function Landing() {
-  const { squad, daily, codes } = await landingData();
+  const { squad, daily, codes, flagged } = await landingData();
   const pick = squad ? captainCase(squad) : null;
 
   const { risers, fallers, news } = overnight(daily?.payload);
@@ -292,6 +307,14 @@ export default async function Landing() {
     })),
     ...fallers.slice(0, 4).map((m) => ({ key: `f${m.fplId}`, name: m.webName, detail: `▼ £${m.priceM.toFixed(1)}m`, tone: "down" as const, kit: kitFor(m.team, m.position) })),
   ];
+  // A quiet night: show who is flagged right now instead of an empty band.
+  const fitness: TickerItem[] = flagged.map((f) => ({
+    key: `x${f.fpl_id}`,
+    name: f.webName,
+    detail: f.status === "d" ? `${f.chance ?? 50}% to play` : f.status === "s" ? "suspended" : "ruled out",
+    tone: f.status === "d" ? ("warn" as const) : ("down" as const),
+    kit: kitImageUrl(f.team_code, f.position === "GKP", 66),
+  }));
 
   return (
     <>
@@ -352,7 +375,7 @@ export default async function Landing() {
         </div>
       </section>
 
-      <Ticker label="FPL today" items={ticker} />
+      {ticker.length > 0 ? <Ticker label="FPL today" items={ticker} /> : <Ticker label="Fitness watch" items={fitness} />}
 
       <section className="block" id="features">
         <div className="wrap">

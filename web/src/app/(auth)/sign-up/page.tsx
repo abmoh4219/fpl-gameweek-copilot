@@ -22,7 +22,8 @@ export default async function SignUp() {
       <p className="auth-sub">Five co-pilot questions included, free. Your squad view and player cards are unlimited. No FPL password, ever.</p>
       <AuthForm mode="sign-up" next="/onboarding" />
       <p className="auth-fine">
-        We keep only your login, your team ID and a question counter. <Link href="/privacy">Privacy</Link>
+        By creating an account you agree to the <Link href="/terms">Terms</Link>. We keep only your login, your team ID
+        and a question counter — <Link href="/privacy">Privacy</Link>.
       </p>
     </div>
   );

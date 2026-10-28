@@ -144,8 +144,11 @@ Go to Supabase → **Authentication**.
    - Scopes: the defaults (`email`, `profile`, `openid`). No verification is
      needed for these.
    - **Branding**: application home page `https://<your-domain>`, privacy
-     policy `https://<your-domain>/privacy`, authorized domain
-     `<your-domain>`. Google requires these before publishing.
+     policy `https://<your-domain>/privacy`, terms of service
+     `https://<your-domain>/terms`, authorized domain `<your-domain>`.
+     Google requires the home page and privacy policy before publishing.
+     **Leave the logo empty**: uploading one sends the app to Google's manual
+     verification.
    - **Audience → Publish app**, so anyone can sign in, not only test users.
      Until then, add your own email under **Test users** to try it.
 3. **APIs & Services → Credentials → Create credentials → OAuth client ID**.
