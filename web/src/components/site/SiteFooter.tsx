@@ -13,7 +13,7 @@ export function SiteFooter() {
               <Wordmark />
             </Link>
             <p className="muted" style={{ maxWidth: 360, marginTop: 14, fontSize: 14 }}>
-              Your Fantasy Premier League team, with a co-pilot that does the homework — and shows its working.
+              Your Fantasy Premier League team, managed by the Gaffer — an AI manager that does the homework and shows its working.
             </p>
           </div>
           <div>

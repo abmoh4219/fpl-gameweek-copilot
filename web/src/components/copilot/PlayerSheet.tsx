@@ -115,7 +115,7 @@ export function PlayerSheet({
               className="btn btn-accent btn-block"
               onClick={() => onAsk(`Should I keep ${p.webName}, or is there a better ${p.position} for my budget?`)}
             >
-              Ask the co-pilot about {p.webName}
+              Ask the Gaffer about {p.webName}
             </button>
           ) : (
             <Link href="/sign-up" className="btn btn-accent btn-block">

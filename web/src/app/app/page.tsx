@@ -66,7 +66,7 @@ export default async function MyTeam({ searchParams }: { searchParams: Promise<{
       {welcome === "1" && (
         <div className="notice ok welcome" role="status">
           <b>You&apos;re in.</b> {"squad" in result ? `${result.squad.teamName} is connected` : "Your team is connected"} —
-          tap any player for their card, or ask the co-pilot a question.
+          tap any player for their card, or give the Gaffer a job.
         </div>
       )}
 

@@ -2,11 +2,11 @@
 
 # Armband
 
-**An AI co-pilot for Fantasy Premier League managers.** Connect your FPL team
-and Armband shows your fifteen on the pitch with the numbers that matter. Then
-ask it to pick your XI, rate your lineup, make a transfer or choose a captain:
-it makes the changes on your pitch for you to apply or revert, and shows the
-working behind every call.
+**An AI manager for Fantasy Premier League.** Connect your FPL team and Armband
+shows your fifteen on the pitch with the numbers that matter. Then give the
+**Gaffer**, Armband's agent, a job: pick your XI, rate your lineup, make a
+transfer, choose a captain. It makes the changes on your pitch for you to
+apply or revert, and shows the working behind every call.
 
 Behind it, a data pipeline watches FPL every few hours, detects price changes
 and injury news, and posts the ones that matter to a Telegram channel.
@@ -15,7 +15,7 @@ and injury news, and posts the ones that matter to a Telegram channel.
 
 ## Highlights
 
-- **An agent, not a chatbot.** Built on the Claude Agent SDK with its own FPL
+- **The Gaffer: an agent, not a chatbot.** Built on the Claude Agent SDK with its own FPL
   tools. It acts on a draft of your team: best XI, bench and captaincy
   changes, transfers. Every change shows on the pitch with **Apply** and
   **Revert**.
@@ -30,7 +30,7 @@ and injury news, and posts the ones that matter to a Telegram channel.
   compute. Questions outside FPL get one polite line and aren't counted.
 - **Free-tier engineering.** GitHub Actions, Supabase, Vercel Hobby, a free
   Hugging Face Space and Make's free plan, each with its budget worked out.
-  Five co-pilot questions per account, a daily spend cap, and a demo recorded
+  Five questions per account, a daily spend cap, and a demo recorded
   once per gameweek and replayed to everyone.
 - **Its own identity.** A floodlit "Matchnight" design system: condensed
   display type, slanted broadcast plates, chalk tactics-board illustrations,
@@ -40,7 +40,7 @@ and injury news, and posts the ones that matter to a Telegram channel.
 
 | Connect your team | Your dugout |
 | --- | --- |
-| ![The "Is this you?" check after entering a team ID](docs/images/onboarding.png) | ![The squad on the pitch next to the co-pilot](docs/images/dugout.png) |
+| ![The "Is this you?" check after entering a team ID](docs/images/onboarding.png) | ![The squad on the pitch next to the Gaffer](docs/images/dugout.png) |
 | **Player cards** | **The squad check** |
 | ![A player card with season points, form and the next five fixtures](docs/images/player-card.png) | ![Captain, players to look at and a five-gameweek fixture grid](docs/images/squad-check.png) |
 
@@ -74,7 +74,7 @@ and injury news, and posts the ones that matter to a Telegram channel.
   config file, with unit tests around them.
 - **Deliver:** one webhook per run, only when there's news. Before each
   deadline a preview of captains, differentials and fixture swings.
-- **Explain:** the co-pilot works from the same computed cards, through tools.
+- **Explain:** the Gaffer works from the same computed cards, through tools.
   See [docs/agent.md](docs/agent.md).
 
 ## Stack
@@ -94,7 +94,7 @@ and injury news, and posts the ones that matter to a Telegram channel.
 | Path | |
 | --- | --- |
 | [`web/`](web) | Next.js app: landing, accounts, the dugout, the demo |
-| [`agent/`](agent) | The co-pilot service: tools, prompt, spend guards |
+| [`agent/`](agent) | The Gaffer: tools, prompt, spend guards |
 | [`jobs/`](jobs) | Sync, change detection, reports, delivery, alerts |
 | [`packages/shared/`](packages/shared) | Schemas, the insight engine, squads and plans |
 | [`supabase/migrations/`](supabase/migrations) | Every schema change, in order |
@@ -119,7 +119,7 @@ pnpm --filter @fpl/web dev    # http://localhost:3000
 
 - [Architecture decisions](docs/decisions.md): twelve ADRs, from storage to
   the agent
-- [The co-pilot](docs/agent.md): tools, plans, limits, testing
+- [The Gaffer](docs/agent.md): the agent's tools, plans, limits, testing
 - [Database](docs/database.md): schemas, security model, retention
 - [Data dictionary](docs/data-dictionary.md): what the FPL API returns, and
   its traps

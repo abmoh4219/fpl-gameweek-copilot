@@ -28,7 +28,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const supabase = await createAuthClient();
   const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return failure("sign_in", "Log in to ask the co-pilot about your team.", 401);
+  if (!auth.user) return failure("sign_in", "Log in to ask the Gaffer about your team.", 401);
 
   const [{ data: profile }, { data: usage }] = await Promise.all([
     supabase.from("my_profile").select("fpl_team_id").limit(1),
@@ -40,7 +40,7 @@ export async function POST(request: Request): Promise<Response> {
   const used = (usage?.[0] as { questions: number } | undefined)?.questions ?? 0;
   const limit = AGENT_LIMITS.questionsPerAccount;
   if (used >= limit) {
-    return failure("rate_limited", `You've used all ${limit} of your co-pilot questions. Your squad view, player cards and the demo stay free.`);
+    return failure("rate_limited", `You've used all ${limit} of your questions to the Gaffer. Your squad view, player cards and the demo stay free.`);
   }
 
   let squad;

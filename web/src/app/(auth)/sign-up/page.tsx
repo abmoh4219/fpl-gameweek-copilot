@@ -19,7 +19,7 @@ export default async function SignUp() {
       <h1 className="auth-title">
         Create your <em>free account</em>
       </h1>
-      <p className="auth-sub">Five co-pilot questions included, free. Your squad view and player cards are unlimited. No FPL password, ever.</p>
+      <p className="auth-sub">Five questions to the Gaffer included, free. Your squad view and player cards are unlimited. No FPL password, ever.</p>
       <AuthForm mode="sign-up" next="/onboarding" />
       <p className="auth-fine">
         By creating an account you agree to the <Link href="/terms">Terms</Link>. We keep only your login, your team ID

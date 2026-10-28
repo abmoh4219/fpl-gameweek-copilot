@@ -133,9 +133,9 @@ export function Dugout(
         </div>
 
         {view && changes.length > 0 && (
-          <div className={`plan-bar${proposed ? " proposed" : ""}`} role="region" aria-label={proposed ? "The co-pilot's changes" : "Your plan"}>
+          <div className={`plan-bar${proposed ? " proposed" : ""}`} role="region" aria-label={proposed ? "The Gaffer's changes" : "Your plan"}>
             <div className="plan-head">
-              <span className="plan-plate">{proposed ? "Co-pilot's plan" : "Your plan"}</span>
+              <span className="plan-plate">{proposed ? "Gaffer's plan" : "Your plan"}</span>
               <span className="plan-note">
                 {proposed ? "Review it on the pitch" : "Not in FPL yet — make these changes in the FPL app"}
               </span>

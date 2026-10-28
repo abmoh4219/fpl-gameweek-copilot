@@ -1,6 +1,6 @@
-# The co-pilot
+# The Gaffer
 
-How Armband's agent works: what it can do, where it runs, what it may spend,
+How the Gaffer, Armband's agent, works: what it can do, where it runs, what it may spend,
 and how it stays honest. Decisions behind it: ADR-0009 (hosting), ADR-0012
 (actions and limits).
 

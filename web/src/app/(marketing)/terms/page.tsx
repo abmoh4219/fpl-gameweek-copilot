@@ -24,7 +24,7 @@ export default function Terms() {
       <h2>What Armband is</h2>
       <p>
         Armband reads your public FPL team, shows it with numbers computed from public football data, and offers a
-        co-pilot that can suggest and plan changes. It is in early access: features may change, pause or be removed, and
+        the Gaffer, an AI manager that can suggest and plan changes. It is in early access: features may change, pause or be removed, and
         it is provided as it is, without guarantees.
       </p>
 
@@ -37,15 +37,15 @@ export default function Terms() {
 
       <h2>Your FPL team</h2>
       <p>
-        Armband never asks for your FPL password and cannot change your team. Plans the co-pilot makes stay in Armband
+        Armband never asks for your FPL password and cannot change your team. Plans the Gaffer makes stay in Armband
         until you make the changes yourself in the FPL app.
       </p>
 
       <h2>Fair use</h2>
       <ul>
-        <li>One account per person. Each account includes five co-pilot questions.</li>
+        <li>One account per person. Each account includes five questions to the Gaffer.</li>
         <li>
-          Do not try to get around the limits, overload the service, scrape it, or use the co-pilot for anything other than
+          Do not try to get around the limits, overload the service, scrape it, or use the Gaffer for anything other than
           Fantasy Premier League.
         </li>
       </ul>

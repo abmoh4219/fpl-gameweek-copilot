@@ -97,9 +97,9 @@ function Analysis({ squad }: { squad: Squad }) {
     ["get_fixture_runs", `${pick.best.team} · ${pick.best.fixtureBand.toLowerCase()} run${pick.next ? ` · next ${pick.next}` : ""}`],
   ];
   return (
-    <div className="analysis" aria-label="Example: the co-pilot answering a question about the demo team">
+    <div className="analysis" aria-label="Example: the Gaffer answering a question about the demo team">
       <div className="analysis-head">
-        <span className="on-air">Co-pilot</span>
+        <span className="on-air">Gaffer</span>
         <span className="q">Who should I captain this week?</span>
       </div>
       <ol className="analysis-trace">
@@ -197,16 +197,16 @@ const FEATURES = [
 const STEPS = [
   ["1'", "Create your account", "Google, or an email and a password. About twenty seconds."],
   ["2'", "Connect your FPL team", "Paste your team ID — the number after /entry/ on your Points page. We show you the team we found so you can confirm it is yours."],
-  ["3'", "Ask the co-pilot", "Captaincy, transfers, fixtures, injuries. Every answer arrives with the numbers behind it."],
+  ["3'", "Give the Gaffer a job", "Captaincy, transfers, fixtures, injuries. Every answer arrives with the numbers behind it."],
 ];
 
 const FAQ: [string, string][] = [
-  ["What is Armband?", "A co-pilot for Fantasy Premier League managers. It shows your squad with the numbers that matter — form, expected goal involvement, minutes risk, fixture difficulty — and answers your questions about captaincy, transfers and fixtures, explaining every recommendation with figures you can check."],
-  ["Is it free?", "Yes. Every account includes five co-pilot questions, and the squad view, player cards, fixtures and demo are unlimited."],
-  ["Does it change my real FPL team?", "No — Armband only reads your team and never asks for your FPL password. When the co-pilot picks your XI, makes a transfer or changes your captain, it shows the plan on your pitch. You apply or revert it in Armband, then make the changes in the FPL app."],
+  ["What is Armband?", "An AI manager for Fantasy Premier League — we call it the Gaffer. It shows your squad with the numbers that matter — form, expected goal involvement, minutes risk, fixture difficulty — and answers your questions about captaincy, transfers and fixtures, explaining every recommendation with figures you can check."],
+  ["Is it free?", "Yes. Every account includes five questions to the Gaffer, and the squad view, player cards, fixtures and demo are unlimited."],
+  ["Does it change my real FPL team?", "No — Armband only reads your team and never asks for your FPL password. When the Gaffer picks your XI, makes a transfer or changes your captain, it shows the plan on your pitch. You apply or revert it in Armband, then make the changes in the FPL app."],
   ["Do I need to give you my FPL password?", "No. We only ever need your public FPL team ID — the number in your Points page address. We read your team; we cannot make transfers or change anything."],
   ["Where does the data come from?", "From Fantasy Premier League's public data, refreshed every three hours, plus Champions League fixture dates for fixture congestion. Our own pipeline computes every metric from it."],
-  ["Can the co-pilot make things up?", "It is built not to. It may only use figures that came back from a lookup in that conversation, and you see every lookup on screen. If it does not have a number, it says so instead of guessing."],
+  ["Can the Gaffer make things up?", "It is built not to. It may only use figures that came back from a lookup in that conversation, and you see every lookup on screen. If it does not have a number, it says so instead of guessing."],
   ["What does \"estimate\" mean?", "Anything about the future — fixture difficulty, goal threat, price rises and falls — is our best computed estimate, never a guarantee. We label it every time."],
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
   ["Why only five questions?", "Each answer takes real computing work, and we keep Armband free. Questions that aren't about FPL are declined and never counted."],
@@ -236,7 +236,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
               The overnight, <em>already read.</em>
             </>
           }
-          sub={`Straight from our pipeline's report for ${daily.payload.date}. Sign in and the co-pilot reads it against your squad.`}
+          sub={`Straight from our pipeline's report for ${daily.payload.date}. Sign in and the Gaffer reads it against your squad.`}
         />
         <div className="boards">
           <div className="board reveal">
@@ -334,7 +334,7 @@ export default async function Landing() {
         <div className="wrap hero-grid">
           <div className="hero-copy">
             <span className="kicker">
-              <b>FPL</b>A co-pilot for your team
+              <b>FPL</b>Meet the Gaffer
             </span>
             <h1 className="hero-title">
               <span className="line"><span>Your FPL team.</span></span>
@@ -342,7 +342,7 @@ export default async function Landing() {
               <span className="line flare"><span>Deadline-ready.</span></span>
             </h1>
             <p className="lede">
-              Connect your team and get a co-pilot that does the homework — form, minutes, fixtures and prices, read
+              Connect your team and meet the Gaffer, an AI manager that does the homework — form, minutes, fixtures and prices, read
               against your fifteen. Ask about captaincy or transfers and watch it look up every figure before it
               answers.
             </p>
@@ -387,7 +387,7 @@ export default async function Landing() {
                 Every decision <em>gets a reason.</em>
               </>
             }
-            sub="No hunches dressed up as advice. The co-pilot looks things up, checks the rules, and shows you how it got there."
+            sub="No hunches dressed up as advice. The Gaffer looks things up, checks the rules, and shows you how it got there."
           />
           <div className="features">
             {FEATURES.map((f, i) => (

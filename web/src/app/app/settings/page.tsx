@@ -63,7 +63,7 @@ export default async function Settings() {
       <section className="setting">
         <div className="setting-label">
           <h2>FPL team</h2>
-          <p>The team the co-pilot reads. Read-only: we can never change it.</p>
+          <p>The team the Gaffer reads. Read-only: we can never change it.</p>
         </div>
         <div>
           <dl className="setting-list">
@@ -88,7 +88,7 @@ export default async function Settings() {
 
       <section className="setting">
         <div className="setting-label">
-          <h2>Co-pilot</h2>
+          <h2>The Gaffer</h2>
           <p>Every account includes {limit} questions. They don&apos;t reset — the demo and your squad view stay free.</p>
         </div>
         <div className="usage">

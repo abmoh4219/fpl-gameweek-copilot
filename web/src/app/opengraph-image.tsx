@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 /** The share card for links to Armband (X, Telegram, WhatsApp…). Our own artwork only. */
-export const alt = "Armband — your FPL co-pilot";
+export const alt = "Armband — meet the Gaffer, your FPL manager";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -40,7 +40,7 @@ export default async function OpenGraphImage() {
           <div style={{ ...big, color: "#ff6a3d" }}>Deadline-ready.</div>
         </div>
         <div style={{ display: "flex", fontSize: 30, color: "#a4a8bd" }}>
-          A co-pilot that looks up every figure before it answers · free
+          Meet the Gaffer: an AI manager that checks every figure · free
         </div>
       </div>
     ),

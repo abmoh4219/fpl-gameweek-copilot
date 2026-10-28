@@ -10,7 +10,7 @@ import "../app/app.css";
 
 export const metadata: Metadata = {
   title: "Demo",
-  description: "Explore a real FPL squad with the Armband co-pilot — no account needed.",
+  description: "Explore a real FPL squad with the Gaffer, Armband's AI manager — no account needed.",
 };
 
 // The squad comes from FPL through our cache; the answers are recorded once a gameweek.
@@ -45,7 +45,7 @@ export default async function Demo() {
           </h1>
           <p className="page-sub">
             This is {squad ? `${squad.teamName}, managed by ${squad.managerName}` : "a real FPL team"}. Tap any player for
-            their card, and pick a question to see how the co-pilot works it out.
+            their card, and give the Gaffer a job to see how it works it out.
           </p>
         </header>
 

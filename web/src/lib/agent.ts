@@ -42,7 +42,7 @@ export async function callAgent(input: {
   plan?: TeamPlan | null;
   caller: string;
 }): Promise<AgentCall> {
-  if (!AGENT_URL || !AGENT_SECRET) return { ok: false, message: "The co-pilot isn't switched on yet. Your squad view still works." };
+  if (!AGENT_URL || !AGENT_SECRET) return { ok: false, message: "The Gaffer isn't in yet. Your squad view still works." };
   let res: Response;
   try {
     res = await fetch(`${AGENT_URL.replace(/\/$/, "")}/chat`, {
@@ -60,9 +60,9 @@ export async function callAgent(input: {
       cache: "no-store",
     });
   } catch {
-    return { ok: false, message: "The co-pilot didn't answer. It may be waking up — try again in 30 seconds." };
+    return { ok: false, message: "The Gaffer didn't answer — the service may be waking up. Try again in 30 seconds." };
   }
-  if (!res.ok || !res.body) return { ok: false, message: "The co-pilot is unavailable right now. Try again in a minute." };
+  if (!res.ok || !res.body) return { ok: false, message: "The Gaffer is unavailable right now. Try again in a minute." };
   return { ok: true, body: res.body };
 }
 

@@ -35,7 +35,7 @@ export default function Privacy() {
           <b>Your FPL team.</b> The team ID you connect, with the team name and manager name FPL shows publicly for it.
         </li>
         <li>
-          <b>A question counter.</b> How many co-pilot questions your account has used, by day, so the limit holds.
+          <b>A question counter.</b> How many questions your account has asked the Gaffer, by day, so the limit holds.
         </li>
       </ul>
       <p>
@@ -46,7 +46,7 @@ export default function Privacy() {
       <h2>What we do not store</h2>
       <ul>
         <li>
-          <b>Your questions and the answers.</b> They are processed to answer you and not saved. The co-pilot runs on
+          <b>Your questions and the answers.</b> They are processed to answer you and not saved. The Gaffer runs on
           Anthropic&apos;s Claude, which receives your question and your squad to produce the answer.
         </li>
         <li>
@@ -61,7 +61,7 @@ export default function Privacy() {
       <h2>Who processes it</h2>
       <p>
         Armband runs on <b>Supabase</b> (database and sign-in), <b>Vercel</b> (the website), <b>Hugging Face</b> (the
-        co-pilot service), <b>Anthropic</b> (the co-pilot&apos;s answers) and, if you choose it, <b>Google</b> (sign-in).
+        Gaffer&apos;s service), <b>Anthropic</b> (the Gaffer&apos;s answers) and, if you choose it, <b>Google</b> (sign-in).
         Football data comes from Fantasy Premier League&apos;s public data and football-data.org.
       </p>
 

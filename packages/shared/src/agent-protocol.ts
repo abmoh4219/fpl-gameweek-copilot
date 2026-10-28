@@ -54,7 +54,7 @@ export type AgentTurn = z.infer<typeof TurnSchema>;
  * for word. The service recognises it and does not count the question.
  */
 export const OFF_TOPIC_REPLY =
-  "I'm Armband, your FPL co-pilot — I only help with Fantasy Premier League and your squad. Ask me about your captain, lineup, transfers or fixtures.";
+  "I'm the Gaffer, Armband's FPL manager — I only talk Fantasy Premier League and your squad. Ask me about your captain, lineup, transfers or fixtures.";
 
 /** What a question may cost, and how many each account gets. */
 export const AGENT_LIMITS = {

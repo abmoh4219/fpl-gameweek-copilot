@@ -234,9 +234,9 @@ export function Copilot(props: Props) {
   const out = live && remaining <= 0;
 
   return (
-    <section className="copilot" aria-label="Co-pilot" ref={panelRef}>
+    <section className="copilot" aria-label="The Gaffer" ref={panelRef}>
       <header className="copilot-head">
-        <span className="on-air">Co-pilot</span>
+        <span className="on-air">Gaffer</span>
         {live ? (
           <span className={`copilot-left${out ? " out" : ""}`}>
             <b>{Math.max(remaining, 0)}</b> of {props.limit} questions left
@@ -249,7 +249,7 @@ export function Copilot(props: Props) {
       <div className="copilot-log" ref={logRef} aria-live="polite">
         {turns.length === 0 && (
           <div className="copilot-empty">
-            <h3>{live ? "Your co-pilot, on duty" : "Give it a job"}</h3>
+            <h3>{live ? "The Gaffer is in" : "Give the Gaffer a job"}</h3>
             <p>
               Ask it to pick your XI, rate your lineup, make a transfer or choose a captain — it makes the changes on your
               pitch for you to apply or revert, with the numbers behind every call.
@@ -365,7 +365,7 @@ export function Copilot(props: Props) {
             ))}
           </div>
           <p className="demo-note">
-            Recorded once a gameweek for this team. <Link href="/sign-up">Create a free account</Link> and the co-pilot
+            Recorded once a gameweek for this team. <Link href="/sign-up">Create a free account</Link> and the Gaffer
             manages yours — 5 questions included.
           </p>
         </div>
