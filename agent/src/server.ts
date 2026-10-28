@@ -11,7 +11,7 @@ import { buildPrompt, squadSnapshot, SYSTEM_PROMPT } from "./prompt.ts";
 import { buildToolServer, startDraft } from "./tools.ts";
 
 /**
- * The agent service (docs/agent-plan.md §3): one HTTP endpoint, POST /chat,
+ * The agent service (docs/agent.md): one HTTP endpoint, POST /chat,
  * reachable only with the shared secret the website holds. It runs the
  * Claude Agent SDK with every built-in tool removed and only our read-only
  * FPL tools, and streams AgentEvents back as NDJSON.

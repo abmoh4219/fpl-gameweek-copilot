@@ -7,7 +7,7 @@ const stack = localStack();
 
 /**
  * Accounts, proven from OUTSIDE over HTTP as a browser would reach them
- * (docs/product-plan.md, ADR-0008): each user sees and changes only their own
+ * (ADR-0008, ADR-0012): each user sees and changes only their own
  * profile and question counter, the counter can only go up, and anonymous
  * visitors reach neither.
  */

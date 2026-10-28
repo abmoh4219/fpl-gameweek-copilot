@@ -26,7 +26,7 @@ import { z } from "zod";
 import { latestPreview, priceWatch, type PriceWatchRow } from "./data.ts";
 
 /**
- * The agent's tools (docs/agent-plan.md §5). Facts come from code; the logic
+ * The agent's tools (docs/agent.md). Facts come from code; the logic
  * lives in packages/shared and is unit tested there. Each call reports itself
  * to the browser's live trace through `emit`, with a summary written by code.
  *

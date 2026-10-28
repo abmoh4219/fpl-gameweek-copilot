@@ -1,5 +1,5 @@
 /**
- * The demo (docs/product-plan.md C4): the demo team, four fixed questions,
+ * The demo (docs/agent.md): the demo team, four fixed questions,
  * no typing. Each answer is recorded ONCE PER GAMEWEEK and replayed to every
  * visitor, so the whole demo costs four agent runs a gameweek — about five a
  * month — no matter how many people try it. The agent key is small; this is

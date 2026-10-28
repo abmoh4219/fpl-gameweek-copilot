@@ -1,160 +1,134 @@
-# FPL Gameweek Copilot
+![Armband — your FPL team, deadline-ready](docs/images/banner.png)
 
-An automated football-data pipeline that watches Fantasy Premier League data,
-detects what changed, works out what matters, and delivers it — daily reports
-to Telegram, a pre-deadline preview, and a web app with player cards and
-fixture difficulty.
+# Armband
 
-Built entirely on free tiers.
+**An AI co-pilot for Fantasy Premier League managers.** Connect your FPL team
+and Armband shows your fifteen on the pitch with the numbers that matter. Then
+ask it to pick your XI, rate your lineup, make a transfer or choose a captain:
+it makes the changes on your pitch for you to apply or revert, and shows the
+working behind every call.
 
-> **Status:** Phase 6 — the pipeline syncs, detects, scores and delivers to
-> Telegram through Make, with a Gemini-written preview checked by code. The
-> web app is next.
+Behind it, a data pipeline watches FPL every few hours, detects price changes
+and injury news, and posts the ones that matter to a Telegram channel.
 
----
+![The landing page](docs/images/landing.png)
 
-## The problem
+## Highlights
 
-FPL managers repeat the same manual checks every single day:
+- **An agent, not a chatbot.** Built on the Claude Agent SDK with its own FPL
+  tools. It acts on a draft of your team: best XI, bench and captaincy
+  changes, transfers. Every change shows on the pitch with **Apply** and
+  **Revert**.
+- **Code computes, the model decides.** Every number comes from a tested
+  insight engine: form, xGI per 90 scaled by minutes, minutes risk, fixture
+  difficulty, goal threat, captain score. The best XI is an exhaustive search
+  over legal formations, and every transfer is rule-checked (positions, three
+  per club, the bank). The model chooses what to do and explains it; it never
+  invents a figure.
+- **Honest by construction.** Estimates are labelled as estimates. Gemini's
+  preview prose is rejected if it contains any number the code didn't
+  compute. Questions outside FPL get one polite line and aren't counted.
+- **Free-tier engineering.** GitHub Actions, Supabase, Vercel Hobby, a free
+  Hugging Face Space and Make's free plan, each with its budget worked out.
+  Five co-pilot questions per account, a daily spend cap, and a demo recorded
+  once per gameweek and replayed to everyone.
+- **Its own identity.** A floodlit "Matchnight" design system: condensed
+  display type, slanted broadcast plates, chalk tactics-board illustrations,
+  motion that respects reduced-motion settings.
 
-- Did any of my players rise or fall in price overnight?
-- Who is close to a change, and should I move before it happens?
-- Any new injuries, suspensions, or press-conference news?
-- How do the next few fixtures actually look — and who has a midweek European
-  game before them?
+## A look around
 
-The data is public and the checks are mechanical, but they are spread across
-several sites, and the useful answer depends on *your* squad. So it gets done
-by hand, daily, badly, and often too late.
+| Connect your team | Your dugout |
+| --- | --- |
+| ![The "Is this you?" check after entering a team ID](docs/images/onboarding.png) | ![The squad on the pitch next to the co-pilot](docs/images/dugout.png) |
+| **Player cards** | **The squad check** |
+| ![A player card with season points, form and the next five fixtures](docs/images/player-card.png) | ![Captain, players to look at and a five-gameweek fixture grid](docs/images/squad-check.png) |
 
-## The solution
-
-A pipeline that does the checking and only speaks up when something matters.
-
-1. **Watch** — sync the FPL API on a schedule; keep a snapshot per run.
-2. **Detect** — diff each snapshot against the previous one: prices,
-   status/injury flags, news text, ownership moves.
-3. **Decide** — score the changes. Is it a confirmed change or an estimate?
-   Does it affect a widely owned player, or one of *my* 15?
-4. **Deliver** — one webhook fires only when there is something to say;
-   Telegram gets the report, X gets a draft.
-5. **Explain** — before each deadline, a preview of captains, differentials,
-   fixture swings and congestion, written from numbers the code computed.
-
-Every number is calculated in TypeScript with unit tests behind it. The AI
-step writes short prose around the computed facts — it never calculates, never
-ranks, and never invents a statistic. Forward-looking numbers are labelled as
-estimates.
-
-## Architecture
-
-```
-  FPL public API                football-data.org
-  (bootstrap-static,            (Champions League
-   fixtures, event/{gw}/live,    fixture dates only)
-   entry picks)                        |
-        |                              |
-        +--------------+---------------+
-                       v
-        GitHub Actions cron  ->  jobs/  (TypeScript)
-                       |
-                       |  snapshot + diff + score
-                       v
-                   Supabase  (Postgres + read-only views)
-                       |
-        +--------------+---------------------+
-        |                                    |
-   ONE webhook per run                  Next.js on Vercel
-   (only when it matters)               - public pages
-        |                               - share images for X
-        v                               - /api/telegram bot route
-    Make.com (2 scenarios)
-        |
-        +-- Scenario 1: events   -> router -> Telegram channel
-        |                                  -> X draft to me
-        +-- Scenario 2: preview  -> Gemini -> back to jobs/ (validated)
-```
-
-Sync failures skip Make entirely and alert Telegram straight from code, so an
-alert still arrives when the automation layer is the thing that broke.
-
-## Stack
-
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Scheduling | GitHub Actions cron | 2,000 free minutes/month on a private repo |
-| Jobs | TypeScript, run with `tsx` | Testable logic, strict types, Zod at every boundary |
-| Database | Supabase (Postgres) | Free tier, SQL views, row-level security |
-| Automation | Make.com free plan | 1,000 credits/month, 2 scenarios — routing only |
-| AI text | Gemini API free tier | Writes prose from computed facts, nothing else |
-| Web | Next.js on Vercel Hobby | Free hosting, cached pages, API routes |
-| Fixtures (Europe) | football-data.org free tier | Champions League dates for the congestion flag |
-| Delivery | Telegram Bot API | Free, instant, no approval process |
-
-Full limits and the budget arithmetic live in [CLAUDE.md](CLAUDE.md); what
-runs when, and how to recover from a failure, in
-[docs/operations.md](docs/operations.md).
+<p align="center"><img src="docs/images/mobile.png" alt="The demo on a phone" width="300"></p>
 
 ## How it works
 
-**Every day, after the FPL price change**
-The sync job fetches `bootstrap-static` once, pulls per-gameweek stats in a
-single `event/{gw}/live` call, and writes a snapshot. It diffs against
-yesterday, computes form, xGI/90, minutes risk, fixture difficulty, goal
-threat and price pressure, and — if anything is worth saying — posts one
-batched webhook. Telegram gets a price report with full player cards; an X
-draft arrives for manual posting. If the job fails, Telegram says so directly.
+```
+  FPL public API ─┐                      ┌─▶ Make.com ──▶ Telegram channel
+  football-data ──┤   GitHub Actions     │   (one batched webhook per run;
+  (CL dates)      └─▶ jobs/ (TypeScript) ─┤    Gemini writes preview prose,
+                      snapshot · diff ·   │    validated back in code)
+                      score · publish     │
+                            │             └─▶ failure alerts straight to
+                            ▼                 Telegram, bypassing Make
+                        Supabase (Postgres)
+                  core · app (RLS) · api (views)
+                            │
+                            ▼
+                    Next.js on Vercel ──/api/agent──▶ Claude Agent SDK
+                 landing · accounts · dugout ·        on a Hugging Face Space
+                 demo, from read-only views           (read tools + action tools)
+```
 
-**Before each gameweek deadline**
-A second job assembles the facts — captain scores, differentials, fixture
-swings, congestion flags — and sends them to the preview scenario. Gemini
-turns the facts into a short opening paragraph and Make hands it straight
-back. Code rejects it if it contains any number that was not in the facts,
-falling back to the template, and only then is the preview stored and sent to
-Telegram — so the web app serves it without another AI call.
+- **Watch:** `price-sync` runs every three hours, `daily-sync` nightly after
+  FPL's price update. One `bootstrap-static` call per run and one
+  `event/{gw}/live` call for every player's stats.
+- **Detect:** each snapshot is diffed against the last: prices, availability,
+  news text, ownership. Dedup keys make re-runs idempotent.
+- **Decide:** the insight engine scores what matters. All weights live in one
+  config file, with unit tests around them.
+- **Deliver:** one webhook per run, only when there's news. Before each
+  deadline a preview of captains, differentials and fixture swings.
+- **Explain:** the co-pilot works from the same computed cards, through tools.
+  See [docs/agent.md](docs/agent.md).
 
-**Any time**
-The website reads from Supabase views only. Visitors never trigger an AI call
-or a third-party API request. `/my-team` is the sole live FPL lookup, cached
-per team ID per gameweek and rate-limited per IP.
+## Stack
 
-## Setup
-
-> Setup is written out as each phase lands. The outline:
-
-1. Clone the repo, `pnpm install` (Node 22+, pnpm 10+).
-2. Copy `.env.example` to `.env` and fill in your own values.
-   Every variable says where it comes from and which part uses it.
-3. For local development, `pnpm db:start` (needs Docker) then
-   `pnpm load:samples` to fill the database from the recorded API responses.
-4. For the hosted project: `pnpm supabase login`, `pnpm supabase link
-   --project-ref <ref>`, `pnpm supabase db push`, then set
-   **Project Settings > API > Exposed schemas** to `api` only.
-   See [docs/database.md](docs/database.md).
-5. Build the Make scenarios by following [docs/make.md](docs/make.md), or
-   import the blueprints from `make/blueprints/`. Then reconnect Telegram and
-   Gemini, and copy the webhook URLs into your environment.
-6. Add the job secrets to **GitHub Secrets** and the web secrets to **Vercel
-   environment variables**. Nothing real is ever committed to this repo.
-7. Create a Telegram bot with @BotFather and point its webhook at
-   `/api/telegram` on your deployment, using your webhook secret.
-
-## Roadmap
-
-| Phase | What |
+| | |
 | --- | --- |
-| **0** | Scaffold — repo layout, CLAUDE.md, ADRs, env template ✅ |
-| **1** | API exploration + Zod schemas + recorded samples ✅ |
-| **2** | Database schema + insight views ✅ |
-| **3** | Sync and change detection on GitHub Actions ✅ |
-| **4** | Insight engine (form, xGI/90, minutes risk, fixtures, captain score) ✅ |
-| **5** | Make: daily report and intraday news alerts ✅ |
-| **6** | Make: gameweek preview with Gemini, validated by code ✅ |
-| **7** | Web app + landing page |
-| **8** | My-team, Telegram bot, quota guards |
-| **9** | Launch — demo video, X thread |
+| Language | TypeScript (strict), Zod at every external boundary |
+| Web | Next.js 16 · React 19 · Supabase Auth (email and Google) |
+| Agent | Claude Agent SDK · Claude Haiku 5.5 · in-process MCP tools |
+| Data | Supabase Postgres: three schemas, RLS, owner-privileged read views |
+| Jobs | GitHub Actions cron · `tsx` |
+| Automation | Make.com · Gemini (preview prose) · Telegram Bot API |
+| Tests | Vitest: 280+ tests, including the database through its real API |
+
+## Repository
+
+| Path | |
+| --- | --- |
+| [`web/`](web) | Next.js app: landing, accounts, the dugout, the demo |
+| [`agent/`](agent) | The co-pilot service: tools, prompt, spend guards |
+| [`jobs/`](jobs) | Sync, change detection, reports, delivery, alerts |
+| [`packages/shared/`](packages/shared) | Schemas, the insight engine, squads and plans |
+| [`supabase/migrations/`](supabase/migrations) | Every schema change, in order |
+| [`docs/`](docs) | Architecture decisions and runbooks |
+
+## Running it locally
+
+Requires Node 22+, pnpm and Docker.
+
+```bash
+pnpm install
+cp .env.example .env          # fill in what you need; every variable is explained
+pnpm db:start                 # local Supabase
+pnpm load:samples             # recorded API responses, loaded by the real loaders
+pnpm test                     # all packages
+pnpm --filter @fpl/web dev    # http://localhost:3000
+```
+
+`pnpm job:daily` syncs live FPL data into the local database.
+
+## Docs
+
+- [Architecture decisions](docs/decisions.md): twelve ADRs, from storage to
+  the agent
+- [The co-pilot](docs/agent.md): tools, plans, limits, testing
+- [Database](docs/database.md): schemas, security model, retention
+- [Data dictionary](docs/data-dictionary.md): what the FPL API returns, and
+  its traps
+- [Operations](docs/operations.md): schedules, alerts, recovery
+- [Make scenarios](docs/make.md) and [Deploying](docs/deploy.md)
 
 ---
 
-Not affiliated with the Premier League or Fantasy Premier League. Uses public
-data only, with its own branding and visuals.
+Armband is an independent project, not affiliated with, endorsed by or
+connected to the Premier League or Fantasy Premier League. It uses public data
+only. Club kits belong to their clubs. Fixture runs, goal threat, captain picks
+and price movements are estimates, never guarantees.

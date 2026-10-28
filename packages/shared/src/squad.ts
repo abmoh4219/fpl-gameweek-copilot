@@ -5,7 +5,7 @@ import type { SiteCard } from "./site.ts";
 
 /**
  * One manager's squad, as the site and the agent both see it
- * (docs/agent-plan.md §4).
+ * (docs/agent.md).
  *
  * Pure: the FPL responses and our published cards go in, a render-ready
  * squad comes out. Every number on it was computed by the pipeline or comes

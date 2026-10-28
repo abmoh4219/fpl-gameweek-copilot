@@ -3,7 +3,7 @@ import { Kit } from "./Kit";
 import "./pitch.css";
 
 /**
- * The squad on an FPL-style pitch (docs/product-plan.md): bright striped
+ * The squad on an FPL-style pitch: bright striped
  * grass, official kits, white name plates, and under each the next fixture
  * or this gameweek's points. Server-rendered; the kit image is the only
  * client piece (it falls back to our own shirt if FPL's image fails).

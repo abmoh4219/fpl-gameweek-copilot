@@ -1,7 +1,7 @@
 import { expectedPoints, OFF_TOPIC_REPLY, type AgentTurn, type SiteCard, type Squad, type SquadPlayer } from "@fpl/shared";
 
 /**
- * The agent's system prompt, versioned in code (docs/agent-plan.md §5).
+ * The agent's system prompt, versioned in code (docs/agent.md).
  * The non-negotiable rule is the project's own: code computes every number,
  * the model decides and explains (CLAUDE.md §2).
  *

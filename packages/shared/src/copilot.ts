@@ -2,7 +2,7 @@ import type { SiteCard } from "./site.ts";
 import type { Squad, SquadPlayer } from "./squad.ts";
 
 /**
- * The agent's tools, as pure functions (docs/agent-plan.md §5).
+ * The agent's tools, as pure functions (docs/agent.md).
  *
  * The agent never computes: it calls these, and explains what they return.
  * Results are deliberately COMPACT — every token a tool returns is a token

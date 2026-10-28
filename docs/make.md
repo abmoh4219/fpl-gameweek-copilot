@@ -10,6 +10,8 @@ scenario formats text or loops over players.
 
 ## Scenario 1 — FPL events
 
+![Scenario 1 in Make: webhook, secret filter, router to the channel and to the owner](images/make-scenario-events.png)
+
 Receives the daily report (from `daily-sync`) and intraday news alerts (from
 `price-sync`). Both use the same payload:
 
@@ -98,11 +100,9 @@ Steps:
    ```
    Until these exist, both jobs log a warning and deliver nothing. Nothing
    else changes.
-10. **Export the blueprint.** Choose *… → Export blueprint* and save it as
-    `make/blueprints/events.raw.json`. The `*.raw.json` pattern is gitignored,
-    because the export embeds the webhook and connection IDs. Then commit a
-    sanitised copy as `make/blueprints/events.json`, with the webhook ID,
-    connection IDs, chat IDs and the secret replaced by placeholders.
+10. **Optional backup:** *… → Export blueprint*, saved as `events.raw.json`.
+    Every `*.raw.json` is gitignored: an export embeds live webhook and
+    connection IDs, so it is never committed.
 
 ### Checking it
 
@@ -119,6 +119,8 @@ not found" or "not enough rights" shows up there, not in our database.
 ---
 
 ## Scenario 2 — FPL preview (Gemini)
+
+![Scenario 2 in Make: webhook, secret filter, Gemini, webhook response](images/make-scenario-preview.png)
 
 Writes the opening paragraph of the gameweek preview. Unlike Scenario 1 it
 **answers the request**: our job waits on the POST, and the *Webhook response*
@@ -201,8 +203,8 @@ it is versioned and tested with the rest of the code. Make only passes it on.
    ```
    The secret is shared with Scenario 1, so `MAKE_WEBHOOK_SECRET` is already
    set.
-10. **Export the blueprint** to `make/blueprints/preview.raw.json`, which is
-    gitignored, for the sanitised copy.
+10. **Optional backup:** export the blueprint as `preview.raw.json`
+    (gitignored, like every raw export).
 
 The free plan allows **two active scenarios**, and this uses the second.
 

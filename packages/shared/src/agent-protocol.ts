@@ -4,7 +4,7 @@ import type { SquadPlayer } from "./squad.ts";
 
 /**
  * The contract between the agent service, the website's proxy and the
- * browser (docs/agent-plan.md §5). Newline-delimited JSON, one event per
+ * browser (docs/agent.md). Newline-delimited JSON, one event per
  * line, in the order they happen. Shared so the three can never drift.
  */
 

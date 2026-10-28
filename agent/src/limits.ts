@@ -1,7 +1,7 @@
 import { AGENT_LIMITS } from "@fpl/shared";
 
 /**
- * Spending guards (docs/agent-plan.md §6), enforced before every run:
+ * Spending guards (docs/agent.md), enforced before every run:
  *   - a per-caller question limit per UK day (caller = salted hash of an
  *     account id, or of "demo" for the daily demo recording)
  *   - a service-wide daily USD cap, summed from each run's reported cost

@@ -1,9 +1,7 @@
 /**
- * Shirt colours for the squad view (docs/agent-plan.md §4).
- *
- * CLAUDE.md §8: no club badges, no official kit images, no player photos. The
- * site draws its OWN shirt and colours it from this table — club colours are
- * nobody's artwork. Keyed by FPL team `code`, which is stable across seasons;
+ * Club colours for our own drawn shirt — the FALLBACK when an official kit
+ * image fails to load (ADR-0010: official kits are loaded from FPL's server,
+ * never copied). Keyed by FPL team `code`, which is stable across seasons;
  * team `id` is not (CLAUDE.md §5).
  */
 export type KitPattern = "solid" | "stripes" | "sleeves";

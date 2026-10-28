@@ -96,9 +96,9 @@ if (scenario === "preview") {
   const payload: DeliveryPayload = {
     version: DELIVERY_PAYLOAD_VERSION,
     kind: "daily_report",
-    headline: "Test delivery from FPL Gameweek Copilot",
+    headline: "Test delivery from Armband",
     messages: [
-      "<b>Test delivery from FPL Gameweek Copilot</b>\n\nIf you can read this, Scenario 1 works.",
+      "<b>Test delivery from Armband</b>\n\nIf you can read this, Scenario 1 works.",
       "<b>Second message</b>\n<i>Long reports arrive as several messages, in order.</i>",
     ],
     xDraft: "Test X draft — this one goes to your own chat, never the channel. #FPL",

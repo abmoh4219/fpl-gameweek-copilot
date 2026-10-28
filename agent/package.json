@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "The Copilot agent service: Claude Agent SDK + read-only FPL tools, run in a container (docs/agent-plan.md).",
+  "description": "Armband's co-pilot service: the Claude Agent SDK with FPL tools, run in a container (docs/agent.md).",
   "scripts": {
     "dev": "tsx --env-file-if-exists=../.env --env-file-if-exists=../.env.local src/server.ts",
     "typecheck": "tsc --noEmit",

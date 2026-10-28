@@ -1,6 +1,6 @@
 /**
  * Agent service configuration, read once at start. Secrets are Hugging Face
- * Space secrets in production (docs/agent-plan.md §6) — never in git.
+ * Space secrets in production (docs/agent.md) — never in git.
  */
 function required(name: string): string {
   const value = process.env[name];

@@ -1,9 +1,9 @@
 {
-  "name": "fpl-gameweek-copilot",
+  "name": "armband",
   "private": true,
   "version": "0.0.0",
   "packageManager": "pnpm@11.21.0",
-  "description": "Football data automation pipeline for Fantasy Premier League managers.",
+  "description": "An AI co-pilot for Fantasy Premier League managers, and the data pipeline behind it.",
   "engines": {
     "node": ">=22",
     "pnpm": ">=10"

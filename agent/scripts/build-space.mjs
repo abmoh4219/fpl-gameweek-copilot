@@ -1,5 +1,5 @@
 /**
- * Builds the Hugging Face Space for the agent (docs/agent-plan.md §3).
+ * Builds the Hugging Face Space for the agent (docs/agent.md, ADR-0009).
  *
  * Output: agent/space/ with exactly four files — server.mjs (our code and
  * @fpl/shared, bundled), package.json (only the Agent SDK and zod, installed
@@ -37,7 +37,7 @@ writeFileSync(
   path.join(out, "package.json"),
   `${JSON.stringify(
     {
-      name: "gameweek-copilot-agent",
+      name: "armband-agent",
       private: true,
       type: "module",
       engines: { node: ">=22" },

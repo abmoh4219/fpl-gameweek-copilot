@@ -1,4 +1,4 @@
-# CLAUDE.md — FPL Gameweek Copilot
+# CLAUDE.md — Armband
 
 Guidance for Claude Code (and any human) working in this repo.
 Read this before proposing or writing code.
@@ -100,12 +100,17 @@ confirmed, every price-watch output is labelled an **estimate**.
 
 ### Web surface
 
-- Polished landing page with **waitlist signup stored in Supabase**
-- `/today` — the day's price and news changes
-- `/players/[id]` — player card with computed metrics
-- `/fixtures` — fixture difficulty grid
-- `/previews/[gw]` — stored gameweek previews
-- `/my-team` — personal squad report by FPL team ID
+- `/` — landing page: a live preview built from the demo squad, the overnight
+  ticker, FAQ
+- `/sign-up`, `/sign-in`, `/onboarding` — accounts (email or Google), then
+  connect an FPL team with an "Is this you?" check
+- `/app` — the dugout: the squad on an FPL-style pitch with official kits, the
+  co-pilot (`docs/agent.md`), and a computed squad check; `/app/settings`
+- `/demo` — the demo team with four recorded co-pilot answers
+
+Planned next: league table and top scorers (football-data.org), a fixtures
+grid, player search, a price-watch page. `app.waitlist` exists from an
+earlier plan and is unused.
 
 ---
 
@@ -125,14 +130,14 @@ confirmed, every price-watch output is labelled an **estimate**.
                        v
                    Supabase  (Postgres: snapshots, changes,
                        |      players, fixtures, previews,
-                       |      waitlist; read-only views for web)
+                       |      accounts; read-only views for web)
                        |
         +--------------+---------------------+
         |                                    |
    ONE webhook per run                  Next.js on Vercel
-   (only if important events)           - public pages from views
-        |                               - share images for X
-        v                               - /api/telegram bot route
+   (only if important events)           - landing, app, demo from views
+        |                               - /api/agent ──▶ agent/ on a
+        v                                 Hugging Face Space (ADR-0009)
     Make.com (2 scenarios)
         |
         +-- Scenario 1: events   -> router -> Telegram channel
@@ -417,13 +422,14 @@ the pipeline; the website and bot read what the pipeline already produced.
   are never counted — under a service-wide daily budget and the key's own
   spend limit. Anonymous visitors never trigger a run: `/demo`
   replays four answers recorded once per gameweek.
-- **`/my-team` is the only live FPL call.** Cached per team ID per gameweek,
-  and rate-limited per IP.
+- **A manager's squad is the only live FPL call:** their entry and picks,
+  cached per team (entry 10 minutes, picks 1 hour), for signed-in users and
+  the demo team only.
 - **Personal reports use templates, not AI.**
 - **Daily AI budget cap** in code. On reaching the cap, or on any Gemini
   error, fall back to the template version — the report still ships.
-- **Pages are cached.** The Telegram bot answers **from the database only**,
-  with a per-user cooldown.
+- **Pages are cached.** Public pages are static or revalidated; nothing a
+  visitor does calls Gemini or football-data.org.
 
 ---
 
@@ -450,21 +456,19 @@ before taking money:
 | --- | --- |
 | `jobs/` | TypeScript scripts run by GitHub Actions cron: sync, detect changes, post the webhook, send failure alerts |
 | `agent/` | The Claude Agent SDK service (ADR-0009): read-only FPL tools, streamed traces, spend caps. Deployed as a Docker Hugging Face Space from `pnpm --filter @fpl/agent build:space` |
-| `web/` | Next.js app on Vercel: public pages, share images, `/api/telegram` bot route |
+| `web/` | Next.js app on Vercel: landing, accounts, the dugout, the demo, `/api/agent` and `/api/demo` |
 | `packages/shared/` | Zod schemas, database types, and the insight engine — shared by `jobs/` and `web/`, unit tested |
 | `supabase/migrations/` | Versioned SQL: tables, snapshot schema, read-only views the web app reads |
-| `make/blueprints/` | Exported **sanitised** Make.com scenario JSON, version controlled |
 | `.github/workflows/` | Cron and CI workflow definitions |
-| `docs/` | `decisions.md` (ADRs), `database.md`, `data-dictionary.md`, `operations.md` |
+| `docs/` | `decisions.md` (ADRs), `agent.md`, `database.md`, `data-dictionary.md`, `operations.md`, `make.md`, `deploy.md` |
 | `samples/` | Recorded API responses for offline development and tests |
 
-> **`samples/fpl/entry.json` and `samples/fpl/entry-picks.json` contain a real
-> manager's personal FPL team.** That is acceptable while this repo is
-> private. **Before any public switch, replace them with anonymised samples**,
-> alongside the `gitleaks` history scan in §10.
+> **`samples/fpl/entry.json` and `samples/fpl/entry-picks.json` are the
+> owner's own FPL team** — the same public team the demo shows — so they are
+> fine to publish. Any other manager's team must never be committed.
 
 Workspace packages are `jobs/` (`@fpl/jobs`), `agent/` (`@fpl/agent`),
-`web/` (`@fpl/web`) and `packages/shared/` (`@fpl/shared`). `supabase/`, `make/`, `docs/` and
+`web/` (`@fpl/web`) and `packages/shared/` (`@fpl/shared`). `supabase/`, `docs/` and
 `samples/` are plain directories — no `package.json`, nothing installed.
 
 `tsconfig.base.json` deliberately sets no `module` / `moduleResolution`: each
@@ -483,9 +487,8 @@ extends the shared strictness.
 - **Conventional commits** (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`).
 - **Never commit secrets.** Real values live in GitHub Secrets, Vercel
   environment variables, or Make — never in this repo. `.env.example` holds
-  placeholders only. Raw Make exports (`make/blueprints/*.raw.json`) are
-  gitignored because they embed live webhook and connection IDs; only
-  sanitised blueprints are committed.
+  placeholders only. Raw Make exports (`*.raw.json`) are gitignored because
+  they embed live webhook and connection IDs.
 - **Nothing scans for leaked secrets here.** GitHub secret scanning is
   unlikely to be available on a private repo without Advanced Security, so a
   committed key would go unnoticed. Never write a real secret into a file,

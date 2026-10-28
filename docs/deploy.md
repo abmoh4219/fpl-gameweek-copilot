@@ -20,21 +20,13 @@ Two rules hold throughout:
 
 ## 0. Database and jobs (5 min)
 
-These migrations exist only locally so far. Push them first:
-
-| Migration | What it adds |
-| --- | --- |
-| `site_views_team_code` | the club `code` for official kits |
-| `accounts` | profiles, the connected team, the question counter |
-| `delete_account` | self-service account deletion (ADR-0011) |
-| `lifetime_questions` | 5 questions per account for life (ADR-0012) |
+Push any new migrations before the code that needs them.
+`pnpm supabase migration list` shows what the cloud is missing.
 
 ```bash
 pnpm supabase db push
-git add . && git commit -m "feat: Armband — accounts, co-pilot, demo"
 git push
-gh workflow run daily-sync     # fresh cards, fixtures, Champions League dates
-gh workflow run price-sync
+gh workflow run price-sync     # optional: refresh cards now instead of waiting
 ```
 
 Then open **Supabase → Advisors → Security Advisor**. Expect exactly the two
