@@ -1,5 +1,6 @@
 import type { Squad, SquadPlayer } from "@fpl/shared";
 import { Kit } from "./Kit";
+import "./pitch.css";
 
 /**
  * The squad on an FPL-style pitch (docs/product-plan.md): bright striped

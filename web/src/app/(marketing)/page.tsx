@@ -3,6 +3,7 @@ import { kitImageUrl, type ReportPayload, type ReportSection, type Squad } from 
 import { SquadArt, TraceArt, TransferArt, WatchArt } from "@/components/landing/TacticsArt";
 import { Ticker, type TickerItem } from "@/components/landing/Ticker";
 import { FplPitch } from "@/components/pitch/FplPitch";
+import { ScoreBug } from "@/components/pitch/ScoreBug";
 import { TELEGRAM_URL, DEMO_TEAM_ID } from "@/components/site/links";
 import { loadSquad } from "@/lib/squad";
 import { readView } from "@/lib/supabase";
@@ -101,29 +102,6 @@ function Analysis({ squad }: { squad: Squad }) {
         {pick.next ? ` and ${pick.next} next` : ""}. Fixture run: {pick.best.fixtureBand.toLowerCase()}{" "}
         <span className="est">estimate</span>
       </div>
-    </div>
-  );
-}
-
-function ScoreBug({ squad }: { squad: Squad }) {
-  return (
-    <div className="bug">
-      <span className="bug-team">
-        <i>{squad.teamName.slice(0, 1).toUpperCase()}</i>
-        {squad.teamName}
-      </span>
-      <span className="bug-cell">
-        <small>GW{squad.gameweek}</small>
-        <b>{squad.gameweekPoints}</b>
-      </span>
-      <span className="bug-cell">
-        <small>Total</small>
-        <b>{squad.totalPoints}</b>
-      </span>
-      <span className="bug-cell">
-        <small>Bank</small>
-        <b>£{squad.bankM.toFixed(1)}m</b>
-      </span>
     </div>
   );
 }

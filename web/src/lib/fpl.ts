@@ -49,3 +49,13 @@ export function parseTeamId(raw: string): number | null {
   const id = Number(raw);
   return id > 0 ? id : null;
 }
+
+/**
+ * What a manager pastes when asked for their team: the bare id, or the whole
+ * address of their Points page (".../entry/7653564/event/8").
+ */
+export function parseTeamInput(raw: string): number | null {
+  const text = raw.trim();
+  const fromUrl = /\/entry\/(\d{1,9})(?:\/|$|\?)/.exec(text);
+  return parseTeamId(fromUrl ? fromUrl[1]! : text);
+}

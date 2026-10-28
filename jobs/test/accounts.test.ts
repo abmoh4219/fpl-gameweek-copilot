@@ -143,4 +143,33 @@ describe.skipIf(!stack)(`accounts (${stack ? "local Supabase" : SKIP_MESSAGE})`,
       await db.end({ timeout: 5 });
     }
   });
+
+  it("anonymous visitors cannot call delete_my_account, nor the elevated function behind it", async () => {
+    const anon = { apikey: stack!.anonKey, "Content-Type": "application/json" };
+    const res = await fetch(rest("rpc/delete_my_account"), { method: "POST", headers: anon, body: "{}" });
+    expect(res.ok).toBe(false);
+    // `app` is not exposed by the Data API at all.
+    const direct = await fetch(rest("rpc/delete_user"), { method: "POST", headers: anon, body: "{}" });
+    expect(direct.ok).toBe(false);
+  });
+
+  it("delete_my_account deletes the caller's own login, and nobody else's", async () => {
+    const carol = { email: `carol-${stamp}@accounts-test.dev`, ...(await signUp(`carol-${stamp}@accounts-test.dev`)) };
+    const dave = { email: `dave-${stamp}@accounts-test.dev`, ...(await signUp(`dave-${stamp}@accounts-test.dev`)) };
+    expect((await rpc("connect_team", carol.token, { p_team_id: 7, p_team_name: "C", p_manager_name: "Carol" })).ok).toBe(true);
+
+    expect((await rpc("delete_my_account", carol.token)).ok).toBe(true);
+
+    const db: Db = connect(stack!.dbUrl);
+    try {
+      const rows = await db<{ email: string }[]>`
+        select email from auth.users where email in (${carol.email}, ${dave.email})
+      `;
+      expect(rows.map((r) => r.email)).toEqual([dave.email]);
+      const [left] = await db<{ n: string }[]>`select count(*) as n from app.profiles where user_id = ${carol.id}`;
+      expect(left!.n).toBe("0");
+    } finally {
+      await db.end({ timeout: 5 });
+    }
+  });
 });

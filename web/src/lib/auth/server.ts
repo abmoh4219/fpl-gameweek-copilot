@@ -37,6 +37,8 @@ export interface Viewer {
   id: string;
   email: string | null;
   name: string | null;
+  /** "email" or "google". */
+  provider: string | null;
   profile: Profile | null;
 }
 
@@ -54,6 +56,7 @@ export async function getViewer(): Promise<Viewer | null> {
     id: data.user.id,
     email: data.user.email ?? null,
     name: meta?.full_name ?? meta?.name ?? null,
+    provider: typeof data.user.app_metadata["provider"] === "string" ? data.user.app_metadata["provider"] : null,
     profile: (rows?.[0] as Profile | undefined) ?? null,
   };
 }

@@ -1,0 +1,429 @@
+/*
+ * Sign-in, sign-up and onboarding. Same Matchnight language as the site:
+ * the form sits in the dugout on the left, the floodlit pitch on the right.
+ */
+
+.auth {
+  display: grid;
+  min-height: 100dvh;
+}
+
+@media (min-width: 1000px) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 24px 20px;
+}
+
+@media (min-width: 640px) {
+  .auth-main {
+    padding: 28px 48px;
+  }
+}
+
+.auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.auth-back {
+  font-size: 13.5px;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+
+.auth-back:hover {
+  color: var(--text);
+}
+
+.auth-body {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 48px 0;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  animation: auth-rise 0.6s var(--ease-out) backwards;
+}
+
+@keyframes auth-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+.auth-kicker {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.auth-title {
+  margin: 12px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 9vw, 54px);
+  font-weight: 800;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+
+.auth-title em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.auth-sub {
+  margin: 14px 0 28px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.auth-switch {
+  margin: 8px 0 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.auth-switch a {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom: 1px solid var(--accent-line);
+}
+
+.auth-switch a:hover {
+  border-color: var(--accent);
+}
+
+.auth-foot {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* the three-step progress: slanted plates, like a broadcast's match phases */
+.steps-mini {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps-mini li {
+  counter-increment: step;
+  padding: 4px 14px;
+  background: var(--bg-2);
+  color: var(--faint);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.steps-mini li::before {
+  content: counter(step) " · ";
+}
+
+.steps-mini li.done {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.steps-mini li.done::before {
+  content: "✓ ";
+}
+
+.steps-mini li.on {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* ---------------------------------------------------------- side panel -- */
+
+.auth-side {
+  position: relative;
+  display: none;
+  isolation: isolate;
+  overflow: hidden;
+  border-left: 1px solid var(--line);
+  background:
+    radial-gradient(70% 50% at 50% 0%, rgba(157, 184, 255, 0.14), transparent 65%),
+    radial-gradient(60% 50% at 50% 100%, rgba(255, 106, 61, 0.16), transparent 70%),
+    linear-gradient(180deg, #0b1126, #080b18);
+}
+
+@media (min-width: 1000px) {
+  .auth-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 56px;
+  }
+}
+
+.auth-chalk {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: rgba(244, 239, 230, 0.08);
+  stroke-width: 1.5;
+}
+
+.auth-armband {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  width: 190px;
+  translate: -50% -50%;
+  filter: drop-shadow(0 30px 50px rgba(255, 106, 61, 0.35));
+  animation: armband-float 6s ease-in-out infinite;
+}
+
+.auth-armband svg {
+  display: block;
+  width: 100%;
+  transform: rotate(-8deg);
+}
+
+@keyframes armband-float {
+  50% { translate: -50% calc(-50% - 10px); }
+}
+
+.auth-pitch-copy {
+  position: relative;
+}
+
+.auth-quote {
+  margin: 0 0 24px;
+  font-family: var(--font-display);
+  font-size: clamp(38px, 3.6vw, 54px);
+  font-weight: 800;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.auth-quote em {
+  color: var(--accent);
+}
+
+.auth-pitch-copy ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+}
+
+.auth-pitch-copy li {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-pitch-copy li::before {
+  content: "✓";
+  color: var(--up);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------- "Is this you?" -- */
+
+.found {
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--bg-1);
+  animation: auth-rise 0.45s var(--ease-out) backwards;
+}
+
+.found-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, var(--bg-3), var(--bg-2));
+}
+
+.found-badge {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+.found-name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.found-manager {
+  margin-top: 3px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.found-id {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.found-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
+}
+
+.found-stats div {
+  display: grid;
+  gap: 2px;
+  padding: 12px 18px;
+}
+
+.found-stats div + div {
+  border-left: 1px solid var(--line);
+}
+
+.found-stats b {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.found-stats span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.found-kits {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 6px 2px;
+  margin: 0;
+  padding: 14px 12px;
+  list-style: none;
+}
+
+.found-kits li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  animation: auth-rise 0.4s var(--ease-out) backwards;
+}
+
+.found-kits li.is-bench {
+  opacity: 0.55;
+}
+
+.found-kits img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.found-kits span {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 10.5px;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.found-kits i {
+  position: absolute;
+  top: -2px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+/* ------------------------------------------------- where is my team ID? -- */
+
+.where {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.where summary {
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.where ol {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding-left: 20px;
+  line-height: 1.55;
+}
+
+.where b {
+  color: var(--text);
+}
+
+.where .url {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  word-break: break-all;
+}
+
+.where mark {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth *,
+  .auth *::before {
+    animation: none !important;
+  }
+}

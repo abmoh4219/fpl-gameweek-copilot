@@ -501,3 +501,40 @@ the table. Both are club and league artwork.
 
 - **Own artwork only.** Safe forever, less authentic; kept as the fallback.
 - **Download and self-host.** Redistributes the artwork; worse than loading it.
+
+## ADR-0011 — Self-service account deletion through one narrow elevated function
+
+### Context
+
+The FAQ promises managers can delete their account from Settings. Deleting a
+login means deleting the caller's `auth.users` row, which a signed-in user
+cannot do: until now nothing user-facing ran with elevated rights (ADR-0008).
+
+### Decision
+
+- `app.delete_user()` is `security definer`, `search_path = ''`, and does one
+  thing: `delete from auth.users where id = auth.uid()`. It lives in `app`,
+  which the Data API never exposes.
+- `api.delete_my_account()` is a `security invoker` wrapper — the only thing
+  the website calls. Execute is granted to `authenticated` only.
+- Profiles and usage rows go with the login through `on delete cascade`.
+- The website asks the manager to type "delete", and the server action
+  checks it again before calling the function.
+- Tests prove anonymous callers are refused and a user deletes only their
+  own login (`jobs/test/accounts.test.ts`).
+
+### Consequences
+
+- No admin key on Vercel; the elevated surface is one auditable statement.
+- After pushing, check the Security Advisor: the function is outside the
+  exposed schema, so no new finding is expected (CLAUDE.md §4a). If one
+  appears, it must be resolved, not accepted.
+
+### Alternatives considered
+
+- **A server route with the Supabase secret key** (`auth.admin.deleteUser`).
+  Works, but puts the most powerful key in the website's environment for one
+  button.
+- **Soft delete** (clear the profile, keep the login). Breaks the FAQ's promise,
+  and a kept login with a fresh profile would let someone reset their daily
+  question count.

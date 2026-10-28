@@ -1768,3 +1768,321 @@ textarea {
     opacity: 1;
   }
 }
+
+/* ---------------------------------------------------------------- brand -- */
+/* shared by the site, the sign-in pages and the app */
+
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mark-svg {
+  transition: transform 0.35s var(--ease-out);
+}
+
+.mark:hover .mark-svg {
+  transform: rotate(-8deg) scale(1.06);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-style: italic;
+  font-size: 23px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* two floodlights in the top corners that flicker on at load */
+.floodlights {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.beam {
+  position: absolute;
+  top: -12%;
+  width: min(56vw, 760px);
+  height: 125%;
+  background: linear-gradient(180deg, rgba(214, 226, 255, 0.2), rgba(214, 226, 255, 0.05) 45%, transparent 78%);
+  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+  filter: blur(8px);
+  transform-origin: 50% 0;
+  animation: lights-on 1.8s 0.15s linear backwards;
+}
+
+.beam.left {
+  left: -14%;
+  transform: rotate(-34deg);
+}
+
+.beam.right {
+  right: -14%;
+  transform: rotate(34deg);
+  animation-delay: 0.5s;
+}
+
+.beam::before {
+  /* the lamp itself */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 90px;
+  height: 90px;
+  translate: -50% -40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 238, 255, 0.55), transparent 65%);
+}
+
+@keyframes lights-on {
+  0% { opacity: 0; }
+  8% { opacity: 0.85; }
+  12% { opacity: 0.1; }
+  20% { opacity: 0.95; }
+  24% { opacity: 0.25; }
+  40%, 100% { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- forms -- */
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+.field > label,
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.field-label a {
+  color: var(--text);
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--bg-1);
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.input::placeholder {
+  color: var(--faint);
+}
+
+.input:hover {
+  border-color: var(--line-3);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  background: var(--bg-2);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.input.big {
+  height: 58px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+
+.input-action {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  translate: 0 -50%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.input-action:hover {
+  color: var(--text);
+  background: var(--bg-3);
+}
+
+.hint {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* "Continue with Google": a plain chalk plate, the provider's own colours on the G */
+.btn-google {
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.btn-google::before,
+.btn-google:hover::before {
+  border-color: transparent;
+  background: var(--text);
+}
+
+.btn-google:hover::before {
+  background: #fff;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.or::before,
+.or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line-2);
+}
+
+.notice {
+  padding: 11px 14px;
+  border: 1px solid var(--line-2);
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: var(--bg-1);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.notice.error {
+  border-color: rgba(255, 77, 109, 0.35);
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.notice.ok {
+  border-color: rgba(62, 230, 168, 0.3);
+  border-left-color: var(--up);
+  background: var(--up-soft);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam,
+  .spinner {
+    animation-duration: 0s !important;
+  }
+}
+
+/* ---------------------------------------------------------------- plates -- */
+/* slanted broadcast labels: "on air" titles, price moves, chance to play */
+
+.on-air {
+  display: inline-block;
+  padding: 3px 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: skewX(var(--skew));
+}
+
+.delta,
+.chance {
+  padding: 3px 12px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+  transform: skewX(var(--skew));
+}
+
+.delta.up,
+.chance.a {
+  background: var(--up-soft);
+  color: var(--up);
+}
+
+.delta.down,
+.chance.x {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.chance.d {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.chance.hard {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.btn-danger {
+  color: var(--danger);
+}
+
+.btn-danger::before {
+  border-color: rgba(255, 77, 109, 0.45);
+}
+
+.btn-danger:hover::before {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
