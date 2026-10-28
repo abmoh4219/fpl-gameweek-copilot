@@ -162,7 +162,7 @@ site_url = "http://localhost:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["http://localhost:3000/auth/callback", "http://127.0.0.1:3000/auth/callback"]
+additional_redirect_urls = ["http://localhost:3000/**", "http://127.0.0.1:3000/**"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -323,11 +323,15 @@ max_frequency = "5s"
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
 # Google sign-in (docs/product-plan.md). Off locally unless you export the
 # two variables below; in the cloud it is configured in the Supabase dashboard.
+# Google sign-in. The id and secret come from supabase/.env (gitignored); see
+# docs/deploy.md §4b. Google only allows plain-http redirects to `localhost`,
+# so the local callback says localhost rather than 127.0.0.1.
 [auth.external.google]
-enabled = false
+enabled = true
 client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
-skip_nonce_check = true
+redirect_uri = "http://localhost:54321/auth/v1/callback"
+skip_nonce_check = false
 
 [auth.external.apple]
 enabled = false

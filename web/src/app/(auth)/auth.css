@@ -427,3 +427,15 @@
     animation: none !important;
   }
 }
+
+.auth-fine {
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  text-align: center;
+  color: var(--faint);
+}
+
+.auth-fine a {
+  color: var(--muted);
+  border-bottom: 1px solid var(--line-3);
+}

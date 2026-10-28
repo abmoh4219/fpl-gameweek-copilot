@@ -133,8 +133,7 @@ Go to Supabase → **Authentication**.
   the site and the tests.
 - **URL Configuration**:
   - **Site URL**: your production URL
-  - **Redirect URLs**: add `https://<your-domain>/auth/callback` and
-    `http://localhost:3000/auth/callback`
+  - **Redirect URLs**: add `https://<your-domain>/**`
 
 ### 4b. Google sign-in
 
@@ -144,13 +143,19 @@ Go to Supabase → **Authentication**.
    - App name **Armband**, plus your support email
    - Scopes: the defaults (`email`, `profile`, `openid`). No verification is
      needed for these.
-   - **Publish app**, so anyone can sign in, not only test users.
-3. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
+   - **Branding**: application home page `https://<your-domain>`, privacy
+     policy `https://<your-domain>/privacy`, authorized domain
+     `<your-domain>`. Google requires these before publishing.
+   - **Audience → Publish app**, so anyone can sign in, not only test users.
+     Until then, add your own email under **Test users** to try it.
+3. **APIs & Services → Credentials → Create credentials → OAuth client ID**.
+   One client serves local development and production:
    - Type: **Web application**
-   - **Authorized JavaScript origins**: your production URL
-   - **Authorized redirect URIs**:
+   - **Authorized JavaScript origins**: `http://localhost:3000` and your
+     production URL
+   - **Authorized redirect URIs** (Supabase's address, not the website's):
+     `http://localhost:54321/auth/v1/callback` and
      `https://<project-ref>.supabase.co/auth/v1/callback`
-     (Supabase's address, not the website's)
 4. Copy the **Client ID** and **Client secret** into Supabase →
    **Authentication → Sign In / Providers → Google**, then enable it and
    **Save**.

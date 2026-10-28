@@ -30,6 +30,7 @@ export function SiteFooter() {
             <ul>
               <li><Link href="/sign-in">Log in</Link></li>
               <li><Link href="/sign-up">Create account</Link></li>
+              <li><Link href="/privacy">Privacy</Link></li>
             </ul>
           </div>
           <div>
