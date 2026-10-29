@@ -91,7 +91,7 @@ describe("secret redaction", () => {
     const previous = process.env["FOOTBALL_DATA_API_TOKEN"];
     process.env["FOOTBALL_DATA_API_TOKEN"] = "abcdef0123456789abcdef0123456789";
     try {
-      const text = redactSecrets("X-Auth-Token: abcdef0123456789abcdef0123456789 rejected");
+      const text = redactSecrets("X-Auth-Token: abcdef0123456789abcdef0123456789 rejected"); // gitleaks:allow (fake token)
       expect(text).not.toContain("abcdef0123456789");
       expect(text).toContain("[redacted:FOOTBALL_DATA_API_TOKEN]");
     } finally {

@@ -98,6 +98,14 @@ football and it says so in one sentence, without using your allowance.
 - **Explain:** the Gaffer works from the same computed cards, through tools.
   See [docs/agent.md](docs/agent.md).
 
+Make stays thin on purpose: code formats every message, so each scenario is a
+handful of modules and a month of alerts fits well inside the free plan's
+1,000 credits ([docs/make.md](docs/make.md)).
+
+| Events: to the channel, and X drafts to the owner | Preview: Gemini prose, checked again in code |
+| --- | --- |
+| ![Make scenario 1: webhook, secret check, router to the Telegram channel and to the owner](docs/images/make-scenario-events.png) | ![Make scenario 2: webhook, secret check, Gemini, webhook response](docs/images/make-scenario-preview.png) |
+
 ## Stack
 
 | | |

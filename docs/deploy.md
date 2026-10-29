@@ -164,5 +164,9 @@ Anonymous visitors never start a run.
 
 ## Before the repo goes public
 
-- Scan the whole history with `gitleaks`.
+- Scan the whole history with `gitleaks` (clean on 2026-10-29; known false
+  positives are in `.gitleaksignore`):
+  ```bash
+  docker run --rm -v "$PWD:/repo:ro" zricethezav/gitleaks:v8.24.3 git /repo --redact
+  ```
 - See CLAUDE.md §8 before charging anyone (kits, Vercel plan, Gemini terms).
