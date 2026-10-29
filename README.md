@@ -11,6 +11,11 @@ apply or revert, and shows the working behind every call.
 Behind it, a data pipeline watches FPL every few hours, detects price changes
 and injury news, and posts the ones that matter to a Telegram channel.
 
+**[Live site](https://armband-one.vercel.app)** ·
+**[Try the demo](https://armband-one.vercel.app/demo)** (no account needed) ·
+[How the Gaffer works](docs/agent.md) ·
+[Architecture decisions](docs/decisions.md)
+
 ![The landing page](docs/images/landing.png)
 
 ## Highlights

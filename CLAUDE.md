@@ -161,7 +161,7 @@ Free tiers only. No paid services anywhere in this project.
 | **Make.com** | 1,000 credits/month, 2 active scenarios, 15-min minimum interval | Daily report + preview must stay **under ~400 credits/month**. See math below. |
 | **Gemini API** | Free-tier RPM / RPD caps (re-check current values — they change) | ~5 calls/month for previews. Never called in a loop, never per player, never by a website visitor. |
 | **football-data.org** | 10 requests/minute, 12 competitions | **1 request/day.** See §6. |
-| **GitHub Actions** | 2,000 min/month (**private** repo) | Scheduled jobs stay **under ~600 min/month**; each run under ~2 minutes. See math below. |
+| **GitHub Actions** | Free on a **public** repo (2,000 min/month if it ever goes private) | Scheduled jobs stay **under ~600 min/month**; each run under ~2 minutes. See math below. |
 | **Supabase** | 500 MB, project **paused after 7 days idle** | Daily cron doubles as keep-alive. See note below. |
 | **Vercel Hobby** | Non-commercial, 100 GB bandwidth | Cached pages, no per-visit third-party calls. |
 
@@ -185,8 +185,9 @@ it belongs in `jobs/` instead.
 
 ### GitHub Actions minutes
 
-The repo is **private**, so Actions minutes are metered: 2,000 free minutes
-per month.
+The repo has been **public since 2026-10-29**, so standard runners cost
+nothing. We still keep the budget below, so a switch back to private (2,000
+metered minutes) would never break the pipeline.
 
 - Daily sync: ~2 min x 30 runs = **~60 min/month**
 - Deadline runs: ~2 min x ~20 runs = **~40 min/month**
@@ -216,11 +217,11 @@ If a run starts creeping past ~2 minutes, find out why before adding more runs.
 - Runs are cheap on a public repo, but every run costs FPL API politeness and
   Supabase rows. Frequency is a product decision, not a free-for-all.
 
-> **The 60-day scheduled-workflow pause applies to public repositories only.**
-> This repo is private, so it does not apply today. Keep it in mind for a
-> future public switch: GitHub disables scheduled workflows after 60 days
-> without repo activity, which would silently stop the daily sync — and with
-> it the Supabase keep-alive described below.
+> **The 60-day scheduled-workflow pause applies to this repo now that it is
+> public.** GitHub disables `schedule:` triggers after 60 days without repo
+> activity. The cron-job.org triggers (ADR-0015) are `workflow_dispatch` calls
+> and are not affected, so the jobs keep running; only the GitHub backup
+> schedules on daily-sync and preview would stop.
 
 > **Supabase keep-alive:** the daily cron doubles as the keep-alive. A free
 > project pauses after 7 days of inactivity, so if jobs fail for 7 days in a
@@ -493,11 +494,13 @@ extends the shared strictness.
   environment variables, or Make — never in this repo. `.env.example` holds
   placeholders only. Raw Make exports (`*.raw.json`) are gitignored because
   they embed live webhook and connection IDs.
-- **Nothing scans for leaked secrets here.** GitHub secret scanning is
-  unlikely to be available on a private repo without Advanced Security, so a
-  committed key would go unnoticed. Never write a real secret into a file,
-  never print a token in logs or error messages, and **scan the full history
-  with `gitleaks` before making this repo public**.
+- **The repo is public: a committed secret is a published secret.** GitHub's
+  secret scanning and push protection cover public repos, but they catch known
+  token formats only. Never write a real secret into a file, never print a
+  token in logs or error messages. History was scanned clean with `gitleaks`
+  on 2026-10-29 (command in `docs/deploy.md`; false positives in
+  `.gitleaksignore`). If a secret ever lands in a commit, **rotate it first**;
+  rewriting history does not unpublish it.
 - **Optional data never takes down the core pipeline.** The price-change
   fields and the Champions League sync are enrichment. If they are missing,
   renamed or failing, the daily pipeline still completes and publishes

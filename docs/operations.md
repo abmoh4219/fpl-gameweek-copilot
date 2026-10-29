@@ -38,8 +38,9 @@ cancellation — never do that to a sync.
 
 ### Minutes budget
 
-Private repo: 2,000 minutes/month, billed **rounded up per run**. Our own
-ceiling is 600.
+Public repo: standard runners are free. We still budget as if the repo were
+private (2,000 minutes/month, billed **rounded up per run**), with our own
+ceiling at 600, so going private again would break nothing.
 
 | Workflow | Runs/month | Measured job time | Billed |
 | --- | --- | --- | --- |
