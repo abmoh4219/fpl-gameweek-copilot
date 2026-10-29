@@ -193,6 +193,17 @@ describe("coach tools", () => {
     expect(last.incoming.map((p) => p.webName)).toEqual(["Mbeumo"]);
   });
 
+  it("search_players works out the budget for a replacement in code", async () => {
+    const { call } = coach();
+    // Rogers: £8.0m; the fixture's bank is £0.7m, so the budget is £8.7m.
+    const { data } = await call("search_players", { replacing: "Rogers", sortBy: "form" });
+    expect(data.budget).toMatchObject({ replacing: "Rogers", position: "MID", bankM: 0.7, sellingPriceM: 8, maxPriceM: 8.7 });
+    for (const p of data.players) {
+      expect(p.position).toBe("MID");
+      expect(p.priceM).toBeLessThanOrEqual(8.7);
+    }
+  });
+
   it("make_transfer refuses a move the bank cannot afford", async () => {
     const { call, plans } = coach();
     // £0.7m in the bank + £5.0m for Belloumi cannot buy a £7.9m player.

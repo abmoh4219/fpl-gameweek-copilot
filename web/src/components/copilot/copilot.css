@@ -210,6 +210,7 @@
 /* one question and its answer */
 .turn {
   display: grid;
+  min-width: 0;
   gap: 12px;
   animation: turn-in 0.35s var(--ease-out) backwards;
 }
@@ -242,7 +243,8 @@
 
 .turn-trace li {
   display: grid;
-  grid-template-columns: 16px auto minmax(0, 1fr);
+  /* the call may shrink too: a long lookup must never widen the panel */
+  grid-template-columns: 16px minmax(0, max-content) minmax(0, 1fr);
   align-items: baseline;
   gap: 9px;
   animation: turn-in 0.3s var(--ease-out) backwards;
@@ -269,8 +271,10 @@
 }
 
 .turn-trace code {
+  overflow: hidden;
   font-family: var(--font-mono);
   color: var(--flood);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

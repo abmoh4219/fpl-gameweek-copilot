@@ -36,6 +36,27 @@ and injury news, and posts the ones that matter to a Telegram channel.
   display type, slanted broadcast plates, chalk tactics-board illustrations,
   motion that respects reduced-motion settings.
 
+## The Gaffer at work
+
+Ask for a best XI and the Gaffer calls one tool, the pitch redraws, and
+**Apply** or **Revert** decides. Every figure in the answer came from code.
+
+![The Gaffer picks a best XI: the plan, the redrawn pitch and the reasoning](docs/images/gaffer-best-xi.png)
+
+Ask for a transfer and it searches the market, checks the move against FPL's
+rules and your bank, and puts the new player on your pitch.
+
+![The Gaffer makes a transfer: the new kit on the pitch and the bank after](docs/images/gaffer-transfer.png)
+
+```text
+pick_best_xi()   →  4-4-2 · C Haaland · 61 → 65.6 exp. pts (est.)
+plan             →  Start: Truffert, O'Reilly · Bench: Kayode, Schade · Vice: Kayode → Tavernier
+```
+
+Measured on the real model: a best-XI answer takes two model turns, about
+17 seconds, and costs about a tenth of a cent. Ask it something outside
+football and it says so in one sentence, without using your allowance.
+
 ## A look around
 
 | Connect your team | Your dugout |

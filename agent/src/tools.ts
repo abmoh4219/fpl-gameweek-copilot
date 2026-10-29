@@ -126,6 +126,13 @@ export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad
     return hits[0]!;
   }
 
+  /** A tool call as the trace shows it: `name(key: value, …)`, readable rather than raw JSON. */
+  const label = (name: string, args: Record<string, unknown>) =>
+    `${name}(${Object.entries(args)
+      .filter(([, v]) => v !== undefined)
+      .map(([k, v]) => `${k}: ${typeof v === "string" ? `"${v}"` : Array.isArray(v) ? v.map((x) => (typeof x === "string" ? `"${x}"` : JSON.stringify(x))).join(", ") : String(v)}`)
+      .join(", ")})`;
+
   const readOnly = { annotations: { readOnlyHint: true, openWorldHint: false } };
   const position = z.enum(["GKP", "DEF", "MID", "FWD"]);
 
@@ -149,8 +156,9 @@ export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad
 
     tool(
       "search_players",
-      "Find players to bring in. Filters by position, maximum price and club; sorts by form (points last 4 GW), xgi90, fixtures (kindest next 5), ownership, expected_points or price. Excludes players already in the squad and anyone without real minutes. Returns at most 10.",
+      "Find players to bring in. To replace a squad player, pass `replacing` with their name: code then sets the position and the budget (bank + their price) and returns it — never add prices yourself. Otherwise filter by position and maximum price. Sorts by form (points last 4 GW), xgi90, fixtures (kindest next 5), ownership, expected_points or price. Excludes the squad and anyone without real minutes. Returns at most 10.",
       {
+        replacing: z.string().min(2).optional().describe("Squad player to replace; sets position and budget"),
         position: position.optional(),
         maxPriceM: z.number().min(3.5).max(16).optional().describe("Maximum price in £m, e.g. 7.5"),
         team: z.string().length(3).optional().describe("Club short name, e.g. 'ARS'"),
@@ -158,18 +166,35 @@ export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad
         limit: z.number().int().min(1).max(10).optional(),
       },
       async (args) =>
-        traced("search_players", `search_players(${JSON.stringify(args)})`, async () => {
+        traced("search_players", label("search_players", args), async () => {
+          // The budget for a like-for-like swap is computed here, never by the model.
+          let budget: { replacing: string; position: string; maxPriceM: number; bankM: number; sellingPriceM: number } | null = null;
+          if (args.replacing) {
+            const out = resolve(ownedCards(), args.replacing);
+            if (typeof out === "string") return { data: out, summary: out, isError: true };
+            const bankM = current().bankM;
+            budget = {
+              replacing: out.webName,
+              position: out.position,
+              bankM,
+              sellingPriceM: out.priceM,
+              maxPriceM: Math.round((bankM + out.priceM) * 10) / 10,
+            };
+          }
+          const position = budget?.position ?? args.position;
+          const maxPriceM = budget?.maxPriceM ?? args.maxPriceM;
           const hits = searchPlayers(ctx.cards, {
             sortBy: args.sortBy,
             limit: args.limit ?? 5,
             excludeIds: owned().map((p) => p.fplId),
-            ...(args.position ? { position: args.position } : {}),
-            ...(args.maxPriceM !== undefined ? { maxPriceM: args.maxPriceM } : {}),
+            ...(position ? { position: position as "GKP" | "DEF" | "MID" | "FWD" } : {}),
+            ...(maxPriceM !== undefined ? { maxPriceM } : {}),
             ...(args.team ? { team: args.team } : {}),
           });
+          const top = hits.length ? `${hits.length} matches · top ${hits[0]!.name} £${hits[0]!.priceM.toFixed(1)}m` : "no matches";
           return {
-            data: hits,
-            summary: hits.length ? `${hits.length} matches · top ${hits[0]!.name} £${hits[0]!.priceM.toFixed(1)}m` : "no matches",
+            data: budget ? { budget: { ...budget, sellingPriceIsEstimate: true }, players: hits } : hits,
+            summary: budget ? `budget £${budget.maxPriceM.toFixed(1)}m (est.) · ${top}` : top,
           };
         }),
       readOnly,
@@ -364,7 +389,7 @@ export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad
         vice_captain: z.string().min(2).optional(),
       },
       async (args) =>
-        traced("change_lineup", `change_lineup(${JSON.stringify(args)})`, async () => {
+        traced("change_lineup", label("change_lineup", args), async () => {
           const players = pool();
           const find = (name: string) => {
             const hit = resolve(players.map((p) => cardsById.get(p.fplId)!), name);
