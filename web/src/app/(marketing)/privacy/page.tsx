@@ -37,6 +37,11 @@ export default function Privacy() {
         <li>
           <b>A question counter.</b> How many questions your account has asked the Gaffer, by day, so the limit holds.
         </li>
+        <li>
+          <b>An email fingerprint.</b> A one-way, keyed hash of your email address with the number of questions it has
+          used. It cannot be turned back into your address. It exists so the five free questions cannot be reset by
+          deleting an account and signing up again.
+        </li>
       </ul>
       <p>
         That is all. We never ask for your FPL password, and Armband can only read your team — it cannot make transfers or
@@ -68,7 +73,8 @@ export default function Privacy() {
       <h2>Deleting your data</h2>
       <p>
         Go to <Link href="/app/settings">Settings</Link> and choose <b>Delete account</b>. Your login, connected team and
-        question history are deleted immediately and permanently. To clear an applied plan, use <b>Clear plan</b> or your
+        question history are deleted immediately and permanently. The only thing kept is the email fingerprint above —
+        a hash and a count, nothing that identifies you. To clear an applied plan, use <b>Clear plan</b> or your
         browser&apos;s site data.
       </p>
 

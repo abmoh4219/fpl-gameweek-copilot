@@ -116,7 +116,7 @@ export default async function Settings() {
       <section className="setting danger">
         <div className="setting-label">
           <h2>Delete account</h2>
-          <p>Removes your login, your connected team and your usage history. Your FPL team itself is untouched.</p>
+          <p>Removes your login, your connected team and your usage history. Your FPL team itself is untouched, and signing up again with the same email does not reset your questions.</p>
         </div>
         <DeleteAccount />
       </section>

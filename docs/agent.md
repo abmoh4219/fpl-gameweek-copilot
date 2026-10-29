@@ -75,7 +75,7 @@ One JSON object per line (`packages/shared/src/agent-protocol.ts`):
 
 | Guard | Value |
 | --- | --- |
-| Questions per account | 5, for life — counted only when an answer completes |
+| Questions per account | 5, for life — counted only when an answer completes, and kept per email fingerprint so deleting and re-registering does not reset them (ADR-0013) |
 | Per question | 6 model turns, $0.02 |
 | Service-wide | $0.50 per UK day |
 | Per caller in the service | 10 per UK day (a backstop) |

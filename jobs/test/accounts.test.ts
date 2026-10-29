@@ -17,6 +17,7 @@ describe.skipIf(!stack)(`accounts (${stack ? "local Supabase" : SKIP_MESSAGE})`,
   const users: { email: string; token: string; id: string }[] = [];
 
   async function signUp(email: string): Promise<{ token: string; id: string }> {
+    used.push(email);
     const res = await fetch(`${stack!.apiUrl}/auth/v1/signup`, {
       method: "POST",
       headers: { apikey: stack!.anonKey, "Content-Type": "application/json" },
@@ -43,9 +44,15 @@ describe.skipIf(!stack)(`accounts (${stack ? "local Supabase" : SKIP_MESSAGE})`,
     }
   });
 
+  /** Every address a test signs up with, so the ledger can be cleaned too. */
+  const used: string[] = [];
+
   afterAll(async () => {
     const db: Db = connect(stack!.dbUrl);
-    await db`delete from auth.users where email like ${`%-${stamp}@accounts-test.dev`}`;
+    await db`delete from auth.users where email like ${`%-${stamp}@accounts-test.dev`} or email like ${`%${stamp}%@gmail.com`}`;
+    for (const email of used) {
+      await db`delete from app.question_ledger where fingerprint = app.email_fingerprint(${email})`;
+    }
     await db.end({ timeout: 5 });
   });
 
@@ -104,8 +111,8 @@ describe.skipIf(!stack)(`accounts (${stack ? "local Supabase" : SKIP_MESSAGE})`,
     const db: Db = connect(stack!.dbUrl);
     try {
       // Pretend Carl used all but one of his questions last week.
-      await db`insert into app.agent_usage (user_id, day, questions)
-               values (${carl.id}, current_date - 7, ${AGENT_LIMITS.questionsPerAccount - 1})`;
+      await db`insert into app.question_ledger (fingerprint, questions)
+               values (app.email_fingerprint(${carl.email}), ${AGENT_LIMITS.questionsPerAccount - 1})`;
     } finally {
       await db.end({ timeout: 5 });
     }
@@ -115,6 +122,43 @@ describe.skipIf(!stack)(`accounts (${stack ? "local Supabase" : SKIP_MESSAGE})`,
     expect(last).toMatchObject({ allowed: true, remaining: 0 });
     const [over] = (await (await rpc("consume_question", carl.token)).json()) as { allowed: boolean }[];
     expect(over!.allowed).toBe(false);
+  });
+
+  it("deleting the account and signing up again with the same email does not reset the allowance", async () => {
+    const email = `dora-${stamp}@accounts-test.dev`;
+    const first = await signUp(email);
+    for (let i = 0; i < AGENT_LIMITS.questionsPerAccount; i++) await rpc("consume_question", first.token);
+    expect((await rpc("delete_my_account", first.token)).ok).toBe(true);
+
+    const again = await signUp(email);
+    expect(again.id).not.toBe(first.id); // a brand-new login…
+    const total = (await (await fetch(rest("my_usage_total?select=questions"), { headers: as(again.token) })).json()) as { questions: number }[];
+    expect(total[0]!.questions).toBe(AGENT_LIMITS.questionsPerAccount); // …with the same count
+    const [row] = (await (await rpc("consume_question", again.token)).json()) as { allowed: boolean }[];
+    expect(row!.allowed).toBe(false);
+  });
+
+  it("treats Gmail dots, +tags and capitals as the same address", async () => {
+    const plain = await signUp(`gmailuser${stamp}@gmail.com`);
+    await rpc("consume_question", plain.token);
+    const variant = await signUp(`Gmail.User${stamp}+armband@gmail.com`);
+    const total = (await (await fetch(rest("my_usage_total?select=questions"), { headers: as(variant.token) })).json()) as { questions: number }[];
+    expect(total[0]!.questions).toBe(1);
+  });
+
+  it("never exposes the ledger or its secret", async () => {
+    const token = users[0]!.token;
+    for (const table of ["question_ledger", "ledger_key"]) {
+      const res = await fetch(rest(table), { headers: as(token) });
+      expect(res.ok).toBe(false);
+    }
+    const db: Db = connect(stack!.dbUrl);
+    try {
+      const rows = await db<{ fingerprint: string }[]>`select fingerprint from app.question_ledger limit 5`;
+      for (const r of rows) expect(r.fingerprint).toMatch(/^[0-9a-f]{64}$/); // hashes, never addresses
+    } finally {
+      await db.end({ timeout: 5 });
+    }
   });
 
   it("keeps each account's counter separate", async () => {

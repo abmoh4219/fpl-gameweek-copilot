@@ -585,3 +585,41 @@ is small, so a daily allowance of 10 per account was more than it can carry.
 - **Letting the model pick the XI.** Cheaper to build, but it would be the
   model computing a number — the one thing it may not do.
 - **A daily allowance.** Fairer to heavy users, but unaffordable on this key.
+
+## ADR-0013 — The free allowance belongs to the email, not the account
+
+### Context
+
+Five questions per account, for life (ADR-0012), were counted in
+`app.agent_usage`, which is deleted with the account. Deleting an account and
+signing up again with the same email therefore reset the allowance.
+
+### Decision
+
+- The lifetime count lives in `app.question_ledger`, keyed by a **fingerprint**
+  of the email: HMAC-SHA256 of the normalised address with a random secret
+  generated inside the database (`app.ledger_key`). It survives deletion; the
+  address itself does not.
+- Normalisation folds case, a `+tag`, and the dots Gmail ignores, so obvious
+  aliases share one allowance.
+- Users cannot read or change the ledger: both tables are deny-all, and two
+  `security definer` functions in `app` add one to the caller's own row or read
+  it. `api.consume_question()` and `api.my_usage_total` keep their shapes, so
+  the website did not change.
+- The privacy page, FAQ and Settings say exactly what is kept.
+
+### Consequences
+
+- Re-registering the same address no longer resets anything (tested).
+- A genuinely different address still gets five questions. No free product can
+  prevent that; the service-wide daily budget and the key's own spend limit
+  bound the total.
+- Changing an account's email would start a fresh count. Email changes need a
+  confirmation email we cannot send, so this is not reachable today.
+
+### Alternatives considered
+
+- **Keep the email after deletion.** Breaks the privacy promise.
+- **A plain hash.** An unsalted hash of an email can be matched against lists
+  of addresses; the keyed hash cannot without the database's secret.
+- **Refuse deletion while questions are used.** Breaks the FAQ's promise.

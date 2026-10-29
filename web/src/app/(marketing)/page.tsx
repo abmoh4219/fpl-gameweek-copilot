@@ -211,7 +211,7 @@ const FAQ: [string, string][] = [
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
   ["Why only five questions?", "Each answer takes real computing work, and we keep Armband free. Questions that aren't about FPL are declined and never counted."],
   ["Is this the official FPL app?", "No. Armband is an independent project, not affiliated with, endorsed by or connected to the Premier League or Fantasy Premier League. It uses public data only; the club kits on the pitch belong to their clubs."],
-  ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your profile, your connected team and your usage history."],
+  ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your login, your connected team and your usage history. We keep only a one-way fingerprint of your email with its question count, so the free allowance can't be reset by signing up again."],
 ];
 
 function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null; codes: Map<string, number> }) {

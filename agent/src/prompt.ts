@@ -34,11 +34,20 @@ Answer
 - Start with the decision in one sentence (player names in **bold**), then 2-3 short bullets with the numbers and the reason, then one line on the main risk.
 - Under 120 words. No headings, tables or emoji. British English, prices as £7.5m.`;
 
+/**
+ * One player, every number labelled. An unlabelled "0% (Thigh injury)" was
+ * once read by the model as ownership; labels make that impossible.
+ */
 function line(p: SquadPlayer, card: SiteCard | undefined): string {
-  const flags = [p.isCaptain ? "C" : "", p.isViceCaptain ? "VC" : ""].filter(Boolean).join(" ");
-  const status = p.status === "a" ? "" : `, ${p.chanceOfPlayingNextRound ?? 0}% ${p.news ? `(${p.news.slice(0, 40)})` : "flagged"}`;
-  const ep = card ? `, ep ${Math.round(expectedPoints(card) * 10) / 10}` : "";
-  return `${p.webName} ${p.position} ${p.team} £${p.priceM.toFixed(1)}m${ep}${status}${flags ? ` [${flags}]` : ""}`;
+  const parts = [`${p.webName} ${p.position} ${p.team}`, `£${p.priceM.toFixed(1)}m`];
+  if (card) parts.push(`ep ${Math.round(expectedPoints(card) * 10) / 10}`);
+  parts.push(`owned ${p.ownership.toFixed(1)}%`);
+  if (p.status !== "a") {
+    parts.push(`chance of playing ${p.chanceOfPlayingNextRound ?? 0}%${p.news ? ` (${p.news.slice(0, 40)})` : ""}`);
+  }
+  if (p.isCaptain) parts.push("captain");
+  if (p.isViceCaptain) parts.push("vice-captain");
+  return parts.join(", ");
 }
 
 /**
