@@ -668,3 +668,37 @@ question.
 - **Render's free plan.** Keeps the Agent SDK, and fits in 512 MB, but 0.1 CPU
   and a minute's wake-up after 15 idle minutes.
 - **Hugging Face PRO.** Breaks the free-tiers-only rule.
+
+## ADR-0015 — cron-job.org triggers the jobs; GitHub's schedule is only a backup
+
+### Context
+
+GitHub Actions' `schedule` is best-effort. Ours ran up to six hours late, and
+on 29 October 2026 it skipped price-sync's 03:17 and 06:17 runs and daily-sync
+entirely. Late injury news defeats the point of intraday detection, and a late
+daily-sync leaves the site and the channel a night behind.
+
+### Decision
+
+- **cron-job.org** (free) calls GitHub's `workflow_dispatch` API for
+  price-sync, daily-sync and preview at the exact minute, with a fine-grained
+  token that can only run this repository's workflows. The token lives only in
+  cron-job.org.
+- **price-sync has no GitHub schedule**: doubling its 8 runs a day would break
+  the minutes budget.
+- **daily-sync and preview keep GitHub's schedule as a backup.** A second run
+  on the same day changes nothing — changes are deduplicated, the daily report
+  is sent once, the preview once per gameweek.
+
+### Consequences
+
+- The jobs run on time; the backup keeps the nightly sync (and with it the
+  Supabase keep-alive) alive if cron-job.org fails.
+- If cron-job.org fails, price-sync stops until it is fixed; its failure email
+  and the dead man's switch on daily-sync make that visible.
+- The token expires (up to a year): renewing it is a calendar item.
+
+### Alternatives considered
+
+- **More frequent GitHub schedules.** Same unreliability, more minutes.
+- **A Vercel cron.** Hobby crons run at most once a day.

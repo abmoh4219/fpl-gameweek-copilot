@@ -205,7 +205,11 @@ If a run starts creeping past ~2 minutes, find out why before adding more runs.
 - Extra runs: **only near gameweek deadlines**, not all day.
 - **Two jobs** (`docs/operations.md`): **price-sync** every 3 hours
   (`17 */3 * * *`, bootstrap-static only, **measured 1.3 s**) and
-  **daily-sync** once at `37 2 * * *` (**measured 5.1 s**). Actions bills
+  **daily-sync** once at `37 2 * * *` (**measured 5.1 s**).
+  **cron-job.org triggers them at the exact minute** through
+  `workflow_dispatch` (ADR-0015), because GitHub's own schedule ran up to six
+  hours late or skipped runs. price-sync has no GitHub schedule; daily-sync and
+  preview keep theirs as a harmless backup. Actions bills
   rounded up per run, so checkout and install dominate, not the work: both
   workflows install with `--filter "@fpl/jobs..."` so `web/` is never built.
   Budget ~243 + 60 + 80 CI = **~383 min/month** against our 600 ceiling.

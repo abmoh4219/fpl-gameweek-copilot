@@ -6,17 +6,24 @@ What runs, when, how to check it, and what to do when it breaks.
 
 ## What runs when
 
-| Workflow | Schedule (UTC) | Runs/day | What it does |
+| Workflow | Trigger (UTC) | Runs/day | What it does |
 | --- | --- | --- | --- |
-| `price-sync` | `17 */3 * * *` — 00:17, 03:17 … 21:17 | 8 | bootstrap-static only: players, price telemetry, **status and news changes** |
-| `daily-sync` | `37 2 * * *` — 02:37 | 1 | everything: fixtures, gameweek stats, Champions League, day-over-day changes, retention |
-| `preview` | `47 9 * * *` — 09:47 | 1 | **skips** unless the next deadline is within 36 h and that gameweek's preview is unsent; then template + Gemini prose (validated), stored and delivered (ADR-0007) |
+| `price-sync` | cron-job.org at `17 */3 * * *` — 00:17, 03:17 … 21:17 | 8 | bootstrap-static only: players, price telemetry, **status and news changes** |
+| `daily-sync` | cron-job.org at 02:37, plus GitHub's `37 2 * * *` as a backup | 1–2 | everything: fixtures, gameweek stats, Champions League, day-over-day changes, retention |
+| `preview` | cron-job.org at 09:47, plus GitHub's `47 9 * * *` as a backup | 1–2 | **skips** unless the next deadline is within 36 h and that gameweek's preview is unsent; then template + Gemini prose (validated), stored and delivered (ADR-0007) |
 | `ci` | on push / PR (skips docs-only) | — | typecheck + tests |
 
-**Why those minutes.** GitHub delays schedules clustered at the top of the
-hour, so both use an odd off-peak minute. **02:37 UTC** is after the ~01:30 UK
-price change in both BST (00:30 UTC) and GMT (01:30 UTC). GitHub cron is
-**UTC only** — never write one of these in UK local time.
+**Why cron-job.org (ADR-0015).** GitHub's `schedule` ran our jobs up to six
+hours late and sometimes skipped them entirely, which made "intraday" news
+arrive after deadlines. cron-job.org calls GitHub's `workflow_dispatch` API at
+the exact minute. price-sync relies on it alone, because doubling 8 runs a day
+would break the minutes budget; daily-sync and preview keep GitHub's schedule
+as a backup, which is harmless because a second run on the same day changes
+nothing (dedup keys, one report per day, one preview per gameweek).
+
+**Why those minutes.** **02:37 UTC** is after the ~01:30 UK price change in
+both BST (00:30 UTC) and GMT (01:30 UTC). Schedules are **UTC only** — never
+write one in UK local time.
 
 **Why price-sync detects status and news.** Injury news lands on Thursday and
 Friday afternoons after press conferences, and deadlines are often Friday
@@ -37,15 +44,52 @@ ceiling is 600.
 | Workflow | Runs/month | Measured job time | Billed |
 | --- | --- | --- | --- |
 | price-sync | ~243 | **1.3 s** | 243 min if the whole run fits in 60 s |
-| daily-sync | ~30 | **5.1 s** | ~60 min |
-| preview | ~30 | seconds (~25 runs skip) | ~30 min |
+| daily-sync | ~30, up to ~60 with the backup | **5.1 s** | ~60–120 min |
+| preview | ~30, up to ~60 with the backup | seconds (most runs skip) | ~30–60 min |
 | ci | ~40 | — | ~80 min |
+
+Worst case ~503 minutes, inside the 600 ceiling.
 
 The jobs themselves are nowhere near the limit; **checkout, Node setup and
 install dominate**. That is why both workflows use `pnpm install --filter
 "@fpl/jobs..."` (never installing `web/`) and the pnpm store cache. If the
-Actions log shows price-sync billing 2 minutes, change its cron to
-`17 */4 * * *` — 182 runs, ~522 minutes worst case.
+Actions log shows price-sync billing 2 minutes, change its cron-job.org
+schedule to `17 */4 * * *` — 182 runs.
+
+---
+
+## Exact triggers: cron-job.org
+
+Three jobs on **cron-job.org** (free, no card) each call GitHub's API at the
+exact minute. Setup, once:
+
+1. **A GitHub token that can only run this repo's workflows.** GitHub →
+   Settings → Developer settings → **Fine-grained personal access tokens** →
+   Generate: repository access **only** `fpl-gameweek-copilot`, permission
+   **Actions: Read and write**, expiry up to a year (put the renewal date in a
+   calendar). It lives only in cron-job.org.
+2. **Each job** (Create cronjob):
+
+   | Job | URL | Schedule (UTC) |
+   | --- | --- | --- |
+   | price-sync | `https://api.github.com/repos/<owner>/fpl-gameweek-copilot/actions/workflows/price-sync.yml/dispatches` | `17 */3 * * *` |
+   | daily-sync | `…/actions/workflows/daily-sync.yml/dispatches` | `37 2 * * *` |
+   | preview | `…/actions/workflows/preview.yml/dispatches` | `47 9 * * *` |
+
+   Under **Advanced**: method **POST**, time zone **UTC**, body
+   `{"ref":"main"}`, and headers `Authorization: Bearer <token>`,
+   `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2022-11-28`,
+   `Content-Type: application/json`. Success is **204 No Content**.
+3. **Notifications:** turn on the email when a job fails, so an expired token
+   is noticed the same day.
+
+**Renewal dates.** The current token expires **2027-10-28** (GitHub reports it
+in the `github-authentication-token-expiration` response header). API version
+`2022-11-28` is deprecated and sunsets **2028-03-10**: when renewing the
+token, also move the header to the current version and re-run **Test run**.
+
+Check it worked: `gh run list --limit 5` shows runs with event
+`workflow_dispatch` at the scheduled minutes.
 
 ---
 

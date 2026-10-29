@@ -1,17 +1,14 @@
 name: price-sync
 
-# Every 3 hours at :17.
-#   17    -> minute 17. GitHub delays schedules that cluster at the top of the
-#            hour, so an odd off-peak minute starts sooner and more reliably.
-#   */3   -> every third hour from 00: 00:17, 03:17 ... 21:17 UTC (8 runs/day).
-#   * * * -> every day, every month, every weekday.
+# Every 3 hours at :17 UTC (00:17, 03:17 ... 21:17), triggered by
+# cron-job.org through workflow_dispatch (docs/operations.md, ADR-0015).
+# GitHub's own `schedule` ran this up to 6 hours late or skipped it, so it is
+# not used here; daily-sync and preview keep theirs as a backup.
 #
 # The job is light on purpose (bootstrap-static only, ~1.5s of work) because
 # GitHub bills private-repo minutes ROUNDED UP per run: staying inside one
 # minute end to end is the difference between ~243 and ~487 minutes a month.
 on:
-  schedule:
-    - cron: "17 */3 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

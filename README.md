@@ -138,7 +138,7 @@ pnpm --filter @fpl/web dev    # http://localhost:3000
 
 ## Docs
 
-- [Architecture decisions](docs/decisions.md): fourteen ADRs, from storage to
+- [Architecture decisions](docs/decisions.md): fifteen ADRs, from storage to
   the agent
 - [The Gaffer](docs/agent.md): the agent's tools, plans, limits, testing
 - [Database](docs/database.md): schemas, security model, retention
