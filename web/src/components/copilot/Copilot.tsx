@@ -242,7 +242,7 @@ export function Copilot(props: Props) {
             <b>{Math.max(remaining, 0)}</b> of {props.limit} questions left
           </span>
         ) : (
-          <span className="copilot-left">Demo · recorded this gameweek</span>
+          <span className="copilot-left">Demo · recorded answers</span>
         )}
       </header>
 

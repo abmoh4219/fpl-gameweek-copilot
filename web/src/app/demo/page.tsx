@@ -5,6 +5,7 @@ import { SquadCheck } from "@/components/copilot/SquadCheck";
 import { Mark, Wordmark } from "@/components/site/Mark";
 import { DEMO_TEAM_ID } from "@/components/site/links";
 import { DEMO_QUESTIONS } from "@/lib/demo";
+import { frozenDemo } from "@/lib/demo-snapshot";
 import { loadSquad } from "@/lib/squad";
 import "../app/app.css";
 
@@ -17,7 +18,8 @@ export const metadata: Metadata = {
 export const revalidate = 900;
 
 export default async function Demo() {
-  const squad = await loadSquad(DEMO_TEAM_ID).catch(() => null);
+  // Without a key the answers are frozen, so the pitch is frozen with them.
+  const squad = frozenDemo()?.squad ?? (await loadSquad(DEMO_TEAM_ID).catch(() => null));
 
   return (
     <div className="demo">

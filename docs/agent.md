@@ -91,6 +91,21 @@ Anonymous visitors never start a run. All limits live in `AGENT_LIMITS`; the
 account limit is enforced in SQL by `api.consume_question()`, and a test keeps
 the two equal.
 
+## When the key is gone
+
+Without `ANTHROPIC_API_KEY` the site still works, and so does the demo:
+
+- **`/demo` is frozen.** It shows the squad and the four answers saved together
+  in `web/src/lib/demo-snapshot.json`, so every plan still matches its pitch.
+- **Signed-in accounts** get "The Gaffer is off duty". Nothing is counted
+  against their five questions.
+
+To refresh the snapshot while a key is live, open `/demo` and click all four
+questions, then run `web/scripts/snapshot-demo.ts` (usage in its header). It
+reads the answers already cached on the live site, so it costs no agent runs.
+An expired key must be **removed** from Vercel, not left in place: the frozen
+demo starts only when no key is set.
+
 ## Testing
 
 - `packages/shared/test/` — lineup picking, rating, legality and plans.

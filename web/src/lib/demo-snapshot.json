@@ -1,0 +1,2184 @@
+{
+ "recordedAt": "2026-10-29T09:27:39.667Z",
+ "squad": {
+  "entryId": 7653564,
+  "teamName": "abmoh4219",
+  "managerName": "Abdelah Aliy",
+  "gameweek": 8,
+  "gameweekPoints": 48,
+  "totalPoints": 548,
+  "overallRank": 399408,
+  "bankM": 0.7,
+  "valueM": 101.6,
+  "activeChip": null,
+  "starters": [
+   {
+    "fplId": 1,
+    "webName": "Raya",
+    "team": "ARS",
+    "teamCode": 3,
+    "position": "GKP",
+    "slot": 1,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 6.2,
+    "ownership": 45.7,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 7,
+    "pickPoints": 7,
+    "seasonPoints": 49,
+    "formPoints": 20,
+    "xgiPer90": 0,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "LIV",
+      "difficulty": 4
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "HUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "NEW",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "MCI",
+      "difficulty": 4
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "BRE",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#C6F432",
+     "secondary": "#1A1A1A",
+     "pattern": "solid",
+     "ink": "#1A1A1A"
+    }
+   },
+   {
+    "fplId": 88,
+    "webName": "Kayode",
+    "team": "BRE",
+    "teamCode": 94,
+    "position": "DEF",
+    "slot": 2,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 4.6,
+    "ownership": 6.9,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 4,
+    "pickPoints": 4,
+    "seasonPoints": 28,
+    "formPoints": 11,
+    "xgiPer90": 0.2,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Hard",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 4
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "EVE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "MUN",
+      "difficulty": 4
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "ARS",
+      "difficulty": 4
+     }
+    ],
+    "kit": {
+     "primary": "#E30613",
+     "secondary": "#F4F4F4",
+     "pattern": "stripes",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 8,
+    "webName": "Calafiori",
+    "team": "ARS",
+    "teamCode": 3,
+    "position": "DEF",
+    "slot": 3,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 6,
+    "ownership": 51,
+    "status": "d",
+    "news": "Hip injury - 75% chance of playing",
+    "chanceOfPlayingNextRound": 75,
+    "eventPoints": 1,
+    "pickPoints": 1,
+    "seasonPoints": 45,
+    "formPoints": 17,
+    "xgiPer90": 0.32,
+    "minutesRisk": "Medium",
+    "goalThreat": "Low",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "LIV",
+      "difficulty": 4
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "HUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "NEW",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "MCI",
+      "difficulty": 4
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "BRE",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#EF0107",
+     "secondary": "#FFFFFF",
+     "pattern": "sleeves",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 504,
+    "webName": "Vuskovic",
+    "team": "BHA",
+    "teamCode": 36,
+    "position": "DEF",
+    "slot": 4,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 5.2,
+    "ownership": 6.6,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 1,
+    "pickPoints": 1,
+    "seasonPoints": 52,
+    "formPoints": 28,
+    "xgiPer90": 0.18,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "MCI",
+      "difficulty": 5
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "BRE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "HUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "NEW",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "BOU",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#0057B8",
+     "secondary": "#F4F4F4",
+     "pattern": "stripes",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 68,
+    "webName": "Tavernier",
+    "team": "BOU",
+    "teamCode": 91,
+    "position": "MID",
+    "slot": 5,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 6.4,
+    "ownership": 20,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 10,
+    "pickPoints": 10,
+    "seasonPoints": 52,
+    "formPoints": 23,
+    "xgiPer90": 0.67,
+    "minutesRisk": "Low",
+    "goalThreat": "Medium",
+    "fixtureBand": "Easy",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "IPS",
+      "difficulty": 2
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "FUL",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#DA291C",
+     "secondary": "#121212",
+     "pattern": "stripes",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 286,
+    "webName": "Belloumi",
+    "team": "HUL",
+    "teamCode": 88,
+    "position": "MID",
+    "slot": 6,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 5.2,
+    "ownership": 9.7,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 4,
+    "pickPoints": 4,
+    "seasonPoints": 43,
+    "formPoints": 16,
+    "xgiPer90": 0.31,
+    "minutesRisk": "Low",
+    "goalThreat": "Medium",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "IPS",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "ARS",
+      "difficulty": 5
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "CRY",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#F5A12D",
+     "secondary": "#141414",
+     "pattern": "stripes",
+     "ink": "#141414"
+    }
+   },
+   {
+    "fplId": 40,
+    "webName": "Rogers",
+    "team": "CHE",
+    "teamCode": 8,
+    "position": "MID",
+    "slot": 7,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 8,
+    "ownership": 50.2,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 1,
+    "pickPoints": 1,
+    "seasonPoints": 41,
+    "formPoints": 14,
+    "xgiPer90": 0.45,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "MUN",
+      "difficulty": 4
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "SUN",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "CRY",
+      "difficulty": 2
+     }
+    ],
+    "kit": {
+     "primary": "#034694",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 399,
+    "webName": "Cherki",
+    "team": "MCI",
+    "teamCode": 43,
+    "position": "MID",
+    "slot": 8,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 8,
+    "ownership": 38.2,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 0,
+    "pickPoints": 0,
+    "seasonPoints": 44,
+    "formPoints": 18,
+    "xgiPer90": 0.71,
+    "minutesRisk": "Low",
+    "goalThreat": "Medium",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "FUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "ARS",
+      "difficulty": 5
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#6CABDD",
+     "secondary": "#1C2C5B",
+     "pattern": "solid",
+     "ink": "#1C2C5B"
+    }
+   },
+   {
+    "fplId": 94,
+    "webName": "Schade",
+    "team": "BRE",
+    "teamCode": 94,
+    "position": "MID",
+    "slot": 9,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 6.2,
+    "ownership": 15,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": 100,
+    "eventPoints": 2,
+    "pickPoints": 2,
+    "seasonPoints": 42,
+    "formPoints": 12,
+    "xgiPer90": 0.37,
+    "minutesRisk": "Low",
+    "goalThreat": "Medium",
+    "fixtureBand": "Hard",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 4
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "EVE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "MUN",
+      "difficulty": 4
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "ARS",
+      "difficulty": 4
+     }
+    ],
+    "kit": {
+     "primary": "#E30613",
+     "secondary": "#F4F4F4",
+     "pattern": "stripes",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 138,
+    "webName": "Kostoulas",
+    "team": "BHA",
+    "teamCode": 36,
+    "position": "FWD",
+    "slot": 10,
+    "isStarter": true,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 1,
+    "priceM": 5.8,
+    "ownership": 10.2,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 2,
+    "pickPoints": 2,
+    "seasonPoints": 43,
+    "formPoints": 25,
+    "xgiPer90": 0.39,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "MCI",
+      "difficulty": 5
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "BRE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "HUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "NEW",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "BOU",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#0057B8",
+     "secondary": "#F4F4F4",
+     "pattern": "stripes",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 411,
+    "webName": "Haaland",
+    "team": "MCI",
+    "teamCode": 43,
+    "position": "FWD",
+    "slot": 11,
+    "isStarter": true,
+    "isCaptain": true,
+    "isViceCaptain": false,
+    "multiplier": 2,
+    "priceM": 15.8,
+    "ownership": 78.3,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": 100,
+    "eventPoints": 8,
+    "pickPoints": 16,
+    "seasonPoints": 66,
+    "formPoints": 33,
+    "xgiPer90": 0.87,
+    "minutesRisk": "Low",
+    "goalThreat": "High",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "FUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "ARS",
+      "difficulty": 5
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#6CABDD",
+     "secondary": "#1C2C5B",
+     "pattern": "solid",
+     "ink": "#1C2C5B"
+    }
+   }
+  ],
+  "bench": [
+   {
+    "fplId": 496,
+    "webName": "Kinsky",
+    "team": "TOT",
+    "teamCode": 6,
+    "position": "GKP",
+    "slot": 12,
+    "isStarter": false,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 0,
+    "priceM": 4.4,
+    "ownership": 15,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 9,
+    "pickPoints": 0,
+    "seasonPoints": 32,
+    "formPoints": 16,
+    "xgiPer90": 0,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Easy",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "CRY",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "IPS",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "SUN",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "FUL",
+      "difficulty": 2
+     }
+    ],
+    "kit": {
+     "primary": "#C6F432",
+     "secondary": "#1A1A1A",
+     "pattern": "solid",
+     "ink": "#1A1A1A"
+    }
+   },
+   {
+    "fplId": 387,
+    "webName": "O'Reilly",
+    "team": "MCI",
+    "teamCode": 43,
+    "position": "DEF",
+    "slot": 13,
+    "isStarter": false,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 0,
+    "priceM": 6.2,
+    "ownership": 8.5,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": 100,
+    "eventPoints": 0,
+    "pickPoints": 0,
+    "seasonPoints": 13,
+    "formPoints": 8,
+    "xgiPer90": 0.49,
+    "minutesRisk": "Medium",
+    "goalThreat": "Medium",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "FUL",
+      "difficulty": 2
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "ARS",
+      "difficulty": 5
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#6CABDD",
+     "secondary": "#1C2C5B",
+     "pattern": "solid",
+     "ink": "#1C2C5B"
+    }
+   },
+   {
+    "fplId": 165,
+    "webName": "João Pedro",
+    "team": "CHE",
+    "teamCode": 8,
+    "position": "FWD",
+    "slot": 14,
+    "isStarter": false,
+    "isCaptain": false,
+    "isViceCaptain": true,
+    "multiplier": 0,
+    "priceM": 7.8,
+    "ownership": 62.7,
+    "status": "i",
+    "news": "Thigh injury - Unknown return date",
+    "chanceOfPlayingNextRound": 0,
+    "eventPoints": 0,
+    "pickPoints": 0,
+    "seasonPoints": 47,
+    "formPoints": 14,
+    "xgiPer90": 0.58,
+    "minutesRisk": "High",
+    "goalThreat": "Medium",
+    "fixtureBand": "Medium",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "MUN",
+      "difficulty": 4
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "SUN",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "CRY",
+      "difficulty": 2
+     }
+    ],
+    "kit": {
+     "primary": "#034694",
+     "secondary": "#FFFFFF",
+     "pattern": "solid",
+     "ink": "#FFFFFF"
+    }
+   },
+   {
+    "fplId": 61,
+    "webName": "Truffert",
+    "team": "BOU",
+    "teamCode": 91,
+    "position": "DEF",
+    "slot": 15,
+    "isStarter": false,
+    "isCaptain": false,
+    "isViceCaptain": false,
+    "multiplier": 0,
+    "priceM": 5.4,
+    "ownership": 3,
+    "status": "a",
+    "news": "",
+    "chanceOfPlayingNextRound": null,
+    "eventPoints": 10,
+    "pickPoints": 0,
+    "seasonPoints": 25,
+    "formPoints": 17,
+    "xgiPer90": 0.15,
+    "minutesRisk": "Low",
+    "goalThreat": "Low",
+    "fixtureBand": "Easy",
+    "fixtures": [
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 9,
+      "isDouble": false,
+      "opponent": "LEE",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 10,
+      "isDouble": false,
+      "opponent": "IPS",
+      "difficulty": 2
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 11,
+      "isDouble": false,
+      "opponent": "NFO",
+      "difficulty": 3
+     },
+     {
+      "isHome": false,
+      "isBlank": false,
+      "gameweek": 12,
+      "isDouble": false,
+      "opponent": "FUL",
+      "difficulty": 3
+     },
+     {
+      "isHome": true,
+      "isBlank": false,
+      "gameweek": 13,
+      "isDouble": false,
+      "opponent": "BHA",
+      "difficulty": 3
+     }
+    ],
+    "kit": {
+     "primary": "#DA291C",
+     "secondary": "#121212",
+     "pattern": "stripes",
+     "ink": "#FFFFFF"
+    }
+   }
+  ],
+  "missing": []
+ },
+ "answers": [
+  [
+   {
+    "type": "tool_call",
+    "id": "t1",
+    "name": "pick_best_xi",
+    "label": "pick_best_xi()"
+   },
+   {
+    "type": "plan",
+    "plan": {
+     "starters": [
+      1,
+      504,
+      61,
+      8,
+      387,
+      68,
+      286,
+      40,
+      399,
+      411,
+      138
+     ],
+     "bench": [
+      496,
+      88,
+      94,
+      165
+     ],
+     "captain": 411,
+     "vice": 68,
+     "transfers": []
+    },
+    "incoming": [],
+    "changes": [
+     "Start: Truffert, O'Reilly",
+     "Bench: Kayode, Schade",
+     "Vice-captain: Kayode → Tavernier"
+    ]
+   },
+   {
+    "type": "tool_result",
+    "id": "t1",
+    "summary": "4-4-2 · C Haaland · 61 → 65.6 exp. pts (est.)",
+    "isError": false
+   },
+   {
+    "type": "text",
+    "delta": "**Ha"
+   },
+   {
+    "type": "text",
+    "delta": "aland** is capt"
+   },
+   {
+    "type": "text",
+    "delta": "ain and **"
+   },
+   {
+    "type": "text",
+    "delta": "Tavernier** is v"
+   },
+   {
+    "type": "text",
+    "delta": "ice-captain, with"
+   },
+   {
+    "type": "text",
+    "delta": " Truffert and O'Re"
+   },
+   {
+    "type": "text",
+    "delta": "illy br"
+   },
+   {
+    "type": "text",
+    "delta": "ought into"
+   },
+   {
+    "type": "text",
+    "delta": " the XI."
+   },
+   {
+    "type": "text",
+    "delta": " I"
+   },
+   {
+    "type": "text",
+    "delta": "'ve"
+   },
+   {
+    "type": "text",
+    "delta": " set the lineup on"
+   },
+   {
+    "type": "text",
+    "delta": " your"
+   },
+   {
+    "type": "text",
+    "delta": " pitch;"
+   },
+   {
+    "type": "text",
+    "delta": " the chang"
+   },
+   {
+    "type": "text",
+    "delta": "es still"
+   },
+   {
+    "type": "text",
+    "delta": " need making"
+   },
+   {
+    "type": "text",
+    "delta": " in the FPL app."
+   },
+   {
+    "type": "text",
+    "delta": "\n\n-"
+   },
+   {
+    "type": "text",
+    "delta": " Haaland has"
+   },
+   {
+    "type": "text",
+    "delta": " the highest exp"
+   },
+   {
+    "type": "text",
+    "delta": "ected points (9,"
+   },
+   {
+    "type": "text",
+    "delta": " estimate), so"
+   },
+   {
+    "type": "text",
+    "delta": " he g"
+   },
+   {
+    "type": "text",
+    "delta": "ets the arm"
+   },
+   {
+    "type": "text",
+    "delta": "band.\n- Truffert"
+   },
+   {
+    "type": "text",
+    "delta": " (5,"
+   },
+   {
+    "type": "text",
+    "delta": " estimate) replaces"
+   },
+   {
+    "type": "text",
+    "delta": " Sch"
+   },
+   {
+    "type": "text",
+    "delta": "ade, and"
+   },
+   {
+    "type": "text",
+    "delta": " O"
+   },
+   {
+    "type": "text",
+    "delta": "'Reilly (2."
+   },
+   {
+    "type": "text",
+    "delta": "3)"
+   },
+   {
+    "type": "text",
+    "delta": " com"
+   },
+   {
+    "type": "text",
+    "delta": "es in for"
+   },
+   {
+    "type": "text",
+    "delta": " Kayode. The"
+   },
+   {
+    "type": "text",
+    "delta": " change l"
+   },
+   {
+    "type": "text",
+    "delta": "ifts expected points from 61"
+   },
+   {
+    "type": "text",
+    "delta": " to 65.6 ("
+   },
+   {
+    "type": "text",
+    "delta": "estimate).\n- João"
+   },
+   {
+    "type": "text",
+    "delta": " Pedro (0%"
+   },
+   {
+    "type": "text",
+    "delta": " chance of playing) stays"
+   },
+   {
+    "type": "text",
+    "delta": " on"
+   },
+   {
+    "type": "text",
+    "delta": " the bench.\n\nMain"
+   },
+   {
+    "type": "text",
+    "delta": " risk:"
+   },
+   {
+    "type": "text",
+    "delta": " Calafiori is"
+   },
+   {
+    "type": "text",
+    "delta": " a 75% chance of play"
+   },
+   {
+    "type": "text",
+    "delta": "ing with"
+   },
+   {
+    "type": "text",
+    "delta": " a hip kn"
+   },
+   {
+    "type": "text",
+    "delta": "ock, so ke"
+   },
+   {
+    "type": "text",
+    "delta": "ep an"
+   },
+   {
+    "type": "text",
+    "delta": " eye on team"
+   },
+   {
+    "type": "text",
+    "delta": " news before the deadline."
+   },
+   {
+    "type": "done",
+    "costUsd": null,
+    "turns": 2,
+    "remaining": null
+   }
+  ],
+  [
+   {
+    "type": "tool_call",
+    "id": "t1",
+    "name": "rate_lineup",
+    "label": "rate_lineup()"
+   },
+   {
+    "type": "tool_result",
+    "id": "t1",
+    "summary": "8.6/10 · 61 of 65.6 exp. pts (est.)",
+    "isError": false
+   },
+   {
+    "type": "text",
+    "delta": "I"
+   },
+   {
+    "type": "text",
+    "delta": "'d"
+   },
+   {
+    "type": "text",
+    "delta": " rate your lineup **"
+   },
+   {
+    "type": "text",
+    "delta": "8.6/10**"
+   },
+   {
+    "type": "text",
+    "delta": " (estimate),"
+   },
+   {
+    "type": "text",
+    "delta": " with about"
+   },
+   {
+    "type": "text",
+    "delta": " 61 expected points against a"
+   },
+   {
+    "type": "text",
+    "delta": " best poss"
+   },
+   {
+    "type": "text",
+    "delta": "ible 65.6.\n\n-"
+   },
+   {
+    "type": "text",
+    "delta": " The main fix is to start **"
+   },
+   {
+    "type": "text",
+    "delta": "Truffert** ("
+   },
+   {
+    "type": "text",
+    "delta": "est"
+   },
+   {
+    "type": "text",
+    "delta": "imated"
+   },
+   {
+    "type": "text",
+    "delta": " 5 points"
+   },
+   {
+    "type": "text",
+    "delta": ") "
+   },
+   {
+    "type": "text",
+    "delta": "ahead of **Kayode"
+   },
+   {
+    "type": "text",
+    "delta": "** (estimated 1."
+   },
+   {
+    "type": "text",
+    "delta": "7)."
+   },
+   {
+    "type": "text",
+    "delta": "\n- **"
+   },
+   {
+    "type": "text",
+    "delta": "O'Reilly** ("
+   },
+   {
+    "type": "text",
+    "delta": "est"
+   },
+   {
+    "type": "text",
+    "delta": "imated 2.3) also"
+   },
+   {
+    "type": "text",
+    "delta": " deserves a start"
+   },
+   {
+    "type": "text",
+    "delta": " over **Schade** (est"
+   },
+   {
+    "type": "text",
+    "delta": "imated 1),"
+   },
+   {
+    "type": "text",
+    "delta": " and the bench order should put"
+   },
+   {
+    "type": "text",
+    "delta": " Truffert "
+   },
+   {
+    "type": "text",
+    "delta": "ahead of O"
+   },
+   {
+    "type": "text",
+    "delta": "'Reilly.\n-"
+   },
+   {
+    "type": "text",
+    "delta": " Haaland as"
+   },
+   {
+    "type": "text",
+    "delta": " captain is the"
+   },
+   {
+    "type": "text",
+    "delta": " strongest option"
+   },
+   {
+    "type": "text",
+    "delta": ", so"
+   },
+   {
+    "type": "text",
+    "delta": " ke"
+   },
+   {
+    "type": "text",
+    "delta": "ep him"
+   },
+   {
+    "type": "text",
+    "delta": ".\n\nMain"
+   },
+   {
+    "type": "text",
+    "delta": " risk: **"
+   },
+   {
+    "type": "text",
+    "delta": "Calafiori** is only"
+   },
+   {
+    "type": "text",
+    "delta": " 75% to"
+   },
+   {
+    "type": "text",
+    "delta": " play, so ke"
+   },
+   {
+    "type": "text",
+    "delta": "ep an"
+   },
+   {
+    "type": "text",
+    "delta": " eye on his"
+   },
+   {
+    "type": "text",
+    "delta": " f"
+   },
+   {
+    "type": "text",
+    "delta": "itness before the deadline."
+   },
+   {
+    "type": "text",
+    "delta": " I ha"
+   },
+   {
+    "type": "text",
+    "delta": "ven't chang"
+   },
+   {
+    "type": "text",
+    "delta": "ed anything y"
+   },
+   {
+    "type": "text",
+    "delta": "et."
+   },
+   {
+    "type": "text",
+    "delta": " Say the"
+   },
+   {
+    "type": "text",
+    "delta": " word if you want"
+   },
+   {
+    "type": "text",
+    "delta": " me to make the swaps."
+   },
+   {
+    "type": "done",
+    "costUsd": null,
+    "turns": 2,
+    "remaining": null
+   }
+  ],
+  [
+   {
+    "type": "tool_call",
+    "id": "t1",
+    "name": "search_players",
+    "label": "search_players(replacing: \"Schade\", sortBy: \"expected_points\", limit: 5)"
+   },
+   {
+    "type": "tool_result",
+    "id": "t1",
+    "summary": "budget £6.9m (est.) · 5 matches · top Henderson £4.9m",
+    "isError": false
+   },
+   {
+    "type": "tool_call",
+    "id": "t2",
+    "name": "make_transfer",
+    "label": "make_transfer(out: \"Schade\", in: \"Henderson\")"
+   },
+   {
+    "type": "plan",
+    "plan": {
+     "starters": [
+      1,
+      88,
+      8,
+      504,
+      68,
+      286,
+      40,
+      399,
+      101,
+      138,
+      411
+     ],
+     "bench": [
+      496,
+      387,
+      165,
+      61
+     ],
+     "captain": 411,
+     "vice": 88,
+     "transfers": [
+      {
+       "out": 94,
+       "in": 101
+      }
+     ]
+    },
+    "incoming": [
+     {
+      "fplId": 101,
+      "webName": "Henderson",
+      "team": "CHE",
+      "teamCode": 8,
+      "position": "MID",
+      "slot": 15,
+      "isStarter": false,
+      "isCaptain": false,
+      "isViceCaptain": false,
+      "multiplier": 0,
+      "priceM": 4.9,
+      "ownership": 1.6,
+      "status": "a",
+      "news": "",
+      "chanceOfPlayingNextRound": 100,
+      "eventPoints": 0,
+      "pickPoints": 0,
+      "seasonPoints": 25,
+      "formPoints": 25,
+      "xgiPer90": 0.25,
+      "minutesRisk": "Low",
+      "goalThreat": "Low",
+      "fixtureBand": "Medium",
+      "fixtures": [
+       {
+        "isHome": true,
+        "isBlank": false,
+        "gameweek": 9,
+        "isDouble": false,
+        "opponent": "MUN",
+        "difficulty": 4
+       },
+       {
+        "isHome": false,
+        "isBlank": false,
+        "gameweek": 10,
+        "isDouble": false,
+        "opponent": "SUN",
+        "difficulty": 3
+       },
+       {
+        "isHome": true,
+        "isBlank": false,
+        "gameweek": 11,
+        "isDouble": false,
+        "opponent": "LEE",
+        "difficulty": 3
+       },
+       {
+        "isHome": false,
+        "isBlank": false,
+        "gameweek": 12,
+        "isDouble": false,
+        "opponent": "NFO",
+        "difficulty": 3
+       },
+       {
+        "isHome": true,
+        "isBlank": false,
+        "gameweek": 13,
+        "isDouble": false,
+        "opponent": "CRY",
+        "difficulty": 2
+       }
+      ],
+      "kit": {
+       "primary": "#034694",
+       "secondary": "#FFFFFF",
+       "pattern": "solid",
+       "ink": "#FFFFFF"
+      }
+     }
+    ],
+    "changes": [
+     "Transfer: Schade out, Henderson in (£6.2m → £4.9m)"
+    ]
+   },
+   {
+    "type": "tool_result",
+    "id": "t2",
+    "summary": "Schade → Henderson · bank £2.0m (est.)",
+    "isError": false
+   },
+   {
+    "type": "text",
+    "delta": "I've"
+   },
+   {
+    "type": "text",
+    "delta": " sw"
+   },
+   {
+    "type": "text",
+    "delta": "apped **Schade** for"
+   },
+   {
+    "type": "text",
+    "delta": " **Henderson**"
+   },
+   {
+    "type": "text",
+    "delta": " on the plan,"
+   },
+   {
+    "type": "text",
+    "delta": " which you'"
+   },
+   {
+    "type": "text",
+    "delta": "ll need"
+   },
+   {
+    "type": "text",
+    "delta": " to apply in the FPL"
+   },
+   {
+    "type": "text",
+    "delta": " app.\n\n- Sch"
+   },
+   {
+    "type": "text",
+    "delta": "ade has an exp"
+   },
+   {
+    "type": "text",
+    "delta": "ected-"
+   },
+   {
+    "type": "text",
+    "delta": "points fig"
+   },
+   {
+    "type": "text",
+    "delta": "ure of 1 (estim"
+   },
+   {
+    "type": "text",
+    "delta": "ate), the"
+   },
+   {
+    "type": "text",
+    "delta": " we"
+   },
+   {
+    "type": "text",
+    "delta": "akest star"
+   },
+   {
+    "type": "text",
+    "delta": "ter in your"
+   },
+   {
+    "type": "text",
+    "delta": " X"
+   },
+   {
+    "type": "text",
+    "delta": "I.\n- Henderson"
+   },
+   {
+    "type": "text",
+    "delta": " (CHE, £4."
+   },
+   {
+    "type": "text",
+    "delta": "9m) has an est"
+   },
+   {
+    "type": "text",
+    "delta": "imated"
+   },
+   {
+    "type": "text",
+    "delta": " 7.7 exp"
+   },
+   {
+    "type": "text",
+    "delta": "ected points and 25 points over"
+   },
+   {
+    "type": "text",
+    "delta": " his"
+   },
+   {
+    "type": "text",
+    "delta": " last four gameweeks,"
+   },
+   {
+    "type": "text",
+    "delta": " and"
+   },
+   {
+    "type": "text",
+    "delta": " is"
+   },
+   {
+    "type": "text",
+    "delta": " f"
+   },
+   {
+    "type": "text",
+    "delta": "ully f"
+   },
+   {
+    "type": "text",
+    "delta": "it.\n- This"
+   },
+   {
+    "type": "text",
+    "delta": " leaves £2.0m"
+   },
+   {
+    "type": "text",
+    "delta": " in the bank."
+   },
+   {
+    "type": "text",
+    "delta": " Ne"
+   },
+   {
+    "type": "text",
+    "delta": "to ("
+   },
+   {
+    "type": "text",
+    "delta": "£"
+   },
+   {
+    "type": "text",
+    "delta": "6.6m) has"
+   },
+   {
+    "type": "text",
+    "delta": " the same estimate"
+   },
+   {
+    "type": "text",
+    "delta": " but costs far more."
+   },
+   {
+    "type": "text",
+    "delta": "\n\nThe"
+   },
+   {
+    "type": "text",
+    "delta": " main risk is that"
+   },
+   {
+    "type": "text",
+    "delta": " Henderson's under"
+   },
+   {
+    "type": "text",
+    "delta": "l"
+   },
+   {
+    "type": "text",
+    "delta": "ying num"
+   },
+   {
+    "type": "text",
+    "delta": "bers are mod"
+   },
+   {
+    "type": "text",
+    "delta": "est (xGI per"
+   },
+   {
+    "type": "text",
+    "delta": " 90 of 0.25"
+   },
+   {
+    "type": "text",
+    "delta": "), so his"
+   },
+   {
+    "type": "text",
+    "delta": " retur"
+   },
+   {
+    "type": "text",
+    "delta": "ns rely"
+   },
+   {
+    "type": "text",
+    "delta": " on clean"
+   },
+   {
+    "type": "text",
+    "delta": " s"
+   },
+   {
+    "type": "text",
+    "delta": "heets and ass"
+   },
+   {
+    "type": "text",
+    "delta": "ists. Also"
+   },
+   {
+    "type": "text",
+    "delta": ", João Pedro ("
+   },
+   {
+    "type": "text",
+    "delta": "0"
+   },
+   {
+    "type": "text",
+    "delta": "% chance of playing) is"
+   },
+   {
+    "type": "text",
+    "delta": " still on your"
+   },
+   {
+    "type": "text",
+    "delta": " bench and is"
+   },
+   {
+    "type": "text",
+    "delta": " worth repl"
+   },
+   {
+    "type": "text",
+    "delta": "acing when you next"
+   },
+   {
+    "type": "text",
+    "delta": " have a free"
+   },
+   {
+    "type": "text",
+    "delta": " transfer."
+   },
+   {
+    "type": "done",
+    "costUsd": null,
+    "turns": 3,
+    "remaining": null
+   }
+  ],
+  [
+   {
+    "type": "text",
+    "delta": "**"
+   },
+   {
+    "type": "text",
+    "delta": "João"
+   },
+   {
+    "type": "text",
+    "delta": " Pedro**"
+   },
+   {
+    "type": "text",
+    "delta": " is out (0% chance of"
+   },
+   {
+    "type": "text",
+    "delta": " playing, thigh, return"
+   },
+   {
+    "type": "text",
+    "delta": " date unknown),"
+   },
+   {
+    "type": "text",
+    "delta": " and **Calafiori**"
+   },
+   {
+    "type": "text",
+    "delta": " is doubtful (75%"
+   },
+   {
+    "type": "text",
+    "delta": " chance, hip)."
+   },
+   {
+    "type": "text",
+    "delta": "\n\n- **João Pedro"
+   },
+   {
+    "type": "text",
+    "delta": "** is"
+   },
+   {
+    "type": "text",
+    "delta": " on your bench with"
+   },
+   {
+    "type": "text",
+    "delta": " an "
+   },
+   {
+    "type": "text",
+    "delta": "ep of 0, so he's"
+   },
+   {
+    "type": "text",
+    "delta": " a"
+   },
+   {
+    "type": "text",
+    "delta": " de"
+   },
+   {
+    "type": "text",
+    "delta": "adweight."
+   },
+   {
+    "type": "text",
+    "delta": " Owned by 62.7"
+   },
+   {
+    "type": "text",
+    "delta": "%, he's wor"
+   },
+   {
+    "type": "text",
+    "delta": "th repl"
+   },
+   {
+    "type": "text",
+    "delta": "acing."
+   },
+   {
+    "type": "text",
+    "delta": "\n- **Calafiori"
+   },
+   {
+    "type": "text",
+    "delta": "** star"
+   },
+   {
+    "type": "text",
+    "delta": "ts at"
+   },
+   {
+    "type": "text",
+    "delta": " D"
+   },
+   {
+    "type": "text",
+    "delta": "EF for"
+   },
+   {
+    "type": "text",
+    "delta": " "
+   },
+   {
+    "type": "text",
+    "delta": "ARS ("
+   },
+   {
+    "type": "text",
+    "delta": "£6.0m, ep"
+   },
+   {
+    "type": "text",
+    "delta": " 4 as"
+   },
+   {
+    "type": "text",
+    "delta": " an"
+   },
+   {
+    "type": "text",
+    "delta": " estimate). If"
+   },
+   {
+    "type": "text",
+    "delta": " he doesn't play, your"
+   },
+   {
+    "type": "text",
+    "delta": " bench options are"
+   },
+   {
+    "type": "text",
+    "delta": " Truffert ("
+   },
+   {
+    "type": "text",
+    "delta": "ep 5)"
+   },
+   {
+    "type": "text",
+    "delta": " and O'Reilly ("
+   },
+   {
+    "type": "text",
+    "delta": "ep 2.3)."
+   },
+   {
+    "type": "text",
+    "delta": "\n\nMain risk: Calaf"
+   },
+   {
+    "type": "text",
+    "delta": "iori's status"
+   },
+   {
+    "type": "text",
+    "delta": " could change before"
+   },
+   {
+    "type": "text",
+    "delta": " k"
+   },
+   {
+    "type": "text",
+    "delta": "ick-off, so check team news"
+   },
+   {
+    "type": "text",
+    "delta": " before the deadline."
+   },
+   {
+    "type": "done",
+    "costUsd": null,
+    "turns": 1,
+    "remaining": null
+   }
+  ]
+ ]
+}

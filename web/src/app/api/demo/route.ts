@@ -3,6 +3,7 @@ import type { AgentEvent } from "@fpl/shared";
 import { DEMO_TEAM_ID } from "@/components/site/links";
 import { collectGaffer, failure, NDJSON_HEADERS } from "@/lib/agent";
 import { DEMO_QUESTIONS } from "@/lib/demo";
+import { frozenDemo } from "@/lib/demo-snapshot";
 import { loadSquad } from "@/lib/squad";
 
 /**
@@ -40,6 +41,12 @@ const inFlight = new Map<string, Promise<AgentEvent[]>>();
 export async function GET(request: Request): Promise<Response> {
   const q = Number(new URL(request.url).searchParams.get("q"));
   if (!Number.isInteger(q) || q < 0 || q >= DEMO_QUESTIONS.length) return failure("bad_request", "Unknown demo question.", 400);
+
+  // No key, no recording: replay the frozen snapshot, which matches the pitch /demo shows.
+  const frozen = frozenDemo();
+  if (frozen) {
+    return new Response(frozen.answers[q]!.map((e) => `${JSON.stringify(e)}\n`).join(""), { headers: NDJSON_HEADERS });
+  }
 
   let gameweek: number;
   try {

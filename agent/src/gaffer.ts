@@ -65,7 +65,7 @@ export async function runGaffer(input: GafferInput, emit: (event: AgentEvent) =>
   }
   if (!opts.client && !hasAnthropicKey()) {
     refund(input.caller);
-    emit({ type: "error", code: "unavailable", message: "The Gaffer isn't in yet. Your squad view still works." });
+    emit({ type: "error", code: "unavailable", message: "The Gaffer is off duty right now. See him at work in the demo; your squad view still works." });
     return;
   }
 
@@ -177,7 +177,7 @@ export async function runGaffer(input: GafferInput, emit: (event: AgentEvent) =>
     if (!streamedText) refund(input.caller);
     console.error("gaffer failed:", error instanceof Error ? error.message : error);
     if (error instanceof Anthropic.AuthenticationError) {
-      emit({ type: "error", code: "unavailable", message: "The Gaffer isn't in yet. Your squad view still works." });
+      emit({ type: "error", code: "unavailable", message: "The Gaffer is off duty right now. See him at work in the demo; your squad view still works." });
     } else if (error instanceof Anthropic.RateLimitError) {
       emit({ type: "error", code: "unavailable", message: "The Gaffer is busy right now. Try again in a minute." });
     } else {
