@@ -1,4 +1,3 @@
-import { createSdkMcpServer, tool } from "@anthropic-ai/claude-agent-sdk";
 import {
   applyPlan,
   bestLineup,
@@ -24,6 +23,7 @@ import {
 } from "@fpl/shared";
 import { z } from "zod";
 import { latestPreview, priceWatch, type PriceWatchRow } from "./data.ts";
+import { tool, type ToolResult } from "./tool.ts";
 
 /**
  * The agent's tools (docs/agent.md). Facts come from code; the logic
@@ -66,7 +66,7 @@ export function startDraft(squad: Squad, plan: TeamPlan | null, cards: ReadonlyM
   return { plan: planOf(squad), incoming: new Map() };
 }
 
-type Result = { content: { type: "text"; text: string }[]; isError?: boolean };
+type Result = ToolResult;
 
 /** The tool definitions, exported on their own so they can be tested without a model. */
 export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad, ctx.plan, new Map(ctx.cards.map((c) => [c.fplId, c])), ctx.teamCodes)) {
@@ -505,9 +505,4 @@ export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad
   ];
 
   return tools;
-}
-
-/** In-process MCP server "fpl": the tools appear to the agent as mcp__fpl__<name>. */
-export function buildToolServer(ctx: ToolContext, draft: Draft) {
-  return createSdkMcpServer({ name: "fpl", version: "1.0.0", tools: buildTools(ctx, draft), alwaysLoad: true });
 }

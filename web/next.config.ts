@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const config: NextConfig = {
   // @fpl/shared ships TypeScript source with no build step (ADR-0004).
-  transpilePackages: ["@fpl/shared"],
+  transpilePackages: ["@fpl/shared", "@fpl/agent"],
   // Do not write an AGENTS.md into the repo on every `next dev`.
   agentRules: false,
   // No third-party scripts, no tracking pixels: a strict, simple header set.

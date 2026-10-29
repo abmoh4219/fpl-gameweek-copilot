@@ -1,19 +1,19 @@
 # Deploying Armband
 
-Four places, in this order:
+Three places, in this order:
 
 1. **Supabase**: the database, pushed first
-2. **Hugging Face**: the agent
-3. **Vercel**: the website
-4. **Supabase Auth and Google**: these need the website's address
+2. **Vercel**: the website, with the Gaffer running inside it (ADR-0014)
+3. **Supabase Auth and Google**: the last settings need the website's address
 
-About 45 minutes the first time. Architecture and reasons: ADR-0008
-(accounts), ADR-0009 (agent), ADR-0011 (account deletion).
+About 30 minutes the first time. Architecture and reasons: ADR-0008
+(accounts), ADR-0011 (account deletion), ADR-0014 (the Gaffer on Vercel).
 
 Two rules hold throughout:
 
-- **`ANTHROPIC_API_KEY` goes in the Hugging Face Space secrets and nowhere
-  else.** Not Vercel, not `.env`, not git, not chat.
+- **`ANTHROPIC_API_KEY` lives only in Vercel's environment variables**, marked
+  Sensitive, never prefixed `NEXT_PUBLIC_`. Not in `.env`, not in git, not in
+  chat.
 - **Push migrations before code.** A commit never changes the cloud database.
 
 ---
@@ -37,62 +37,12 @@ accepted findings (CLAUDE.md §4a):
 
 Anything else is a real problem. Stop and fix it before going further.
 
-Check the cards were published. This should print about 669:
-
-```bash
-curl -s "https://<project-ref>.supabase.co/rest/v1/player_cards?select=fpl_id" \
-  -H "apikey: <publishable key>" -H "Accept-Profile: api" | grep -o fpl_id | wc -l
-```
-
 The publishable key (`sb_publishable_…`) is in **Project Settings → API
 Keys**. It is meant to be public.
 
 ---
 
-## 1. The shared secret (1 min)
-
-```bash
-openssl rand -hex 32
-```
-
-Keep this value. It goes into the Space **and** Vercel, and nowhere else.
-
----
-
-## 2. The agent on Hugging Face Spaces (10 min)
-
-1. Build the four files to upload:
-   ```bash
-   pnpm --filter @fpl/agent build:space
-   ```
-   They land in `agent/space/`: `server.mjs`, `package.json`, `Dockerfile`,
-   `README.md`. Nothing else from the repo is uploaded.
-2. huggingface.co → **New → Space**:
-   - Name: `armband-agent`
-   - SDK: **Docker → Blank**
-   - Hardware: **CPU basic · free**
-   - Visibility: **Public**. The website has to reach it; the shared secret
-     protects it.
-3. **Files → Add file → Upload files**. Drop in the four files and **Commit**.
-4. **Settings → Variables and secrets → New secret**, four times:
-
-   | Name | Value |
-   | --- | --- |
-   | `ANTHROPIC_API_KEY` | the key from your friend |
-   | `AGENT_SHARED_SECRET` | the value from step 1 |
-   | `SUPABASE_URL` | `https://<project-ref>.supabase.co` |
-   | `SUPABASE_PUBLISHABLE_KEY` | your `sb_publishable_…` key |
-
-5. Wait for **Running** (2–4 min). Then open
-   `https://<username>-armband-agent.hf.space/health`. You should see
-   `"service":"armband-agent"`, `"ok":true` and `"keyLoaded":true`.
-
-**Ask the key's owner to set a spend limit on it** (Anthropic Console →
-Limits). That is the hard ceiling under all of our own limits.
-
----
-
-## 3. The website on Vercel (10 min)
+## 1. The website and the Gaffer on Vercel (10 min)
 
 1. vercel.com → **Add New → Project** → import the GitHub repo.
 2. Set **Root Directory** to `web`. The framework (Next.js) is detected.
@@ -100,47 +50,48 @@ Limits). That is the hard ceiling under all of our own limits.
    ```
    cd .. && pnpm install --frozen-lockfile --filter "@fpl/web..."
    ```
-   This installs only the website and `@fpl/shared`, never the 294 MB agent
-   package.
+   This installs the website and the two workspace packages it uses
+   (`@fpl/shared`, `@fpl/agent`), not the pipeline jobs.
 4. **Environment Variables:**
 
-   | Name | Value |
-   | --- | --- |
-   | `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
-   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` |
-   | `AGENT_URL` | `https://<username>-armband-agent.hf.space` |
-   | `AGENT_SHARED_SECRET` | the value from step 1 |
-   | `ENABLE_EXPERIMENTAL_COREPACK` | `1` (uses the repo's exact pnpm) |
+   | Name | Value | Notes |
+   | --- | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` | public |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…` | public |
+   | `ANTHROPIC_API_KEY` | the key | tick **Sensitive**. Server-only |
+   | `ENABLE_EXPERIMENTAL_COREPACK` | `1` | uses the repo's exact pnpm |
 
-   **Never add `ANTHROPIC_API_KEY` here.**
 5. **Deploy.** Note the production URL, e.g. `https://armband.vercel.app`.
 6. Add `NEXT_PUBLIC_SITE_URL` = that URL, then **Redeploy**. It is used for
    share images and links.
 
+**Ask the key's owner to set a spend limit on it** (Anthropic Console →
+Limits). That is the hard ceiling under all of our own limits.
+
 ---
 
-## 4. Sign-in: Supabase Auth and Google (15 min)
+## 2. Sign-in: Supabase Auth and Google (10 min)
 
-### 4a. Supabase Auth settings
+### 2a. Supabase Auth settings
 
 Go to Supabase → **Authentication**.
 
-- **Sign In / Providers → Email**: enabled. Turn **Confirm email** **OFF**.
-  Without our own email provider, Supabase's built-in mailer only reaches
-  your own team, so confirmation emails would never arrive. Accounts start
-  signed in straight away.
+- **Sign In / Providers → User Signups**: **Allow new users to sign up** on,
+  **Confirm email** off. Without our own email provider, Supabase's built-in
+  mailer only reaches your own team, so confirmation emails would never
+  arrive. Accounts start signed in straight away.
 - **Sign In / Providers → Email → Minimum password length**: `8`, to match
   the site and the tests.
 - **URL Configuration**:
   - **Site URL**: your production URL
-  - **Redirect URLs**: add `https://<your-domain>/**`
+  - **Redirect URLs**: `https://<your-domain>/**` (and `http://localhost:3000/**`
+    for local work)
 
-### 4b. Google sign-in
+### 2b. Google sign-in
 
 1. **console.cloud.google.com** → create (or pick) a project.
-2. **APIs & Services → OAuth consent screen**:
-   - User type **External**
-   - App name **Armband**, plus your support email
+2. **Google Auth Platform** (formerly *OAuth consent screen*):
+   - Audience **External**, app name **Armband**, plus your support email.
    - Scopes: the defaults (`email`, `profile`, `openid`). No verification is
      needed for these.
    - **Branding**: application home page `https://<your-domain>`, privacy
@@ -151,8 +102,8 @@ Go to Supabase → **Authentication**.
      verification.
    - **Audience → Publish app**, so anyone can sign in, not only test users.
      Until then, add your own email under **Test users** to try it.
-3. **APIs & Services → Credentials → Create credentials → OAuth client ID**.
-   One client serves local development and production:
+3. **Clients → Create client**. One client serves local development and
+   production:
    - Type: **Web application**
    - **Authorized JavaScript origins**: `http://localhost:3000` and your
      production URL
@@ -161,13 +112,14 @@ Go to Supabase → **Authentication**.
      `https://<project-ref>.supabase.co/auth/v1/callback`
 4. Copy the **Client ID** and **Client secret** into Supabase →
    **Authentication → Sign In / Providers → Google**, then enable it and
-   **Save**.
+   **Save**. Locally, the same pair goes in `supabase/.env` (gitignored).
 
-The Google secret lives only in Supabase. It never goes in Vercel or git.
+The Google secret lives only in Supabase and `supabase/.env`. Never in Vercel
+or git.
 
 ---
 
-## 5. Smoke test, then warm up the demo (5 min)
+## 3. Smoke test, then warm up the demo (5 min)
 
 On your phone, on the production URL:
 
@@ -175,33 +127,28 @@ On your phone, on the production URL:
    *Now, your team*.
 2. Enter `7653564` → the *Is this you?* card shows the team and its 15 kits →
    **Yes** → your dugout.
-3. Tap a player → their card opens. Ask *Who should I captain this week?* →
-   the lookups appear, the answer streams in, players light up, and the
-   counter reads **4 of 5 questions left**. Then ask *Pick my best XI* → the
-   pitch redraws with **Apply / Revert**.
-4. Settings → *2 of 5 questions used*. Sign out, then log in with Google.
+3. Ask the Gaffer *Pick my best XI and captain for this gameweek* → the lookup
+   appears, the pitch redraws with **Apply / Revert**, and the counter reads
+   **4 of 5 questions left**.
+4. Settings → *1 of 5 questions used*. Sign out, then log in with Google.
 5. **Warm up the demo:** open `/demo` and click each of the four questions
    once.
    - Those four clicks are the demo's only agent runs **for this gameweek**.
    - Every visitor after you gets the recorded answers.
    - Do this before you share the link, so the first visitor doesn't wait.
-6. `…hf.space/health` → `today.spentUsd` shows what those runs cost.
-
-**If it says the co-pilot is waking up:** a free Space sleeps after about 48
-hours idle and takes about 30 seconds to start. Open `/health` once before you
-share anything.
+6. Anthropic Console → **Usage** shows what those runs cost (about a tenth of
+   a cent each).
 
 ---
 
-## What the agent can spend
+## What the Gaffer can spend
 
 | Guard | Value | Where |
 | --- | --- | --- |
-| Questions per account | **5, for life**, counted only when an answer completes; off-topic questions are free | `api.consume_question()` and `AGENT_LIMITS.questionsPerAccount` |
-| Backstop per caller in the agent service | 10 per UK day | `AGENT_LIMITS.questionsPerCallerPerDay` |
+| Questions per account | **5, for life**, counted only when an answer completes; off-topic questions are free; kept per email fingerprint (ADR-0013) | `api.consume_question()` and `AGENT_LIMITS.questionsPerAccount` |
 | Demo | 4 runs per gameweek, replayed to everyone | `web/src/app/api/demo/route.ts` |
-| Service spend per UK day | $0.50, across everyone | `AGENT_LIMITS.dailyBudgetUsd` |
-| Spend per question | $0.02, at most 6 model turns | `AGENT_LIMITS.perQuestionBudgetUsd`, `maxTurns` |
+| Per question | 6 model turns, $0.02, priced from the reported tokens | `AGENT_LIMITS.maxTurns`, `perQuestionBudgetUsd` |
+| Per server instance, per UK day | $0.50 and 10 questions per caller. Best effort: each Vercel instance keeps its own count | `AGENT_LIMITS.dailyBudgetUsd`, `questionsPerCallerPerDay` |
 | Hard ceiling | the key's own spend limit | Anthropic Console (key owner) |
 
 Anonymous visitors never start a run.
@@ -211,14 +158,11 @@ Anonymous visitors never start a run.
 1. Edit `AGENT_LIMITS` in `packages/shared/src/agent-protocol.ts`.
 2. For the account limit, also add a **new migration** changing
    `lifetime_limit` in `api.consume_question()`. A test checks the two match.
-3. Rebuild and re-upload the Space's `server.mjs`.
-4. Redeploy Vercel.
+3. Push, and Vercel redeploys.
 
 ---
 
 ## Before the repo goes public
 
-- Replace `samples/fpl/entry.json` and `entry-picks.json`. They contain a
-  real manager's team.
 - Scan the whole history with `gitleaks`.
 - See CLAUDE.md §8 before charging anyone (kits, Vercel plan, Gemini terms).

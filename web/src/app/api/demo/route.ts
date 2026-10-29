@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import type { AgentEvent } from "@fpl/shared";
 import { DEMO_TEAM_ID } from "@/components/site/links";
-import { callAgent, callerId, failure, NDJSON_HEADERS } from "@/lib/agent";
+import { collectGaffer, failure, NDJSON_HEADERS } from "@/lib/agent";
 import { DEMO_QUESTIONS } from "@/lib/demo";
 import { loadSquad } from "@/lib/squad";
 
@@ -12,25 +12,13 @@ import { loadSquad } from "@/lib/squad";
  * records it, every later one is served from the cache (CLAUDE.md §7).
  */
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 class NotRecorded extends Error {}
 
 async function record(q: number): Promise<AgentEvent[]> {
   const squad = await loadSquad(DEMO_TEAM_ID);
-  const call = await callAgent({ squad, question: DEMO_QUESTIONS[q]!, history: [], caller: callerId("demo") });
-  if (!call.ok) throw new NotRecorded(call.message);
-
-  const text = await new Response(call.body).text();
-  const events: AgentEvent[] = [];
-  for (const raw of text.split("\n")) {
-    if (!raw.trim()) continue;
-    try {
-      events.push(JSON.parse(raw) as AgentEvent);
-    } catch {
-      // A torn line: ignore it; the completeness check below decides.
-    }
-  }
+  const events = await collectGaffer({ squad, question: DEMO_QUESTIONS[q]!, history: [], plan: null, caller: "demo" });
   // Only a complete, successful answer is worth keeping for a gameweek. Throwing
   // means nothing is cached and the next visitor tries again.
   const done = events.some((e) => e.type === "done");
@@ -42,7 +30,7 @@ async function record(q: number): Promise<AgentEvent[]> {
 
 // One shared cache entry per (gameweek, question). The gameweek in the key is
 // what rolls the answers over; the long revalidate is only a safety net.
-const recorded = unstable_cache(async (_gameweek: number, q: number) => record(q), ["demo-answer-v4"], {
+const recorded = unstable_cache(async (_gameweek: number, q: number) => record(q), ["demo-answer-v5"], {
   revalidate: 60 * 60 * 24 * 8,
 });
 

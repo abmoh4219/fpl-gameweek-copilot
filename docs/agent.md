@@ -1,14 +1,14 @@
 # The Gaffer
 
-How the Gaffer, Armband's agent, works: what it can do, where it runs, what it may spend,
-and how it stays honest. Decisions behind it: ADR-0009 (hosting), ADR-0012
-(actions and limits).
+How the Gaffer, Armband's agent, works: what it can do, where it runs, what
+it may spend, and how it stays honest. Decisions behind it: ADR-0012 (actions
+and limits), ADR-0013 (the allowance), ADR-0014 (running it on Vercel).
 
 ## In one paragraph
 
-A manager asks in plain English. The agent — Claude Haiku 5.5 on the Claude
-Agent SDK — sees a snapshot of their squad and works through read-only tools
-and three **action** tools. Code computes every number and checks every rule;
+A manager asks in plain English. The Gaffer — Claude Haiku 5.5 on the
+Messages API, with a tool loop we own — sees a snapshot of their squad and
+works through read-only tools and three **action** tools. Code computes every number and checks every rule;
 the model decides what to do and explains it. When it changes the team, the
 change appears on the manager's pitch as a **plan** they apply or revert,
 then make in the FPL app. Armband never writes to FPL.
@@ -16,20 +16,26 @@ then make in the FPL app. Armband never writes to FPL.
 ## Where it runs
 
 ```
- browser ──POST /api/agent──▶ Vercel route ──x-agent-secret──▶ Hugging Face Space
-   ▲   (question, history,     │ checks account + allowance     │ Claude Agent SDK
-   │    applied plan)          │ loads squad from FPL (cached)  │ + FPL tools (MCP)
-   │                           │ counts the question on "done"  │
-   └──────── NDJSON events ◀───┴───────────────────────────────◀┘
+ browser ──POST /api/agent──▶ Vercel route (Next.js)
+   ▲   (question, history,     │ checks the account and its allowance
+   │    applied plan)          │ loads the squad from FPL (cached)
+   │                           │ runGaffer(): Claude ⇄ our tools, in-process
+   │                           │ counts the question on "done"
+   └──────── NDJSON events ◀───┘
 ```
 
-- **Why not on Vercel:** the Agent SDK ships a native binary of about 294 MB,
-  over Vercel's 250 MB function limit. A free Docker Space runs it as one
-  long-lived process, which also keeps the in-memory spend counters honest.
-- The Space holds the only copy of `ANTHROPIC_API_KEY`. The website holds a
-  shared secret, never the key; the browser holds neither.
-- Built-in SDK tools are removed (`tools: []`): no shell, files or web. The
-  model sees only our MCP server, `mcp__fpl__*`.
+- **One service.** The loop lives in `agent/src/gaffer.ts` and runs inside the
+  website's route, so there is no second server, no shared secret and no cold
+  start.
+- **`ANTHROPIC_API_KEY` is a server-only Vercel variable.** The browser never
+  sees it, nor the cost of an answer.
+- The model has **only our tools**: no shell, files or web. Each tool's Zod
+  schema becomes its JSON Schema for the API *and* validates the model's
+  arguments before the tool runs.
+- **Each turn streams**: text deltas go straight to the browser; tool calls run
+  in code, in parallel, and their results go back as one message.
+- **The frozen prompt and the tool list are cached** (`cache_control` on the
+  system prompt); the squad snapshot and the question come after it.
 
 ## Tools
 
@@ -76,9 +82,8 @@ One JSON object per line (`packages/shared/src/agent-protocol.ts`):
 | Guard | Value |
 | --- | --- |
 | Questions per account | 5, for life — counted only when an answer completes, and kept per email fingerprint so deleting and re-registering does not reset them (ADR-0013) |
-| Per question | 6 model turns, $0.02 |
-| Service-wide | $0.50 per UK day |
-| Per caller in the service | 10 per UK day (a backstop) |
+| Per question | 6 model turns, $0.02 — priced in code from the tokens the API reports |
+| Per server instance | $0.50 and 10 questions per caller, per UK day — a best-effort backstop |
 | Demo | 4 answers recorded once per gameweek, replayed to everyone |
 | Hard ceiling | the key's own spend limit (Anthropic Console) |
 
@@ -91,6 +96,7 @@ the two equal.
 - `packages/shared/test/` — lineup picking, rating, legality and plans.
 - `agent/test/tools.test.ts` — every tool, against a synthetic squad, with no
   model and no network.
+- `agent/test/gaffer.test.ts` — the loop itself, against a scripted Claude:
+  tool round-trips, caching, invalid arguments, off-topic, the turn limit and
+  pricing.
 - `jobs/test/accounts.test.ts` — the allowance, through the real database.
-- Locally, any process that speaks the same NDJSON on port 7860 can stand in
-  for the agent, so the whole interface can be exercised without a key.

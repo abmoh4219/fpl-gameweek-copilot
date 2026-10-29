@@ -1,5 +1,5 @@
 import type { SiteCard, TeamRun } from "@fpl/shared";
-import { config } from "./config.ts";
+import { supabaseConfig } from "./config.ts";
 
 /**
  * Read-only access to the public `api` views, cached in memory for a few
@@ -12,10 +12,11 @@ const cache = new Map<string, { at: number; value: unknown }>();
 async function view<T>(path: string): Promise<T> {
   const hit = cache.get(path);
   if (hit && Date.now() - hit.at < TTL_MS) return hit.value as T;
-  const res = await fetch(`${config.supabaseUrl}/rest/v1/${path}`, {
+  const { url, key } = supabaseConfig();
+  const res = await fetch(`${url}/rest/v1/${path}`, {
     headers: {
-      apikey: config.supabaseKey,
-      Authorization: `Bearer ${config.supabaseKey}`,
+      apikey: key,
+      Authorization: `Bearer ${key}`,
       "Accept-Profile": "api",
     },
     signal: AbortSignal.timeout(15_000),

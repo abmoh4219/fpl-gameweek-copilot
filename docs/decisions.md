@@ -623,3 +623,48 @@ signing up again with the same email therefore reset the allowance.
 - **A plain hash.** An unsalted hash of an email can be matched against lists
   of addresses; the keyed hash cannot without the database's secret.
 - **Refuse deletion while questions are used.** Breaks the FAQ's promise.
+
+## ADR-0014 — The Gaffer runs inside the website, on the Messages API
+
+Supersedes the hosting part of ADR-0009.
+
+### Context
+
+The agent ran on the Claude Agent SDK in a Docker container on a free Hugging
+Face Space, because the SDK's bundled program (about 294 MB) is over Vercel's
+250 MB function limit. Hugging Face then made Docker Spaces paid. The free
+alternatives either ask for a card or offer 0.1 CPU with a minute's cold
+start. Measured locally, the Agent SDK path used about 370 MB at peak per
+question.
+
+### Decision
+
+- **The Gaffer's loop is ours**, on the Anthropic TypeScript SDK
+  (`@anthropic-ai/sdk`, about 24 MB) in `agent/src/gaffer.ts`: stream a turn,
+  run the tool calls in code, send the results back, repeat. Tools, prompt,
+  plans, limits and events are unchanged.
+- **It runs in-process** in the website's `/api/agent` and `/api/demo` routes.
+  `agent/` is now a library the website imports, like `packages/shared`.
+- **`ANTHROPIC_API_KEY` is a server-only Vercel environment variable**
+  (Sensitive, never `NEXT_PUBLIC_`). The shared secret and the agent URL are
+  gone.
+- Each tool's Zod schema yields its JSON Schema for the API **and** validates
+  the model's arguments before the tool runs. The frozen system prompt and
+  tool list are cached.
+- The per-question budget is enforced from the token counts the API reports,
+  priced in `agent/src/config.ts`.
+
+### Consequences
+
+- One service to deploy, no cold starts, no shared secret.
+- The per-caller and daily counters are per server instance, so they are a
+  best-effort backstop. The binding limits are the per-account allowance in
+  the database (ADR-0013) and the key's own spend limit.
+- The Agent SDK's built-in tools, sessions and MCP plumbing are no longer used;
+  the Gaffer never needed them, since its tools are all ours.
+
+### Alternatives considered
+
+- **Render's free plan.** Keeps the Agent SDK, and fits in 512 MB, but 0.1 CPU
+  and a minute's wake-up after 15 idle minutes.
+- **Hugging Face PRO.** Breaks the free-tiers-only rule.

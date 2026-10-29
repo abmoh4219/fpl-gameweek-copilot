@@ -1,10 +1,10 @@
 import { AGENT_LIMITS, AgentRequestSchema } from "@fpl/shared";
-import { callAgent, callerId, failure, mapEvents, NDJSON_HEADERS } from "@/lib/agent";
+import { failure, gafferStream, NDJSON_HEADERS } from "@/lib/agent";
 import { createAuthClient } from "@/lib/auth/server";
 import { loadSquad } from "@/lib/squad";
 
 /**
- * The browser's only door to the agent for live questions (ADR-0009).
+ * The browser's only door to the Gaffer for live questions (ADR-0014).
  *
  * Accounts only. The team is the one on the caller's profile — never one the
  * browser names. The LIFETIME allowance is checked before the agent runs, and
@@ -12,7 +12,7 @@ import { loadSquad } from "@/lib/squad";
  * so a failed, interrupted or declined off-topic question never costs one.
  */
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 60;
 
 const RequestSchema = AgentRequestSchema.omit({ teamId: true });
 
@@ -50,24 +50,26 @@ export async function POST(request: Request): Promise<Response> {
     return failure("unavailable", "We couldn't load your team from FPL right now. Try again in a minute.");
   }
 
-  const call = await callAgent({
-    squad,
-    question: parsed.data.question,
-    history: parsed.data.history.slice(-AGENT_LIMITS.historyTurns),
-    plan: parsed.data.plan,
-    caller: callerId(`account:${auth.user.id}`),
-  });
-  if (!call.ok) return failure("unavailable", call.message);
-
-  const stream = mapEvents(call.body, async (event) => {
-    if (event.type !== "done") return event;
-    // Declined as off-topic: nothing to count.
-    if (event.offTopic) return { type: "done", costUsd: null, turns: event.turns, remaining: Math.max(limit - used, 0), offTopic: true };
-    // The answer completed: count it now, and report what is left.
-    const { data } = await supabase.rpc("consume_question");
-    const row = (Array.isArray(data) ? data[0] : data) as { remaining: number } | undefined;
-    return { type: "done", costUsd: null, turns: event.turns, remaining: row?.remaining ?? null };
-  });
+  const stream = gafferStream(
+    {
+      squad,
+      question: parsed.data.question,
+      history: parsed.data.history.slice(-AGENT_LIMITS.historyTurns),
+      plan: parsed.data.plan,
+      caller: `account:${auth.user.id}`,
+    },
+    {
+      signal: request.signal,
+      onDone: async (event) => {
+        // Declined as off-topic: nothing to count.
+        if (event.offTopic) return { ...event, remaining: Math.max(limit - used, 0) };
+        // The answer completed: count it now, and report what is left.
+        const { data } = await supabase.rpc("consume_question");
+        const row = (Array.isArray(data) ? data[0] : data) as { remaining: number } | undefined;
+        return { ...event, remaining: row?.remaining ?? null };
+      },
+    },
+  );
 
   return new Response(stream, { headers: NDJSON_HEADERS });
 }

@@ -15,8 +15,8 @@ and injury news, and posts the ones that matter to a Telegram channel.
 
 ## Highlights
 
-- **The Gaffer: an agent, not a chatbot.** Built on the Claude Agent SDK with its own FPL
-  tools. It acts on a draft of your team: best XI, bench and captaincy
+- **The Gaffer: an agent, not a chatbot.** Claude Haiku 5.5 on the Messages
+  API, with a tool loop of our own and its own FPL tools. It acts on a draft of your team: best XI, bench and captaincy
   changes, transfers. Every change shows on the pitch with **Apply** and
   **Revert**.
 - **Code computes, the model decides.** Every number comes from a tested
@@ -28,8 +28,8 @@ and injury news, and posts the ones that matter to a Telegram channel.
 - **Honest by construction.** Estimates are labelled as estimates. Gemini's
   preview prose is rejected if it contains any number the code didn't
   compute. Questions outside FPL get one polite line and aren't counted.
-- **Free-tier engineering.** GitHub Actions, Supabase, Vercel Hobby, a free
-  Hugging Face Space and Make's free plan, each with its budget worked out.
+- **Free-tier engineering.** GitHub Actions, Supabase, Vercel Hobby
+  and Make's free plan, each with its budget worked out.
   Five questions per account, a daily spend cap, and a demo recorded
   once per gameweek and replayed to everyone.
 - **Its own identity.** A floodlit "Matchnight" design system: condensed
@@ -54,7 +54,7 @@ plan             →  Start: Truffert, O'Reilly · Bench: Kayode, Schade · Vice
 ```
 
 Measured on the real model: a best-XI answer takes two model turns, about
-17 seconds, and costs about a tenth of a cent. Ask it something outside
+8 seconds, and costs about a tenth of a cent. Ask it something outside
 football and it says so in one sentence, without using your allowance.
 
 ## A look around
@@ -81,8 +81,8 @@ football and it says so in one sentence, without using your allowance.
                   core · app (RLS) · api (views)
                             │
                             ▼
-                    Next.js on Vercel ──/api/agent──▶ Claude Agent SDK
-                 landing · accounts · dugout ·        on a Hugging Face Space
+                    Next.js on Vercel ──/api/agent──▶ the Gaffer, in-process:
+                 landing · accounts · dugout ·        Claude Haiku 5.5 ⇄ our tools
                  demo, from read-only views           (read tools + action tools)
 ```
 
@@ -104,7 +104,7 @@ football and it says so in one sentence, without using your allowance.
 | --- | --- |
 | Language | TypeScript (strict), Zod at every external boundary |
 | Web | Next.js 16 · React 19 · Supabase Auth (email and Google) |
-| Agent | Claude Agent SDK · Claude Haiku 5.5 · in-process MCP tools |
+| Agent | Claude Haiku 5.5 · Anthropic TypeScript SDK · our own streaming tool loop |
 | Data | Supabase Postgres: three schemas, RLS, owner-privileged read views |
 | Jobs | GitHub Actions cron · `tsx` |
 | Automation | Make.com · Gemini (preview prose) · Telegram Bot API |
@@ -138,7 +138,7 @@ pnpm --filter @fpl/web dev    # http://localhost:3000
 
 ## Docs
 
-- [Architecture decisions](docs/decisions.md): thirteen ADRs, from storage to
+- [Architecture decisions](docs/decisions.md): fourteen ADRs, from storage to
   the agent
 - [The Gaffer](docs/agent.md): the agent's tools, plans, limits, testing
 - [Database](docs/database.md): schemas, security model, retention

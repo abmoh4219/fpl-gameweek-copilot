@@ -1,15 +1,10 @@
-import { createHash } from "node:crypto";
-import type { AgentEvent, AgentTurn, Squad, TeamPlan } from "@fpl/shared";
+import { runGaffer, type GafferInput } from "@fpl/agent";
+import type { AgentEvent } from "@fpl/shared";
 
 /**
- * Talking to the agent service (ADR-0009). Server-only: the service URL and
- * its shared secret never reach a browser.
+ * Running the Gaffer from the website (ADR-0014). Server-only: it runs inside
+ * this process with ANTHROPIC_API_KEY, which never reaches a browser.
  */
-const AGENT_URL = process.env["AGENT_URL"];
-const AGENT_SECRET = process.env["AGENT_SHARED_SECRET"];
-
-export const agentConfigured = () => Boolean(AGENT_URL && AGENT_SECRET);
-
 export function line(event: AgentEvent): string {
   return `${JSON.stringify(event)}\n`;
 }
@@ -24,81 +19,45 @@ export function failure(code: Extract<AgentEvent, { type: "error" }>["code"], me
   return new Response(line({ type: "error", code, message }), { status, headers: NDJSON_HEADERS });
 }
 
-/**
- * Who is asking, as the agent service's per-caller backstop sees it: a
- * salted hash, so the service can count a caller without knowing who it is.
- */
-export function callerId(raw: string): string {
-  return createHash("sha256").update(`${AGENT_SECRET ?? "dev"}:${raw}`).digest("hex").slice(0, 32);
-}
-
-export type AgentCall = { ok: true; body: ReadableStream<Uint8Array> } | { ok: false; message: string };
-
-export async function callAgent(input: {
-  squad: Squad;
-  question: string;
-  history: AgentTurn[];
-  /** The plan the manager applied in Armband, so the co-pilot continues from it. */
-  plan?: TeamPlan | null;
-  caller: string;
-}): Promise<AgentCall> {
-  if (!AGENT_URL || !AGENT_SECRET) return { ok: false, message: "The Gaffer isn't in yet. Your squad view still works." };
-  let res: Response;
-  try {
-    res = await fetch(`${AGENT_URL.replace(/\/$/, "")}/chat`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-agent-secret": AGENT_SECRET },
-      body: JSON.stringify({
-        teamId: input.squad.entryId,
-        question: input.question,
-        history: input.history,
-        plan: input.plan ?? null,
-        squad: input.squad,
-        visitor: input.caller,
-      }),
-      signal: AbortSignal.timeout(110_000),
-      cache: "no-store",
-    });
-  } catch {
-    return { ok: false, message: "The Gaffer didn't answer — the service may be waking up. Try again in 30 seconds." };
-  }
-  if (!res.ok || !res.body) return { ok: false, message: "The Gaffer is unavailable right now. Try again in a minute." };
-  return { ok: true, body: res.body };
-}
+type DoneEvent = Extract<AgentEvent, { type: "done" }>;
 
 /**
- * Split an NDJSON byte stream into events, letting `onEvent` rewrite or drop
- * each one before it is passed on. Lines that are not valid JSON are dropped.
+ * The Gaffer's events as an NDJSON stream for the browser. `onDone` may
+ * rewrite the final event (to count the question and report what is left)
+ * before it is sent; the browser never sees spend.
  */
-export function mapEvents(
-  body: ReadableStream<Uint8Array>,
-  onEvent: (event: AgentEvent) => Promise<AgentEvent | null> | AgentEvent | null,
+export function gafferStream(
+  input: GafferInput,
+  opts: { signal?: AbortSignal; onDone?: (event: DoneEvent) => Promise<DoneEvent> } = {},
 ): ReadableStream<Uint8Array> {
-  const decoder = new TextDecoder();
   const encoder = new TextEncoder();
-  let buffer = "";
-  const handle = async (raw: string, controller: TransformStreamDefaultController<Uint8Array>) => {
-    if (!raw.trim()) return;
-    let event: AgentEvent;
-    try {
-      event = JSON.parse(raw) as AgentEvent;
-    } catch {
-      return;
-    }
-    const out = await onEvent(event);
-    if (out) controller.enqueue(encoder.encode(line(out)));
-  };
-  return body.pipeThrough(
-    new TransformStream<Uint8Array, Uint8Array>({
-      async transform(chunk, controller) {
-        buffer += decoder.decode(chunk, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() ?? "";
-        for (const raw of lines) await handle(raw, controller);
-      },
-      async flush(controller) {
-        await handle(buffer, controller);
-      },
-    }),
-  );
+  return new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const send = (event: AgentEvent) => {
+        try {
+          controller.enqueue(encoder.encode(line(event)));
+        } catch {
+          // The browser went away; nothing left to tell it.
+        }
+      };
+      let done: DoneEvent | null = null;
+      await runGaffer(input, (event) => (event.type === "done" ? (done = event) : send(event)), opts.signal ? { signal: opts.signal } : {});
+      if (done) {
+        const final: DoneEvent = opts.onDone ? await opts.onDone(done) : done;
+        send({ ...final, costUsd: null });
+      }
+      try {
+        controller.close();
+      } catch {
+        // Already closed by a cancelled request.
+      }
+    },
+  });
+}
+
+/** Every event of one run, for the demo's recording. */
+export async function collectGaffer(input: GafferInput): Promise<AgentEvent[]> {
+  const events: AgentEvent[] = [];
+  await runGaffer(input, (event) => events.push(event));
+  return events;
 }
