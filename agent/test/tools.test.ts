@@ -91,6 +91,8 @@ describe("agent tools", () => {
     })();
     expect(result.isError).toBe(true);
     expect(events.at(-1)).toMatchObject({ type: "tool_result", isError: true });
+    // "Not found" says what it means, so the model never guesses a club from memory.
+    expect((result.content[0] as { text: string }).text).toMatch(/not in the Premier League this season/);
   });
 
   it("searches outside the squad only", async () => {

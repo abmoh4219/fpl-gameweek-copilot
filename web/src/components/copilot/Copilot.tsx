@@ -305,8 +305,14 @@ export function Copilot(props: Props) {
               ) : (
                 <div className="turn-meta">
                   {t.acted && <span className="acted">Changes on your pitch ↑</span>}
-                  <span>Numbers from {t.trace.length} lookup{t.trace.length === 1 ? "" : "s"}</span>
-                  <span className="est">Forward-looking = estimate</span>
+                  {t.trace.length > 0 ? (
+                    <>
+                      <span>Numbers from {t.trace.length} lookup{t.trace.length === 1 ? "" : "s"}</span>
+                      <span className="est">Forward-looking = estimate</span>
+                    </>
+                  ) : (
+                    <span>General FPL answer</span>
+                  )}
                 </div>
               ))}
           </article>

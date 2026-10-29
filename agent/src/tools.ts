@@ -119,7 +119,12 @@ export function buildTools(ctx: ToolContext, draft: Draft = startDraft(ctx.squad
   /** Resolve a name; ambiguous or unknown names come back as an error the model can act on. */
   function resolve(pool: readonly SiteCard[], name: string): SiteCard | string {
     const hits = findPlayers(pool, name);
-    if (hits.length === 0) return `No player matching "${name}".`;
+    // Every Premier League player is in FPL's data, so "not found" (spelled right)
+    // means "not in the Premier League this season" — said here, so the model
+    // never fills the gap from out-of-date memory.
+    if (hits.length === 0) {
+      return `No player matching "${name}" in this season's FPL game. Every Premier League player is in it, so if the name is spelled right, they are not in the Premier League this season.`;
+    }
     if (hits.length > 1 && hits[0]!.webName.toLowerCase() !== name.toLowerCase()) {
       return `"${name}" is ambiguous: ${hits.map((h) => `${h.webName} (${h.team}, id ${h.fplId})`).join(", ")}. Use the exact name.`;
     }
