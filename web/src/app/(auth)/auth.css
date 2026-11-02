@@ -63,25 +63,22 @@
 }
 
 .auth-kicker {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
 }
 
 .auth-title {
   margin: 12px 0 0;
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: clamp(40px, 9vw, 54px);
-  font-weight: 800;
-  line-height: 0.92;
-  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1.05;
 }
 
 .auth-title em {
   color: var(--accent);
-  font-style: italic;
+  font-style: normal;
 }
 
 .auth-sub {
@@ -162,9 +159,9 @@
   overflow: hidden;
   border-left: 1px solid var(--line);
   background:
-    radial-gradient(70% 50% at 50% 0%, rgba(157, 184, 255, 0.14), transparent 65%),
-    radial-gradient(60% 50% at 50% 100%, rgba(255, 106, 61, 0.16), transparent 70%),
-    linear-gradient(180deg, #0b1126, #080b18);
+    radial-gradient(70% 50% at 50% 0%, rgba(var(--beam), 0.14), transparent 65%),
+    radial-gradient(60% 50% at 50% 100%, rgba(var(--accent-rgb), 0.16), transparent 70%),
+    linear-gradient(180deg, var(--sky), var(--bg));
 }
 
 @media (min-width: 1000px) {
@@ -183,7 +180,7 @@
   width: 100%;
   height: 100%;
   fill: none;
-  stroke: rgba(244, 239, 230, 0.08);
+  stroke: rgba(var(--ink-rgb), 0.08);
   stroke-width: 1.5;
 }
 
@@ -193,7 +190,7 @@
   left: 50%;
   width: 190px;
   translate: -50% -50%;
-  filter: drop-shadow(0 30px 50px rgba(255, 106, 61, 0.35));
+  filter: drop-shadow(0 30px 50px rgba(var(--accent-rgb), 0.35));
   animation: armband-float 6s ease-in-out infinite;
 }
 
@@ -213,15 +210,16 @@
 
 .auth-quote {
   margin: 0 0 24px;
-  font-family: var(--font-display);
-  font-size: clamp(38px, 3.6vw, 54px);
-  font-weight: 800;
-  line-height: 0.95;
-  text-transform: uppercase;
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 3vw, 44px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
 
 .auth-quote em {
   color: var(--accent);
+  font-style: normal;
 }
 
 .auth-pitch-copy ul {
@@ -278,11 +276,10 @@
 }
 
 .found-name {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
-  text-transform: uppercase;
   overflow-wrap: anywhere;
 }
 

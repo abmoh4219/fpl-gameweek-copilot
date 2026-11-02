@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Mark, Wordmark } from "./Mark";
-import { TELEGRAM_URL } from "./links";
+import { GITHUB_URL, PORTFOLIO_URL, TELEGRAM_URL } from "./links";
 
 export function SiteFooter() {
   return (
@@ -13,14 +13,14 @@ export function SiteFooter() {
               <Wordmark />
             </Link>
             <p className="muted" style={{ maxWidth: 360, marginTop: 14, fontSize: 14 }}>
-              Your Fantasy Premier League team, managed by the Gaffer — an AI manager that does the homework and shows its working.
+              Free, open-source tools for Fantasy Premier League. Every number computed, every working shown.
             </p>
           </div>
           <div>
             <h4>Product</h4>
             <ul>
               <li><a href="/#features">Features</a></li>
-              <li><a href="/#how">How it works</a></li>
+              <li><a href="/#gaffer">The Gaffer</a></li>
               <li><Link href="/demo">Demo</Link></li>
               <li><a href="/#faq">FAQ</a></li>
             </ul>
@@ -35,8 +35,10 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4>Community</h4>
+            <h4>Open source</h4>
             <ul>
+              <li><a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a></li>
+              <li><a href={`${GITHUB_URL}/blob/main/CONTRIBUTING.md`} target="_blank" rel="noreferrer">Contribute</a></li>
               <li><a href={TELEGRAM_URL} target="_blank" rel="noreferrer">Telegram channel</a></li>
             </ul>
           </div>
@@ -50,7 +52,11 @@ export function SiteFooter() {
           Armband
         </div>
         <div className="footer-base">
-          <span>© {new Date().getFullYear()} Armband</span>
+          <span>
+            © {new Date().getFullYear()} Armband · Free &amp; open source (
+            <a href={`${GITHUB_URL}/blob/main/LICENSE`} target="_blank" rel="noreferrer">MIT</a>) · Built by{" "}
+            <a href={PORTFOLIO_URL} target="_blank" rel="noreferrer">Abdelah</a>
+          </span>
           <span>Data refreshed every three hours</span>
         </div>
       </div>

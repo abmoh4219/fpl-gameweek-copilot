@@ -33,11 +33,14 @@ interface CardProps {
   tone: { tone: HighlightTone; note: string } | undefined;
   mark: string | undefined;
   onSelect: ((p: SquadPlayer) => void) | undefined;
+  glide: boolean;
 }
 
-function Card({ p, value, compact, picked, tone, mark, onSelect }: CardProps) {
+function Card({ p, value, compact, picked, tone, mark, onSelect, glide }: CardProps) {
   const s = status(p);
   const className = `fpl-card${compact ? " compact" : ""}${picked ? " is-pick" : ""}${tone ? ` hl hl-${tone.tone}` : ""}${mark && !tone ? " marked" : ""}${onSelect ? " tappable" : ""}`;
+  // A stable name per player lets a view transition glide the card to its new place.
+  const style = glide ? { viewTransitionName: `fpl-${p.fplId}` } : undefined;
   const inner = (
     <>
       {(p.isCaptain || p.isViceCaptain) && <span className="fpl-badge">{p.isCaptain ? "C" : "V"}</span>}
@@ -63,6 +66,7 @@ function Card({ p, value, compact, picked, tone, mark, onSelect }: CardProps) {
       <button
         type="button"
         className={className}
+        style={style}
         data-fpl-id={p.fplId}
         onClick={() => onSelect(p)}
         title={tone?.note}
@@ -73,7 +77,7 @@ function Card({ p, value, compact, picked, tone, mark, onSelect }: CardProps) {
     );
   }
   return (
-    <div className={className} data-fpl-id={p.fplId}>
+    <div className={className} data-fpl-id={p.fplId} style={style}>
       {inner}
     </div>
   );
@@ -87,6 +91,7 @@ export function FplPitch({
   highlights,
   marks,
   onSelect,
+  glide = false,
 }: {
   squad: Squad;
   value?: PlateValue;
@@ -99,6 +104,8 @@ export function FplPitch({
   marks?: Map<number, string>;
   /** Makes each player a button that opens their card. */
   onSelect?: (p: SquadPlayer) => void;
+  /** Give every card a view-transition name, so a lineup change animates players to their new places. */
+  glide?: boolean;
 }) {
   return (
     <div className="fpl">
@@ -119,7 +126,7 @@ export function FplPitch({
               {squad.starters
                 .filter((p) => p.position === pos)
                 .map((p) => (
-                  <Card key={p.fplId} p={p} value={value} compact={compact} picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} mark={marks?.get(p.fplId)} onSelect={onSelect} />
+                  <Card key={p.fplId} p={p} value={value} compact={compact} picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} mark={marks?.get(p.fplId)} onSelect={onSelect} glide={glide} />
                 ))}
             </div>
           ))}
@@ -128,7 +135,7 @@ export function FplPitch({
       <div className="fpl-bench">
         <span className="fpl-bench-label">Substitutes</span>
         {squad.bench.map((p) => (
-          <Card key={p.fplId} p={p} value={value} compact picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} mark={marks?.get(p.fplId)} onSelect={onSelect} />
+          <Card key={p.fplId} p={p} value={value} compact picked={p.fplId === highlight} tone={highlights?.get(p.fplId)} mark={marks?.get(p.fplId)} onSelect={onSelect} glide={glide} />
         ))}
       </div>
     </div>

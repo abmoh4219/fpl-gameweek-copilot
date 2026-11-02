@@ -102,7 +102,7 @@
   border-top: 3px solid var(--accent);
   border-radius: 6px 6px var(--radius) var(--radius);
   background:
-    radial-gradient(90% 40% at 100% 0%, rgba(255, 106, 61, 0.07), transparent 60%),
+    radial-gradient(90% 40% at 100% 0%, rgba(var(--accent-rgb), 0.07), transparent 60%),
     var(--bg-1);
 }
 
@@ -142,11 +142,10 @@
 
 .copilot-empty h3 {
   margin: 4px 0 8px;
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .copilot-empty p {
@@ -409,7 +408,7 @@
 }
 
 .send:hover:not(:disabled) {
-  background: #ff8257;
+  background: var(--accent-hover);
 }
 
 .send:disabled {
@@ -462,7 +461,7 @@
   overflow-y: auto;
   border-left: 1px solid var(--line-2);
   background:
-    radial-gradient(90% 30% at 100% 0%, rgba(255, 106, 61, 0.1), transparent 60%),
+    radial-gradient(90% 30% at 100% 0%, rgba(var(--accent-rgb), 0.1), transparent 60%),
     var(--bg-1);
   box-shadow: -30px 0 80px rgba(0, 0, 0, 0.5);
   animation: sheet-in 0.35s var(--ease-out) backwards;
@@ -519,11 +518,10 @@
 
 .sheet-name {
   margin: 4px 0 8px;
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-size: 38px;
-  font-weight: 800;
-  line-height: 0.95;
-  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 1.05;
 }
 
 .sheet-tags {
@@ -688,9 +686,9 @@
 .plan-bar.proposed {
   border-left-color: var(--accent);
   background:
-    radial-gradient(80% 120% at 0% 0%, rgba(255, 106, 61, 0.12), transparent 60%),
+    radial-gradient(80% 120% at 0% 0%, rgba(var(--accent-rgb), 0.12), transparent 60%),
     var(--bg-1);
-  box-shadow: 0 20px 50px -30px rgba(255, 106, 61, 0.6);
+  box-shadow: 0 20px 50px -30px rgba(var(--accent-rgb), 0.6);
 }
 
 .plan-head {

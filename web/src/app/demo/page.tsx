@@ -4,6 +4,7 @@ import { Dugout } from "@/components/copilot/Dugout";
 import { SquadCheck } from "@/components/copilot/SquadCheck";
 import { Mark, Wordmark } from "@/components/site/Mark";
 import { DEMO_TEAM_ID } from "@/components/site/links";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { DEMO_QUESTIONS } from "@/lib/demo";
 import { frozenDemo } from "@/lib/demo-snapshot";
 import { loadSquad } from "@/lib/squad";
@@ -30,6 +31,7 @@ export default async function Demo() {
         </Link>
         <span className="demo-plate">Demo</span>
         <div className="demo-bar-actions">
+          <ThemeToggle />
           <Link href="/sign-in" className="nav-quiet">
             Log in
           </Link>

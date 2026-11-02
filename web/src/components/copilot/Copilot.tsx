@@ -371,8 +371,8 @@ export function Copilot(props: Props) {
             ))}
           </div>
           <p className="demo-note">
-            Recorded once a gameweek for this team. <Link href="/sign-up">Create a free account</Link> and the Gaffer
-            manages yours — 5 questions included.
+            Recorded answers for this team. <Link href="/sign-up">Connect your own team</Link> to see your fifteen,
+            free.
           </p>
         </div>
       )}

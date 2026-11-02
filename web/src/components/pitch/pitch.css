@@ -223,7 +223,7 @@
   margin-top: 12px;
   padding: 10px 6px 12px;
   border-radius: 10px;
-  background: rgba(0, 40, 16, 0.45);
+  background: var(--bench-bg);
 }
 
 .fpl-bench-label {
@@ -243,7 +243,7 @@
 
 /* the co-pilot's pick: a flare ring that breathes */
 .fpl-card.is-pick {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 28px rgba(255, 106, 61, 0.55);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 28px rgba(var(--accent-rgb), 0.55);
   animation: pick 2.4s ease-in-out infinite;
 }
 
@@ -265,7 +265,7 @@
 }
 
 @keyframes pick {
-  50% { box-shadow: 0 0 0 2px var(--accent), 0 0 44px rgba(255, 106, 61, 0.8); }
+  50% { box-shadow: 0 0 0 2px var(--accent), 0 0 44px rgba(var(--accent-rgb), 0.8); }
 }
 
 /* tappable cards (in the app): a button that still looks like the card */
@@ -363,4 +363,10 @@ button.fpl-card:focus-visible {
   text-transform: uppercase;
   white-space: nowrap;
   transform: skewX(var(--skew));
+}
+
+/* a marked or highlighted card keeps its injury flag clear of the label on top */
+.fpl-card.marked .fpl-flag,
+.fpl-card.hl .fpl-flag {
+  top: 14px;
 }

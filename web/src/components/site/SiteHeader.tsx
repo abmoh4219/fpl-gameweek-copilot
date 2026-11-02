@@ -3,9 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createBrowserAuthClient } from "@/lib/auth/browser";
+import { GitHubIcon } from "./GitHubIcon";
+import { compactCount } from "@/lib/github";
+import { GITHUB_URL } from "./links";
 import { Mark, Wordmark } from "./Mark";
+import { ThemeToggle } from "./ThemeToggle";
 
-export function SiteHeader() {
+/** Below this the count reads as "nobody uses it", so the pill shows "Star" alone. */
+const SHOW_STARS_FROM = 10;
+
+export function SiteHeader({ stars }: { stars: number | null }) {
   const [scrolled, setScrolled] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
 
@@ -31,12 +38,31 @@ export function SiteHeader() {
           <Wordmark />
         </Link>
         <nav className="site-nav" aria-label="Main">
-          <a href="/#features">Product</a>
-          <a href="/#how">How it works</a>
+          <a href="/#features">Features</a>
+          <a href="/#gaffer">The Gaffer</a>
           <Link href="/demo">Demo</Link>
           <a href="/#faq">FAQ</a>
         </nav>
         <div className="site-actions">
+          <ThemeToggle />
+          <a
+            href={GITHUB_URL}
+            className="gh-pill"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Star Armband on GitHub"
+          >
+            <span>
+              <GitHubIcon size={16} />
+              <span className="hide-mobile">Star</span>
+            </span>
+            {stars !== null && stars >= SHOW_STARS_FROM && (
+              <span className="gh-count">
+                <span className="gh-star" aria-hidden="true">★</span>
+                {compactCount(stars)}
+              </span>
+            )}
+          </a>
           {signedIn ? (
             <Link href="/app" className="btn btn-accent">
               Open app

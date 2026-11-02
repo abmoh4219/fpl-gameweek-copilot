@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { redirect } from "next/navigation";
 import { AppNav } from "@/components/app/AppNav";
 import { Mark, Wordmark } from "@/components/site/Mark";
@@ -46,6 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <b>{who}</b>
             {viewer.email && <small>{viewer.email}</small>}
           </div>
+          <ThemeToggle />
           <form action="/auth/sign-out" method="post">
             <button type="submit" className="rail-out" title="Sign out" aria-label="Sign out">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">

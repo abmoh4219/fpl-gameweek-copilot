@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { kitImageUrl, type ReportPayload, type ReportSection, type Squad } from "@fpl/shared";
-import { SquadArt, TraceArt, TransferArt, WatchArt } from "@/components/landing/TacticsArt";
+import { HeroShow } from "@/components/landing/HeroShow";
 import { Ticker, type TickerItem } from "@/components/landing/Ticker";
-import { FplPitch } from "@/components/pitch/FplPitch";
-import { ScoreBug } from "@/components/pitch/ScoreBug";
-import { TELEGRAM_URL, DEMO_TEAM_ID } from "@/components/site/links";
+import { SquadArt, TraceArt, TransferArt, WatchArt } from "@/components/landing/TacticsArt";
+import { DEMO_TEAM_ID, TELEGRAM_URL } from "@/components/site/links";
 import { loadSquad } from "@/lib/squad";
 import { readView } from "@/lib/supabase";
+import { bestXi, squadCards } from "@/lib/toolkit";
 
 export const revalidate = 900;
 
@@ -37,7 +37,8 @@ async function landingData() {
     ).catch(() => []),
   ]);
   const codes = new Map(teams.map((t) => [t.team_short_name, t.team_code]));
-  return { squad, daily: reports[0] ?? null, codes, flagged };
+  const result = squad ? await squadCards(squad).then((cards) => bestXi(squad, cards)).catch(() => null) : null;
+  return { squad, daily: reports[0] ?? null, codes, flagged, result };
 }
 
 type Of<K extends ReportSection["kind"]> = Extract<ReportSection, { kind: K }>;
@@ -194,22 +195,16 @@ const FEATURES = [
   },
 ];
 
-const STEPS = [
-  ["1'", "Create your account", "Google, or an email and a password. About twenty seconds."],
-  ["2'", "Connect your FPL team", "Paste your team ID — the number after /entry/ on your Points page. We show you the team we found so you can confirm it is yours."],
-  ["3'", "Give the Gaffer a job", "Captaincy, transfers, fixtures, injuries. Every answer arrives with the numbers behind it."],
-];
-
 const FAQ: [string, string][] = [
-  ["What is Armband?", "An AI manager for Fantasy Premier League — we call it the Gaffer. It shows your squad with the numbers that matter — form, expected goal involvement, minutes risk, fixture difficulty — and answers your questions about captaincy, transfers and fixtures, explaining every recommendation with figures you can check."],
-  ["Is it free?", "Yes. Every account includes five questions to the Gaffer, and the squad view, player cards, fixtures and demo are unlimited."],
+  ["What is Armband?", "Free, open-source tools for Fantasy Premier League. Connect your team and see your fifteen with the numbers that matter (form, expected goal involvement, minutes risk, fixture difficulty), then pick your best XI, rate your lineup, choose a captain and find transfers that fit your bank. The Gaffer, our AI manager, does the same work in plain words."],
+  ["Is it free?", "Yes, and it stays free. Every tool is free with no limits and no ads. The code is open source, so anyone can check how it works or run their own copy."],
+  ["Is it open source?", "Yes. All of Armband is on GitHub under the MIT license: the website, the data pipeline, the insight engine and the Gaffer. Read how every number is computed, run it yourself, or contribute."],
   ["Does it change my real FPL team?", "No — Armband only reads your team and never asks for your FPL password. When the Gaffer picks your XI, makes a transfer or changes your captain, it shows the plan on your pitch. You apply or revert it in Armband, then make the changes in the FPL app."],
   ["Do I need to give you my FPL password?", "No. We only ever need your public FPL team ID — the number in your Points page address. We read your team; we cannot make transfers or change anything."],
   ["Where does the data come from?", "From Fantasy Premier League's public data, refreshed every three hours, plus Champions League fixture dates for fixture congestion. Our own pipeline computes every metric from it."],
   ["Can the Gaffer make things up?", "It is built not to. It may only use figures that came back from a lookup in that conversation, and you see every lookup on screen. If it does not have a number, it says so instead of guessing."],
   ["What does \"estimate\" mean?", "Anything about the future — fixture difficulty, goal threat, price rises and falls — is our best computed estimate, never a guarantee. We label it every time."],
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
-  ["Why only five questions?", "Each answer takes real computing work, and we keep Armband free. Questions that aren't about FPL are declined and never counted."],
   ["Is this the official FPL app?", "No. Armband is an independent project, not affiliated with, endorsed by or connected to the Premier League or Fantasy Premier League. It uses public data only; the club kits on the pitch belong to their clubs."],
   ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your login, your connected team and your usage history. We keep only a one-way fingerprint of your email with its question count, so the free allowance can't be reset by signing up again."],
 ];
@@ -288,8 +283,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
 // ------------------------------------------------------------------ page --
 
 export default async function Landing() {
-  const { squad, daily, codes, flagged } = await landingData();
-  const pick = squad ? captainCase(squad) : null;
+  const { squad, daily, codes, flagged, result } = await landingData();
 
   const { risers, fallers, news } = overnight(daily?.payload);
   const kitFor = (team: string, position: string) => {
@@ -334,7 +328,8 @@ export default async function Landing() {
         <div className="wrap hero-grid">
           <div className="hero-copy">
             <span className="kicker">
-              <b>FPL</b>Meet the Gaffer
+              <b>Free</b>
+              <span>Meet the Gaffer, your FPL manager</span>
             </span>
             <h1 className="hero-title">
               <span className="line"><span>Your FPL team.</span></span>
@@ -342,13 +337,12 @@ export default async function Landing() {
               <span className="line flare"><span>Deadline-ready.</span></span>
             </h1>
             <p className="lede">
-              Connect your team and meet the Gaffer, an AI manager that does the homework — form, minutes, fixtures and prices, read
-              against your fifteen. Ask about captaincy or transfers and watch it look up every figure before it
-              answers.
+              Armband reads your fifteen against form, minutes, fixtures and prices, then picks your best XI, rates your
+              lineup and finds transfers that fit your bank. Every number computed, every working shown.
             </p>
             <div className="ctas">
               <Link href="/sign-up" className="btn btn-accent">
-                Start free <Arrow />
+                Connect your team <Arrow />
               </Link>
               <Link href="/demo" className="btn">
                 Try the demo
@@ -357,20 +351,14 @@ export default async function Landing() {
             <ul className="hero-facts">
               <li>No FPL password</li>
               <li>Refreshed every 3 hours</li>
-              <li>Free in early access</li>
+              <li>Free, forever</li>
             </ul>
           </div>
 
-          {squad && (
-            <>
-              <div className="hero-pitch">
-                <ScoreBug squad={squad} />
-                <FplPitch squad={squad} value="fixture" {...(pick ? { highlight: pick.best.fplId } : {})} />
-              </div>
-              <div className="hero-chat">
-                <Analysis squad={squad} />
-              </div>
-            </>
+          {result && (
+            <div className="hero-pitch">
+              <HeroShow result={result} />
+            </div>
           )}
         </div>
       </section>
@@ -387,7 +375,7 @@ export default async function Landing() {
                 Every decision <em>gets a reason.</em>
               </>
             }
-            sub="No hunches dressed up as advice. The Gaffer looks things up, checks the rules, and shows you how it got there."
+            sub="No hunches dressed up as advice. Armband looks things up, checks the rules, and shows you how it got there."
           />
           <div className="features">
             {FEATURES.map((f, i) => (
@@ -404,32 +392,24 @@ export default async function Landing() {
         </div>
       </section>
 
-      <section className="block" id="how">
-        <div className="wrap">
-          <SectionHead
-            index="02"
-            label="How it works"
-            title={
-              <>
-                Kick-off in <em>three minutes.</em>
-              </>
-            }
-            sub="No spreadsheets, no ten open tabs."
-          />
-          <ol className="timeline reveal">
-            {STEPS.map(([minute, title, body]) => (
-              <li key={title}>
-                <span className="minute">{minute}</span>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </li>
-            ))}
-          </ol>
-          <div className="ctas center">
-            <Link href="/sign-up" className="btn btn-accent">
-              Create free account <Arrow />
+      <section className="block" id="gaffer">
+        <div className="wrap split">
+          <div>
+            <SectionHead
+              index="02"
+              label="The Gaffer"
+              title={
+                <>
+                  An AI manager that <em>shows its working.</em>
+                </>
+              }
+              sub="Ask in plain words. The Gaffer calls the same tools, looks up every figure, and puts its plan on your pitch for you to apply or revert."
+            />
+            <Link href="/demo" className="text-link">
+              Watch it work in the demo <Arrow />
             </Link>
           </div>
+          {squad && <Analysis squad={squad} />}
         </div>
       </section>
 
@@ -447,19 +427,18 @@ export default async function Landing() {
             />
             <ul className="checks reveal">
               <li>
-                <b>Every figure is looked up.</b> Form, xGI, prices and fixtures come from our pipeline, and you see each
-                lookup.
+                <b>Code computes, never the model.</b> Form, xGI, prices and fixtures come from our pipeline and tested
+                functions.
               </li>
               <li>
-                <b>Rules are checked by code.</b> A transfer is only suggested after it passes FPL&apos;s rules and your
+                <b>Rules are checked by code.</b> A transfer is only shown after it passes FPL&apos;s rules and your
                 budget.
               </li>
               <li>
-                <b>Estimates say so.</b> Anything about the future is labelled — never sold as certain.
+                <b>Estimates say so.</b> Anything about the future is labelled, never sold as certain.
               </li>
               <li>
-                <b>Invented numbers are disallowed.</b> Written previews are checked before publishing; a sentence with a
-                number we did not compute never goes out.
+                <b>Invented numbers are disallowed.</b> A sentence with a number we did not compute never goes out.
               </li>
             </ul>
           </div>
@@ -500,10 +479,10 @@ export default async function Landing() {
           <h2 className="display huge reveal">
             The deadline <em>won&apos;t wait.</em>
           </h2>
-          <p className="sub">Connect your team in under a minute and ask your first question before it locks.</p>
+          <p className="sub">Connect your team in under a minute. Free, open source, and every number shown.</p>
           <div className="ctas center">
             <Link href="/sign-up" className="btn btn-accent">
-              Start free <Arrow />
+              Connect your team <Arrow />
             </Link>
             <Link href="/demo" className="btn">
               Try the demo

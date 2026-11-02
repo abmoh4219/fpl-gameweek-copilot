@@ -2,7 +2,11 @@
 
 # Armband
 
-**An AI manager for Fantasy Premier League.** Connect your FPL team and Armband
+[![CI](https://github.com/abmoh4219/fpl-gameweek-copilot/actions/workflows/ci.yml/badge.svg)](https://github.com/abmoh4219/fpl-gameweek-copilot/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Live](https://img.shields.io/badge/live-armband--one.vercel.app-ff6a3d.svg)](https://armband-one.vercel.app)
+
+**Free, open-source tools and an AI manager for Fantasy Premier League.** Connect your FPL team and Armband
 shows your fifteen on the pitch with the numbers that matter. Then give the
 **Gaffer**, Armband's agent, a job: pick your XI, rate your lineup, make a
 transfer, choose a captain. It makes the changes on your pitch for you to
@@ -159,6 +163,16 @@ pnpm --filter @fpl/web dev    # http://localhost:3000
   its traps
 - [Operations](docs/operations.md): schedules, alerts, recovery
 - [Make scenarios](docs/make.md) and [Deploying](docs/deploy.md)
+
+## Contributing
+
+Armband is free and open source, and contributions are welcome: bug reports,
+new stat tables, accessibility fixes, better models. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE) © Abdelah Mohammed Aliy. Built by [Abdelah](https://abdelah-portfolio.vercel.app/).
 
 ---
 
