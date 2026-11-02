@@ -107,9 +107,13 @@ confirmed, every price-watch output is labelled an **estimate**.
 - `/app` — the dugout: the squad on an FPL-style pitch with official kits, the
   co-pilot (`docs/agent.md`), and a computed squad check; `/app/settings`
 - `/demo` — the demo team with four recorded co-pilot answers
+- `/stats` — season leaderboards (goals, assists, xG/xA/xGI, points, form,
+  value, bonus, BPS, clean sheets, ownership), filtered by position and price;
+  pure functions in `packages/shared/src/stats.ts`, read from
+  `api.player_current`
 
-Planned next: league table and top scorers (football-data.org), a fixtures
-grid, player search, a price-watch page. `app.waitlist` exists from an
+Planned next: a fixtures grid, a price-watch page, the free Gaffer tools
+(no model needed), player search. `app.waitlist` exists from an
 earlier plan and is unused.
 
 ---

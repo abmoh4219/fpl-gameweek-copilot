@@ -184,6 +184,17 @@ export const INSIGHT_CONFIG = {
     retryDelayMs: 20_000,
   },
 
+  stats: {
+    /**
+     * A per-90 leaderboard only ranks players with at least this many season
+     * minutes (three full matches). Without it a player with a 3-minute cameo
+     * tops xGI/90 (CLAUDE.md §4c).
+     */
+    minMinutesPer90: 270,
+    /** Rows shown per leaderboard. */
+    rows: 25,
+  },
+
   preview: {
     /**
      * Send the preview once a deadline is this close. Deadlines are Friday

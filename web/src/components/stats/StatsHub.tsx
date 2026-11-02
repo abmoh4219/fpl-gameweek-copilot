@@ -1,0 +1,144 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import { INSIGHT_CONFIG, LEADERBOARDS, formatStat, kitImageUrl, leaderboard, type Leaderboard, type StatPosition, type StatRow } from "@fpl/shared";
+
+/**
+ * The stats hub: one leaderboard at a time, picked from grouped tabs, with
+ * position and price filters. Everything is computed in the browser from the
+ * one cached list the page already loaded; nothing here calls a server.
+ */
+const POSITIONS: { id: StatPosition | null; label: string }[] = [
+  { id: null, label: "All" },
+  { id: "GKP", label: "GK" },
+  { id: "DEF", label: "DEF" },
+  { id: "MID", label: "MID" },
+  { id: "FWD", label: "FWD" },
+];
+
+const PRICES = [null, 5, 6, 7, 8, 10] as const;
+
+const GROUPS = ["Attack", "Expected", "FPL", "Defence", "Market"] as const;
+
+function Kit({ r }: { r: StatRow }) {
+  return <img className="st-kit" src={kitImageUrl(r.teamCode, r.position === "GKP", 66)} alt="" loading="lazy" referrerPolicy="no-referrer" width={28} height={37} />;
+}
+
+export function StatsHub({ rows }: { rows: StatRow[] }) {
+  const [boardId, setBoardId] = useState("goals");
+  const [position, setPosition] = useState<StatPosition | null>(null);
+  const [maxPriceM, setMaxPriceM] = useState<number | null>(null);
+
+  const board: Leaderboard = LEADERBOARDS.find((b) => b.id === boardId) ?? LEADERBOARDS[0]!;
+  const table = useMemo(() => leaderboard(rows, board, { position, maxPriceM }), [rows, board, position, maxPriceM]);
+  const top = table[0] ? board.value(table[0]) : 0;
+  const unavailable = board.positions && position && !board.positions.includes(position);
+
+  return (
+    <div className="st">
+      <div className="st-boards" role="tablist" aria-label="Leaderboards">
+        {GROUPS.map((g) => (
+          <div className="st-group" key={g}>
+            <span className="st-group-label">{g}</span>
+            <div className="st-group-tabs">
+              {LEADERBOARDS.filter((b) => b.group === g).map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={b.id === board.id}
+                  className={`st-tab${b.id === board.id ? " is-on" : ""}`}
+                  onClick={() => setBoardId(b.id)}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="st-filters">
+        <div className="st-seg" role="group" aria-label="Position">
+          {POSITIONS.map((p) => (
+            <button key={p.label} type="button" className={position === p.id ? "is-on" : ""} aria-pressed={position === p.id} onClick={() => setPosition(p.id)}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <label className="st-price">
+          <span>Max price</span>
+          <select value={maxPriceM ?? ""} onChange={(e) => setMaxPriceM(e.target.value === "" ? null : Number(e.target.value))}>
+            {PRICES.map((p) => (
+              <option key={p ?? "any"} value={p ?? ""}>
+                {p === null ? "Any" : `£${p.toFixed(1)}m`}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="st-card">
+        <div className="st-head">
+          <h2>{board.label}</h2>
+          <p>
+            {board.note}
+            {board.per90 ? ` Players with at least ${INSIGHT_CONFIG.stats.minMinutesPer90} minutes.` : ""}
+          </p>
+        </div>
+
+        {unavailable || table.length === 0 ? (
+          <p className="st-empty">
+            {unavailable ? `${board.label} is only ranked for ${board.positions!.join(" and ")}.` : "Nobody matches these filters."}
+          </p>
+        ) : (
+          <div className="st-scroll">
+            <table className="st-table">
+              <thead>
+                <tr>
+                  <th scope="col" className="st-rank">#</th>
+                  <th scope="col" className="st-player">Player</th>
+                  <th scope="col" className="st-main">{board.label}</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Mins</th>
+                  <th scope="col">Pts</th>
+                  <th scope="col">Owned</th>
+                </tr>
+              </thead>
+              <tbody>
+                {table.map((r, i) => {
+                  const v = board.value(r);
+                  return (
+                    <tr key={r.fplId}>
+                      <td className="st-rank">{i + 1}</td>
+                      <td className="st-player">
+                        <div className="st-who">
+                          <Kit r={r} />
+                          <span>
+                            <b>{r.webName}</b>
+                            <small>
+                              {r.team} · {r.position}
+                              {r.status !== "a" && <i className={`st-flag ${r.status === "d" ? "doubt" : "out"}`}>{r.status === "d" ? "doubt" : "out"}</i>}
+                            </small>
+                          </span>
+                        </div>
+                      </td>
+                      <td className="st-main">
+                        <span className="st-value">{formatStat(v, board.format)}</span>
+                        <span className="st-bar" style={{ ["--w" as string]: `${top > 0 ? Math.max(4, (v / top) * 100) : 0}%` }} />
+                      </td>
+                      <td>£{r.priceM.toFixed(1)}m</td>
+                      <td>{r.minutes.toLocaleString("en-GB")}</td>
+                      <td>{r.totalPoints}</td>
+                      <td>{r.ownership.toFixed(1)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

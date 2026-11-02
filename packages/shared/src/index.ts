@@ -11,3 +11,4 @@ export * from "./squad.ts";
 export * from "./copilot.ts";
 export * from "./agent-protocol.ts";
 export * from "./plan.ts";
+export * from "./stats.ts";

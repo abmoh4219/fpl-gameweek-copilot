@@ -144,6 +144,12 @@
   font-size: 14px;
 }
 
+@media (max-width: 420px) {
+  .site-actions {
+    gap: 8px;
+  }
+}
+
 @media (max-width: 380px) {
   .site-header .wrap {
     gap: 12px;

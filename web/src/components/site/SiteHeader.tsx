@@ -39,6 +39,7 @@ export function SiteHeader({ stars }: { stars: number | null }) {
         </Link>
         <nav className="site-nav" aria-label="Main">
           <a href="/#features">Features</a>
+          <Link href="/stats">Stats</Link>
           <a href="/#gaffer">The Gaffer</a>
           <Link href="/demo">Demo</Link>
           <a href="/#faq">FAQ</a>
