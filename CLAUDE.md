@@ -112,8 +112,13 @@ confirmed, every price-watch output is labelled an **estimate**.
   pure functions in `packages/shared/src/stats.ts`, read from
   `api.player_current`
 
-Planned next: a fixtures grid, a price-watch page, the free Gaffer tools
-(no model needed), player search. `app.waitlist` exists from an
+- `/fixtures` — the fixture planner: every club's next five gameweeks by FPL
+  difficulty, sorted by the engine's adjusted run (next 3 / next 5), with
+  Champions League congestion marked; assembled by
+  `packages/shared/src/fixtures-grid.ts`
+
+Planned next: a price-watch page, the free Gaffer tools (no model needed),
+player search. `app.waitlist` exists from an
 earlier plan and is unused.
 
 ---

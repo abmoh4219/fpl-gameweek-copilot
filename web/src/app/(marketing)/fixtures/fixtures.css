@@ -1,0 +1,205 @@
+/* The fixture planner. Built on the site tokens, so it follows both themes. */
+
+.fixtures-page {
+  padding-top: 132px;
+}
+
+.fixtures-page .sec-head {
+  margin-bottom: 32px;
+}
+
+.fx {
+  display: grid;
+  gap: 16px;
+}
+
+.fx-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.fx-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.fx-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fx-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.fx-card {
+  border-radius: 20px;
+  background: var(--bg-1);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+
+.fx-scroll {
+  overflow-x: auto;
+}
+
+.fx-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.fx-table th,
+.fx-table td {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.fx-table thead th {
+  padding: 12px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--faint);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.fx-table tbody tr:last-child th,
+.fx-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.fx-table .fx-team {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding-left: 20px;
+  background: var(--bg-1);
+  text-align: left;
+}
+
+.fx-who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.fx-who img {
+  width: 24px;
+  height: auto;
+}
+
+.fx-cell-wrap {
+  min-width: 92px;
+}
+
+.fx-stack {
+  display: grid;
+  gap: 3px;
+}
+
+.fx-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.fx-stack.is-double .fx-cell {
+  height: 26px;
+  font-size: 11.5px;
+}
+
+.fx-cell.d1, .fx-swatch.d1 { background: var(--fdr-1); color: #fff; }
+.fx-cell.d2, .fx-swatch.d2 { background: var(--fdr-2); color: #062113; }
+.fx-cell.d3, .fx-swatch.d3 { background: var(--fdr-3); color: var(--text); }
+.fx-cell.d4, .fx-swatch.d4 { background: var(--fdr-4); color: #fff; }
+.fx-cell.d5, .fx-swatch.d5 { background: var(--fdr-5); color: #fff; }
+.fx-cell.dx { color: var(--faint); box-shadow: inset 0 0 0 1px var(--line-2); }
+
+.fx-cl {
+  display: inline-grid;
+  place-items: center;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--warn);
+  color: #1d1300;
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 800;
+}
+
+.fx-cell .fx-cl {
+  position: absolute;
+  top: -5px;
+  right: -3px;
+}
+
+.fx-table .fx-run {
+  padding-right: 20px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.fx-run small {
+  font-weight: 500;
+}
+
+td.fx-run {
+  display: table-cell;
+}
+
+td.fx-run .mono {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.fx-band {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.fx-band.easy { color: var(--up); }
+.fx-band.medium { color: var(--warn); }
+.fx-band.hard { color: var(--danger); }
+
+.fx-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+@media (max-width: 640px) {
+  .fixtures-page {
+    padding-top: 104px;
+  }
+  .fx-table .fx-team {
+    padding-left: 14px;
+  }
+}

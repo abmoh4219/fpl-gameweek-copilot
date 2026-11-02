@@ -12,3 +12,4 @@ export * from "./copilot.ts";
 export * from "./agent-protocol.ts";
 export * from "./plan.ts";
 export * from "./stats.ts";
+export * from "./fixtures-grid.ts";
