@@ -142,6 +142,11 @@ export interface FixtureSwing {
   gameweeks: number[];
   /** Mean FPL difficulty per gameweek (a double averages both); null for a blank. */
   difficulty: (number | null)[];
+  /** Mean FPL difficulty of the next two gameweeks, and of the three after; null if all blank. */
+  early: number | null;
+  late: number | null;
+  /** Mean over all five, so a run that "gets easier" can still be seen to be hard overall. */
+  overall: number | null;
   /** Early minus late mean difficulty: positive means the run gets easier. */
   swing: number;
   direction: "easier" | "harder" | "steady";
@@ -150,7 +155,10 @@ export interface FixtureSwing {
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
 
 /**
- * Fixture swings: compare the next two gameweeks with the three after. A
+ * Fixture swings: compare the next two gameweeks with the three after. This
+ * describes CHANGE in FPL's own difficulty rating, not how easy a run is: a
+ * club can "get easier" and still face a hard five (hence `overall`). It is
+ * never transfer advice. A
  * swing smaller than `swingSteadyBelow` in the config (FPL difficulty points) is "steady".
  * Blanks are skipped in the means, not counted as easy or hard.
  */
@@ -161,9 +169,22 @@ export function fixtureSwings(rows: readonly GridRow[], steadyBelow: number = IN
       const known = (xs: (number | null)[]) => xs.filter((v): v is number => v !== null);
       const early = mean(known(difficulty.slice(0, 2)));
       const late = mean(known(difficulty.slice(2)));
+      const overall = mean(known(difficulty));
       const swing = early !== null && late !== null ? Math.round((early - late) * 100) / 100 : 0;
       const direction: FixtureSwing["direction"] = Math.abs(swing) < steadyBelow ? "steady" : swing > 0 ? "easier" : "harder";
-      return { teamFplId: r.teamFplId, team: r.team, teamCode: r.teamCode, gameweeks: r.cells.map((c) => c.gameweek), difficulty, swing, direction };
+      const r2 = (v: number | null) => (v === null ? null : Math.round(v * 100) / 100);
+      return {
+        teamFplId: r.teamFplId,
+        team: r.team,
+        teamCode: r.teamCode,
+        gameweeks: r.cells.map((c) => c.gameweek),
+        difficulty,
+        early: r2(early),
+        late: r2(late),
+        overall: r2(overall),
+        swing,
+        direction,
+      };
     })
     .sort((a, b) => b.swing - a.swing || a.team.localeCompare(b.team));
 }

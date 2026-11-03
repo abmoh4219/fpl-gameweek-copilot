@@ -3,8 +3,9 @@ import { fixtureSwings, kitImageUrl, type FixtureSwing, type GridRow } from "@fp
 /**
  * Fixture swings as small multiples: one mini line per club of FPL difficulty
  * across the next five gameweeks, easier plotted higher, the opponent under
- * each point. Grouped by direction so the story reads at a glance; each point
- * carries a native tooltip. Built from the same grid as the table below.
+ * each point. It DESCRIBES a change in FPL's rating (next two vs the three
+ * after) and shows the numbers behind it, including the five-game average,
+ * so a run that "gets easier" can still be seen to be hard. Never advice.
  */
 const W = 220;
 const H = 92;
@@ -59,9 +60,13 @@ function Card({ s, row }: { s: FixtureSwing; row: GridRow }) {
       <figcaption>
         <img src={kitImageUrl(row.teamCode, false, 66)} alt="" loading="lazy" referrerPolicy="no-referrer" width={22} height={29} />
         <b>{row.team}</b>
-        <span className={`sw-tag ${s.direction}`}>{s.direction === "easier" ? "▲ easier" : s.direction === "harder" ? "▼ harder" : "steady"}</span>
+        <span className={`sw-tag ${s.direction}`}>{s.direction === "easier" ? "▲ easier later" : s.direction === "harder" ? "▼ harder later" : "steady"}</span>
       </figcaption>
       <Spark s={s} opponents={opponents} />
+      <p className="sw-facts">
+        Next 2 <b>{s.early?.toFixed(1) ?? "—"}</b> → then <b>{s.late?.toFixed(1) ?? "—"}</b>
+        <span>5-game avg {s.overall?.toFixed(1) ?? "—"}</span>
+      </p>
     </figure>
   );
 }
@@ -78,13 +83,15 @@ export function FixtureSwings({ rows }: { rows: GridRow[] }) {
     <div className="ins-card sw">
       <h2 className="ins-title">Fixture swings</h2>
       <p className="ins-how">
-        Each club&apos;s difficulty across the next five gameweeks, easier higher. Comparing the next two with the three
-        after shows whose run is about to turn. Lower-case opponents are away games.
+        How each club&apos;s fixtures change across the next five gameweeks, using FPL&apos;s own difficulty rating (1 easy,
+        5 hard), easier plotted higher. It compares the next two games with the three after, so it shows a change, not
+        whether the whole run is easy: check the five-game average. FPL&apos;s rating ignores form and injuries; treat it
+        as an estimate. Lower-case opponents are away.
       </p>
       {(
         [
-          ["Turning easier: buy before the swing", easier],
-          ["Turning harder: think about selling", harder],
+          [`Gets easier after GW${swings[0]?.gameweeks[1] ?? ""}`, easier],
+          [`Gets harder after GW${swings[0]?.gameweeks[1] ?? ""}`, harder],
         ] as const
       ).map(
         ([title, list]) =>

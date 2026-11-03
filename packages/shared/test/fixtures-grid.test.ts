@@ -93,6 +93,7 @@ describe("fixture swings", () => {
     ]);
     const flt = swings.find((s) => s.team === "FLT")!;
     expect(flt.difficulty).toEqual([3, 3, 3, null, 3]);
-    expect(swings.find((s) => s.team === "UPP")!.swing).toBe(2.5);
+    const upp = swings.find((s) => s.team === "UPP")!;
+    expect(upp).toMatchObject({ early: 4.5, late: 2, overall: 3, swing: 2.5 });
   });
 });

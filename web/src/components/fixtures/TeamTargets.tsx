@@ -13,8 +13,9 @@ export function TeamTargets({ targets }: { targets: TeamTarget[] }) {
     <div className="ins-card fx-targets">
       <h2 className="ins-title">Teams to target</h2>
       <p className="ins-how">
-        Each club&apos;s attack (season xG) against how hard its next five gameweeks are. Top right is where you want
-        players from: clubs that create a lot and face an easy run. Fixture difficulty is an estimate.
+        Each club&apos;s attack (season xG) against how hard its next five gameweeks are, by our adjusted difficulty.
+        Top right: clubs that have created a lot and face an easier run. Both are estimates from the season so far, not
+        predictions; injuries and form can change either.
       </p>
       <ScatterPlot
         points={points}
