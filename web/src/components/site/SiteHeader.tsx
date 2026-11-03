@@ -41,6 +41,7 @@ export function SiteHeader({ stars }: { stars: number | null }) {
           <a href="/#features">Features</a>
           <Link href="/stats">Stats</Link>
           <Link href="/fixtures">Fixtures</Link>
+          <Link href="/prices">Prices</Link>
           <a href="/#gaffer">The Gaffer</a>
           <Link href="/demo">Demo</Link>
           <a href="/#faq">FAQ</a>

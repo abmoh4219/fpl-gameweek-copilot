@@ -117,8 +117,13 @@ confirmed, every price-watch output is labelled an **estimate**.
   Champions League congestion marked; assembled by
   `packages/shared/src/fixtures-grid.ts`
 
-Planned next: a price-watch page, the free Gaffer tools (no model needed),
-player search. `app.waitlist` exists from an
+- `/prices` — price watch: the players closest to a rise or fall from FPL's
+  own fields (labelled estimates; past 100% is never a confirmed change; a
+  per-player lock is shown as such) and the confirmed changes of the last
+  week; `packages/shared/src/prices.ts`, whose column allow-list never
+  includes `momentum` or `hourly_rate` (a test asserts it)
+
+Planned next: the free Gaffer tools (no model needed), player search. `app.waitlist` exists from an
 earlier plan and is unused.
 
 ---
