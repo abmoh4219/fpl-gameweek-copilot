@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChartPoint } from "@fpl/shared";
 
@@ -35,6 +36,8 @@ interface Props {
   summary: string;
   /** Tooltip extra line, e.g. "+3.1 goals over xG". */
   detail?: (p: ChartPoint) => string;
+  /** Where a click (or Enter on a labelled dot) takes the reader; omit for points that aren't players. */
+  href?: (p: ChartPoint) => string;
 }
 
 const PAD = { top: 16, right: 18, bottom: 44, left: 48 };
@@ -70,7 +73,8 @@ function scale(axis: Axis, values: number[], range0: [number, number]) {
   return { f, lo, hi, ticks };
 }
 
-export function ScatterPlot({ points, x, y, diagonal, zone, summary, detail }: Props) {
+export function ScatterPlot({ points, x, y, diagonal, zone, summary, detail, href }: Props) {
+  const router = useRouter();
   const wrap = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(720);
   const [hover, setHover] = useState<ChartPoint | null>(null);
@@ -147,6 +151,9 @@ export function ScatterPlot({ points, x, y, diagonal, zone, summary, detail }: P
         aria-label={summary}
         onPointerMove={onMove}
         onPointerLeave={() => setHover(null)}
+        // The nearest dot is the target, so a click lands where the tooltip points.
+        onClick={() => hover && href && router.push(href(hover))}
+        className={href && hover ? "is-clickable" : undefined}
       >
         {/* grid and axes: hairline, solid, recessive */}
         {sy.ticks.map((t) => (
@@ -201,6 +208,9 @@ export function ScatterPlot({ points, x, y, diagonal, zone, summary, detail }: P
             tabIndex={p.labelled ? 0 : -1}
             aria-label={p.labelled ? `${p.label}: ${x.label} ${x.format(p.x)}, ${y.label} ${y.format(p.y)}` : undefined}
             onFocus={() => setHover(p)}
+            onKeyDown={(e) => {
+              if (href && e.key === "Enter") router.push(href(p));
+            }}
             onBlur={() => setHover(null)}
           />
         ))}
@@ -230,6 +240,7 @@ export function ScatterPlot({ points, x, y, diagonal, zone, summary, detail }: P
             {y.label}: <b>{y.format(hover.y)}</b>
           </span>
           {detail && <em>{detail(hover)}</em>}
+          {href && <small className="chart-tip-go">Click to open →</small>}
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { closestToChange, kitImageUrl, type StatPosition, type WatchRow } from "@fpl/shared";
 
@@ -56,7 +57,9 @@ export function PriceWatch({ rows, codes }: { rows: WatchRow[]; codes: Record<st
               <span className="pw-who">
                 {code ? <img src={kitImageUrl(code, r.position === "GKP", 66)} alt="" loading="lazy" referrerPolicy="no-referrer" width={24} height={32} /> : <span />}
                 <span>
-                  <b>{r.webName}</b>
+                  <Link href={`/players/${r.fplId}`} className="pw-link">
+                    {r.webName}
+                  </Link>
                   <small>
                     {r.team} · {r.position} · £{r.priceM.toFixed(1)}m
                     {r.locked && (

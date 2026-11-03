@@ -1,3 +1,4 @@
+import { INSIGHT_CONFIG } from "./insights/config.ts";
 import type { FixtureRunBand } from "./insights/types.ts";
 
 /**
@@ -131,4 +132,38 @@ export function teamTargetChart(teams: readonly TeamTarget[], picks = 5): { fplI
     // Twenty clubs: every name fits and every club is a reader's question.
     labelled: true,
   }));
+}
+
+/** One club's difficulty week by week, and whether its run turns easier. */
+export interface FixtureSwing {
+  teamFplId: number;
+  team: string;
+  teamCode: number;
+  gameweeks: number[];
+  /** Mean FPL difficulty per gameweek (a double averages both); null for a blank. */
+  difficulty: (number | null)[];
+  /** Early minus late mean difficulty: positive means the run gets easier. */
+  swing: number;
+  direction: "easier" | "harder" | "steady";
+}
+
+const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+
+/**
+ * Fixture swings: compare the next two gameweeks with the three after. A
+ * swing smaller than `swingSteadyBelow` in the config (FPL difficulty points) is "steady".
+ * Blanks are skipped in the means, not counted as easy or hard.
+ */
+export function fixtureSwings(rows: readonly GridRow[], steadyBelow: number = INSIGHT_CONFIG.stats.swingSteadyBelow): FixtureSwing[] {
+  return rows
+    .map((r) => {
+      const difficulty = r.cells.map((c) => mean(c.fixtures.map((f) => f.difficulty)));
+      const known = (xs: (number | null)[]) => xs.filter((v): v is number => v !== null);
+      const early = mean(known(difficulty.slice(0, 2)));
+      const late = mean(known(difficulty.slice(2)));
+      const swing = early !== null && late !== null ? Math.round((early - late) * 100) / 100 : 0;
+      const direction: FixtureSwing["direction"] = Math.abs(swing) < steadyBelow ? "steady" : swing > 0 ? "easier" : "harder";
+      return { teamFplId: r.teamFplId, team: r.team, teamCode: r.teamCode, gameweeks: r.cells.map((c) => c.gameweek), difficulty, swing, direction };
+    })
+    .sort((a, b) => b.swing - a.swing || a.team.localeCompare(b.team));
 }

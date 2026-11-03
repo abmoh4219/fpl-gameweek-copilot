@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { fixtureGrid, type CongestionMark, type RunScore, type TeamRun, type TeamTarget, type TickerViewRow } from "@fpl/shared";
 import { FixturePlanner } from "@/components/fixtures/FixturePlanner";
+import { FixtureSwings } from "@/components/fixtures/FixtureSwings";
 import { TeamTargets } from "@/components/fixtures/TeamTargets";
 import { readView } from "@/lib/supabase";
 import "./fixtures.css";
@@ -75,6 +76,7 @@ export default async function FixturesPage() {
           </p>
         </div>
         {targets.length > 0 && <TeamTargets targets={targets} />}
+        {rows.length > 0 && <FixtureSwings rows={rows} />}
         {rows.length > 0 ? (
           <FixturePlanner gameweeks={gameweeks} rows={rows} />
         ) : (

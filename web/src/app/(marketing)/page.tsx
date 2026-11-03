@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { kitImageUrl, type ReportPayload, type ReportSection, type Squad } from "@fpl/shared";
+import { kitImageUrl, type ReportPayload, type ReportSection, type Squad, type TeamRun } from "@fpl/shared";
+import { ExploreTools, type ExploreFacts } from "@/components/landing/ExploreTools";
 import { HeroShow } from "@/components/landing/HeroShow";
 import { Ticker, type TickerItem } from "@/components/landing/Ticker";
 import { SquadArt, TraceArt, TransferArt, WatchArt } from "@/components/landing/TacticsArt";
@@ -23,7 +24,7 @@ interface FlaggedRow {
 }
 
 async function landingData() {
-  const [squad, reports, teams, flagged] = await Promise.all([
+  const [squad, reports, teams, flagged, scorers, risers, runs, ids] = await Promise.all([
     loadSquad(DEMO_TEAM_ID).catch(() => null),
     readView<{ report_type: string; payload: ReportPayload; created_at: string }>(
       "latest_reports",
@@ -35,10 +36,28 @@ async function landingData() {
       "select=fpl_id,team_code,webName:card->>webName,position:card->>position,status:card->>status,chance:card->chanceOfPlayingNextRound" +
         "&card->>status=neq.a&order=card->ownership.desc.nullslast&limit=10",
     ).catch(() => []),
+    // The Explore cards' live numbers. Direction only from price_change_percent (CLAUDE.md §2).
+    readView<{ web_name: string; team_short_name: string; goals_scored: number }>(
+      "player_current",
+      "select=web_name,team_short_name,goals_scored&order=goals_scored.desc,total_points.desc&limit=1",
+    ).catch(() => []),
+    readView<{ web_name: string; team_short_name: string; price_change_percent: number }>(
+      "price_watch",
+      "select=web_name,team_short_name,price_change_percent&direction=eq.rising&order=price_change_percent.desc&limit=1",
+    ).catch(() => []),
+    readView<{ team_short_name: string; run: TeamRun }>("team_runs", "select=team_short_name,run").catch(() => []),
+    readView<{ fpl_id: number }>("player_current", "select=fpl_id").catch(() => []),
   ]);
   const codes = new Map(teams.map((t) => [t.team_short_name, t.team_code]));
   const result = squad ? await squadCards(squad).then((cards) => bestXi(squad, cards)).catch(() => null) : null;
-  return { squad, daily: reports[0] ?? null, codes, flagged, result };
+  const easiest = [...runs].filter((r) => r.run?.long).sort((a, b) => a.run.long.adjustedDifficulty - b.run.long.adjustedDifficulty)[0];
+  const explore: ExploreFacts = {
+    topScorer: scorers[0] ? { name: scorers[0].web_name, team: scorers[0].team_short_name, goals: scorers[0].goals_scored } : null,
+    riser: risers[0] ? { name: risers[0].web_name, team: risers[0].team_short_name, percent: risers[0].price_change_percent } : null,
+    easiest: easiest ? { team: easiest.team_short_name, band: easiest.run.long.band } : null,
+    players: ids.length,
+  };
+  return { squad, daily: reports[0] ?? null, codes, flagged, result, explore };
 }
 
 type Of<K extends ReportSection["kind"]> = Extract<ReportSection, { kind: K }>;
@@ -224,7 +243,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
     <section className="block" id="today">
       <div className="wrap">
         <SectionHead
-          index="04"
+          index="05"
           label="Today in FPL"
           title={
             <>
@@ -283,7 +302,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
 // ------------------------------------------------------------------ page --
 
 export default async function Landing() {
-  const { squad, daily, codes, flagged, result } = await landingData();
+  const { squad, daily, codes, flagged, result, explore } = await landingData();
 
   const { risers, fallers, news } = overnight(daily?.payload);
   const kitFor = (team: string, position: string) => {
@@ -365,10 +384,26 @@ export default async function Landing() {
 
       {ticker.length > 0 ? <Ticker label="FPL today" items={ticker} /> : <Ticker label="Fitness watch" items={fitness} />}
 
-      <section className="block" id="features">
+      <section className="block" id="explore">
         <div className="wrap">
           <SectionHead
             index="01"
+            label="Free tools"
+            title={
+              <>
+                Everything before the deadline, <em>free.</em>
+              </>
+            }
+            sub="Stats, prices, fixtures and every player, refreshed every three hours. No account needed."
+          />
+          <ExploreTools facts={explore} />
+        </div>
+      </section>
+
+      <section className="block" id="features">
+        <div className="wrap">
+          <SectionHead
+            index="02"
             label="What it does"
             title={
               <>
@@ -396,7 +431,7 @@ export default async function Landing() {
         <div className="wrap split">
           <div>
             <SectionHead
-              index="02"
+              index="03"
               label="The Gaffer"
               title={
                 <>
@@ -417,7 +452,7 @@ export default async function Landing() {
         <div className="wrap split">
           <div>
             <SectionHead
-              index="03"
+              index="04"
               label="Trust, built in"
               title={
                 <>
@@ -451,7 +486,7 @@ export default async function Landing() {
       <section className="block" id="faq">
         <div className="wrap split faq">
           <div>
-            <SectionHead index="05" label="FAQ" title={<>Questions, <em>answered.</em></>} sub="The short version of how Armband works." />
+            <SectionHead index="06" label="FAQ" title={<>Questions, <em>answered.</em></>} sub="The short version of how Armband works." />
             <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="text-link">
               Ask us on Telegram <Arrow />
             </a>

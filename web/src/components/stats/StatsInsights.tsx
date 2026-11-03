@@ -140,6 +140,7 @@ export function StatsInsights({ rows }: { rows: StatRow[] }) {
           y={view.y}
           diagonal={view.diagonal}
           detail={view.detail}
+          href={(p) => `/players/${p.fplId}`}
           summary={`${view.title} ${view.points.length} players plotted; ${view.points.filter((p) => p.labelled).map((p) => p.label).join(", ")} highlighted.`}
           {...(zone ? { zone } : {})}
         />

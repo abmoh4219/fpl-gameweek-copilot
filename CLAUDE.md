@@ -100,8 +100,8 @@ confirmed, every price-watch output is labelled an **estimate**.
 
 ### Web surface
 
-- `/` — landing page: a live preview built from the demo squad, the overnight
-  ticker, FAQ
+- `/` — landing page: a live best-XI demo built from the demo squad, the
+  overnight ticker, "Explore" cards (one live number per tool page), FAQ
 - `/sign-up`, `/sign-in`, `/onboarding` — accounts (email or Google), then
   connect an FPL team with an "Is this you?" check
 - `/app` — the dugout: the squad on an FPL-style pitch with official kits, the
@@ -119,13 +119,16 @@ confirmed, every price-watch output is labelled an **estimate**.
   difficulty, sorted by the engine's adjusted run (next 3 / next 5), with
   Champions League congestion marked; assembled by
   `packages/shared/src/fixtures-grid.ts`, with a "teams to target" chart
-  (season xG against next-5 difficulty)
+  (season xG against next-5 difficulty) and fixture swings (small multiples
+  of clubs whose run turns easier or harder; threshold in the config)
 
 - `/prices` — price watch: the players closest to a rise or fall from FPL's
   own fields (labelled estimates; past 100% is never a confirmed change; a
   per-player lock is shown as such) and the confirmed changes of the last
   week; `packages/shared/src/prices.ts`, whose column allow-list never
-  includes `momentum` or `hourly_rate` (a test asserts it)
+  includes `momentum` or `hourly_rate` (a test asserts it). Opens with a
+  diverging "tonight at a glance" board. Chart dots and player names link to
+  `/players/[id]`
 
 - `/players` — search every player by name or club; `/players/[id]` — one
   player's season: points and xGI per gameweek, FPL's own points breakdown

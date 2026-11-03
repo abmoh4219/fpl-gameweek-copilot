@@ -1952,3 +1952,106 @@ a.kicker b {
   border-radius: 0 0 12px 12px;
   color: var(--muted);
 }
+
+/* ---------------------------------------------------------------- explore -- */
+
+.explore {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+@media (min-width: 720px) {
+  .explore {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .explore {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.explore-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background: var(--bg-1);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s, background 0.25s;
+}
+
+.explore-card:hover {
+  transform: translateY(-3px);
+  background: var(--bg-2);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+/* the live number: the tool, working, before the click */
+.explore-live {
+  display: grid;
+  gap: 4px;
+  min-height: 118px;
+  align-content: end;
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(120% 120% at 0% 0%, var(--accent-soft), transparent 60%),
+    var(--bg);
+}
+
+.explore-live small {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.explore-live b {
+  overflow: hidden;
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 2vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explore-live em {
+  font-size: 12.5px;
+  font-style: normal;
+  color: var(--faint);
+}
+
+.explore-text {
+  padding: 18px 22px 22px;
+}
+
+.explore-text h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.explore-text h3 .arrow {
+  color: var(--muted);
+  transition: transform 0.2s var(--ease-out), color 0.2s;
+}
+
+.explore-card:hover h3 .arrow {
+  transform: translateX(4px);
+  color: var(--accent);
+}
+
+.explore-text p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+}

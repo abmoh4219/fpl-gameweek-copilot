@@ -199,6 +199,13 @@ export const INSIGHT_CONFIG = {
     chartLabels: 4,
     /** A differential: owned by fewer than this share of managers. */
     differentialOwnership: 10,
+    /**
+     * A fixture swing smaller than this (FPL difficulty points, early vs late
+     * mean) is "steady". FPL difficulty moves in whole steps, so half a step
+     * is noise: at 0.5, 12 of 20 clubs were flagged; at 0.75 only the real
+     * movers are (measured 2026-11-03).
+     */
+    swingSteadyBelow: 0.75,
   },
 
   preview: {

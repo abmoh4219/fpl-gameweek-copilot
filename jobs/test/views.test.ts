@@ -152,16 +152,38 @@ describe.skipIf(!stack)(`insight views (${stack ? "local Supabase" : SKIP_MESSAG
   });
 
   it("cl_congestion flags both sides of a Champions League match", async () => {
-    const [row] = await db<{ after_cl: number; before_cl: number; bad_gap: number }[]>`
-      select
-        count(*) filter (where is_after_cl)::int  as after_cl,
-        count(*) filter (where is_before_cl)::int as before_cl,
-        count(*) filter (
-          where (is_after_cl and days_since_cl >= 4)
-             or (is_before_cl and days_until_cl >= 4)
-        )::int as bad_gap
-      from core.cl_congestion
-    `;
+    // The view only covers fixtures from now() on, and the samples are from
+    // September, so the test would quietly run out of future fixtures as the
+    // calendar moves. Inside a transaction that is always rolled back, shift
+    // every PL and CL date forward by the same amount: the gaps between
+    // matches (what the flags measure) are unchanged, and the test passes on
+    // any date.
+    class Rollback extends Error {
+      constructor(readonly row: { after_cl: number; before_cl: number; bad_gap: number }) {
+        super("rollback");
+      }
+    }
+    let row: { after_cl: number; before_cl: number; bad_gap: number } | undefined;
+    try {
+      await db.begin(async (tx) => {
+        await tx`update core.fixtures set kickoff_utc = kickoff_utc + (now() - timestamptz '2026-08-01')`;
+        await tx`update core.cl_fixtures set match_utc = match_utc + (now() - timestamptz '2026-08-01')`;
+        const [r] = await tx<{ after_cl: number; before_cl: number; bad_gap: number }[]>`
+          select
+            count(*) filter (where is_after_cl)::int  as after_cl,
+            count(*) filter (where is_before_cl)::int as before_cl,
+            count(*) filter (
+              where (is_after_cl and days_since_cl >= 4)
+                 or (is_before_cl and days_until_cl >= 4)
+            )::int as bad_gap
+          from core.cl_congestion
+        `;
+        throw new Rollback(r!);
+      });
+    } catch (e) {
+      if (!(e instanceof Rollback)) throw e;
+      row = e.row;
+    }
     expect(row!.after_cl).toBeGreaterThan(0);
     expect(row!.before_cl).toBeGreaterThan(0);
     // A flag must never be set for a gap of 4 days or more.

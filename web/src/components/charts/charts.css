@@ -329,3 +329,13 @@
 .pts-split-total {
   margin-left: auto;
 }
+
+.chart svg.is-clickable {
+  cursor: pointer;
+}
+
+.chart-tip .chart-tip-go {
+  margin: 6px 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}

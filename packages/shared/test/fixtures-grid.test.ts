@@ -67,3 +67,32 @@ describe("teams to target", () => {
     expect(pts.find((p) => p.label === "NON")!.sub).toBe("Attack rank 4 · fixtures rank 4");
   });
 });
+
+describe("fixture swings", () => {
+  it("finds runs that turn easier or harder, skipping blanks and averaging doubles", async () => {
+    const { fixtureGrid, fixtureSwings } = await import("../src/index.ts");
+    const cells = (team: number, short: string, ds: (number | null | [number, number])[]) =>
+      ds.flatMap((d, i) =>
+        d === null
+          ? [t({ team_fpl_id: team, team_short_name: short, gameweek: 10 + i, is_blank: true, opponent_short_name: null, difficulty: null, kickoff_utc: null })]
+          : Array.isArray(d)
+            ? d.map((x, k) => t({ team_fpl_id: team, team_short_name: short, gameweek: 10 + i, difficulty: x, kickoff_utc: `2026-11-${10 + i}T1${k}:00:00+00:00` }))
+            : [t({ team_fpl_id: team, team_short_name: short, gameweek: 10 + i, difficulty: d })],
+      );
+    const ticker = [
+      ...cells(1, "UPP", [5, 4, 2, 2, 2]), // hard now, easy later
+      ...cells(2, "DWN", [2, 2, 4, 5, 4]), // easy now, hard later
+      ...cells(3, "FLT", [3, 3, 3, null, [2, 4]]), // steady, with a blank and a double
+    ];
+    const { rows } = fixtureGrid(ticker, [run(1, 3, 3), run(2, 3, 3), run(3, 3, 3)]);
+    const swings = fixtureSwings(rows);
+    expect(swings.map((s) => [s.team, s.direction])).toEqual([
+      ["UPP", "easier"],
+      ["FLT", "steady"],
+      ["DWN", "harder"],
+    ]);
+    const flt = swings.find((s) => s.team === "FLT")!;
+    expect(flt.difficulty).toEqual([3, 3, 3, null, 3]);
+    expect(swings.find((s) => s.team === "UPP")!.swing).toBe(2.5);
+  });
+});

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PRICE_WATCH_COLUMNS, changeDays, kitImageUrl, watchRowFromView, type ChangeViewRow, type PriceWatchViewRow } from "@fpl/shared";
+import { PressureBoard } from "@/components/prices/PressureBoard";
 import { PriceWatch } from "@/components/prices/PriceWatch";
 import { readView } from "@/lib/supabase";
+import "@/components/charts/charts.css";
 import "./prices.css";
 
 export const metadata: Metadata = {
@@ -59,6 +62,7 @@ export default async function PricesPage() {
           </p>
         </div>
 
+        {rows.length > 0 && <PressureBoard rows={rows} />}
         {rows.length > 0 ? (
           <PriceWatch rows={rows} codes={codes} />
         ) : (
@@ -86,9 +90,9 @@ export default async function PricesPage() {
                     {list.slice(0, 12).map((c) => (
                       <div className="pw-change" key={`${c.fpl_id}-${c.changed_on}`}>
                         {kit(c.team_short_name, c.element_type)}
-                        <span className="pw-name">
+                        <Link href={`/players/${c.fpl_id}`} className="pw-name pw-link">
                           {c.web_name} <small>{c.team_short_name}</small>
-                        </span>
+                        </Link>
                         <span className={`pw-delta ${tone}`}>
                           {tone === "up" ? "▲" : "▼"} £{Math.abs(c.change_m).toFixed(1)}m
                         </span>
