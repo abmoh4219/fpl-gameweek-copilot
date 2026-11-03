@@ -213,6 +213,12 @@ rather than pretending the comparison is day-over-day.
 four finished gameweeks. Use `pnpm backfill:gw 1 2 3 4` to pull them, then
 re-run `pnpm job:daily` to rebuild the report.
 
+**The cloud is missing early gameweeks** (player pages start mid-season). The
+cloud database URL lives only in GitHub Secrets, so backfill it from Actions:
+`gh workflow run backfill -f gameweeks="1 2 3 4 5"`, or the backfill
+workflow's "Run workflow" button. One FPL call per gameweek; the loads are
+idempotent upserts, so re-running a gameweek is safe.
+
 **Gameweek stats backlog.** `daily-sync` fetches at most **5 gameweeks** of
 live stats per run (current, plus any finished gameweek FPL has not marked
 `data_checked`). A longer backlog is logged as a warning and catches up over

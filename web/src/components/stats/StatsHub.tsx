@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { INSIGHT_CONFIG, LEADERBOARDS, formatStat, kitImageUrl, leaderboard, type Leaderboard, type StatPosition, type StatRow } from "@fpl/shared";
 
@@ -115,7 +116,9 @@ export function StatsHub({ rows }: { rows: StatRow[] }) {
                         <div className="st-who">
                           <Kit r={r} />
                           <span>
-                            <b>{r.webName}</b>
+                            <Link href={`/players/${r.fplId}`} className="st-link">
+                              {r.webName}
+                            </Link>
                             <small>
                               {r.team} · {r.position}
                               {r.status !== "a" && <i className={`st-flag ${r.status === "d" ? "doubt" : "out"}`}>{r.status === "d" ? "doubt" : "out"}</i>}

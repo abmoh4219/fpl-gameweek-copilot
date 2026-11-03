@@ -1,0 +1,55 @@
+name: backfill
+
+# Manual only: load per-gameweek stats for named gameweeks into the cloud
+# database, e.g. after an outage or to seed a season that started before we
+# did. One FPL call per gameweek (event/{gw}/live). Run from the Actions tab
+# ("Run workflow") or: gh workflow run backfill -f gameweeks="1 2 3 4"
+on:
+  workflow_dispatch:
+    inputs:
+      gameweeks:
+        description: "Gameweeks to load, separated by spaces (e.g. 1 2 3 4)"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fpl-sync
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # The input reaches the shell through an env var and is checked to be
+      # numbers and spaces only, so nothing typed into the form can run as code.
+      - name: Check the gameweeks
+        env:
+          GAMEWEEKS: ${{ inputs.gameweeks }}
+        run: |
+          if ! [[ "$GAMEWEEKS" =~ ^[0-9]{1,2}( [0-9]{1,2})*$ ]]; then
+            echo "gameweeks must be numbers separated by single spaces, e.g. 1 2 3 4" >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --filter "@fpl/jobs..." --frozen-lockfile
+
+      - name: Backfill
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          GAMEWEEKS: ${{ inputs.gameweeks }}
+          TZ: Europe/London
+        # $GAMEWEEKS is unquoted on purpose: one argument per gameweek.
+        run: pnpm backfill:gw $GAMEWEEKS

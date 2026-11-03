@@ -127,7 +127,12 @@ confirmed, every price-watch output is labelled an **estimate**.
   week; `packages/shared/src/prices.ts`, whose column allow-list never
   includes `momentum` or `hourly_rate` (a test asserts it)
 
-Planned next: the free Gaffer tools (no model needed), player search. `app.waitlist` exists from an
+- `/players` — search every player by name or club; `/players/[id]` — one
+  player's season: points and xGI per gameweek, FPL's own points breakdown
+  (`api.player_gameweeks`), price history rebuilt from confirmed changes,
+  ring gauges and the next five fixtures (`packages/shared/src/player.ts`)
+
+Planned next: the free Gaffer tools (no model needed). `app.waitlist` exists from an
 earlier plan and is unused.
 
 ---
@@ -265,7 +270,7 @@ Full detail in `docs/database.md`; these are the rules that bind every change.
   limits) must use RLS policies plus `security_invoker` views** — never an
   owner-privileged view over per-user rows.
 - **Exactly two Security Advisor findings are accepted**, both deliberate:
-  the ten owner-privileged `api` views flagged as **"Security Definer View"**
+  the eleven owner-privileged `api` views flagged as **"Security Definer View"**
   (`api.waitlist` is `security_invoker` and must never be flagged), and
   **"RLS Enabled No Policy"** on every `core` table (intentional deny-all).
   **Anything else the advisor reports is a real problem** and must be fixed.

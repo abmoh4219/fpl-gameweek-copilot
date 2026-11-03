@@ -67,7 +67,7 @@ design working as intended:
 
 | Finding | Where | Why it is accepted |
 | --- | --- | --- |
-| **Security Definer View** | the 10 owner-privileged `api.*` views (not `api.waitlist`) | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
+| **Security Definer View** | the 11 owner-privileged `api.*` views (not `api.waitlist`) | They are owner-privileged on purpose, so `anon` needs no grants on `core`. This is the decision above |
 | **RLS Enabled No Policy** | every `core.*` table | Deliberate deny-all. RLS is on with no policies so nothing but the service role can read a row |
 
 **Anything else the advisor reports is a real problem** and must be fixed, not

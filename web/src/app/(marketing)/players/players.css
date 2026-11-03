@@ -1,0 +1,137 @@
+/* The player search. Built on the site tokens, so it follows both themes. */
+
+.players-page {
+  padding-top: 132px;
+}
+
+.players-page .sec-head {
+  margin-bottom: 32px;
+}
+
+.ps {
+  display: grid;
+  gap: 14px;
+}
+
+.ps-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ps-search {
+  display: flex;
+  flex: 1 1 320px;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: var(--bg-1);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+  color: var(--faint);
+  transition: box-shadow 0.2s;
+}
+
+.ps-search:focus-within {
+  box-shadow: inset 0 0 0 1px var(--accent-line), 0 0 0 4px var(--accent-soft);
+}
+
+.ps-search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.ps-count {
+  margin: 0;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.ps-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ps-row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) repeat(4, 72px) 20px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--bg-1);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.ps-row:hover {
+  background: var(--bg-2);
+  box-shadow: inset 0 0 0 1px var(--line-2);
+}
+
+.ps-row img {
+  width: 30px;
+  height: auto;
+}
+
+.ps-name b {
+  display: block;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ps-name small {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+.ps-stat {
+  display: grid;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  text-align: right;
+}
+
+.ps-stat small {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.ps-go {
+  color: var(--faint);
+  text-align: right;
+}
+
+.ps-row:hover .ps-go {
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .players-page {
+    padding-top: 104px;
+  }
+  .ps-row {
+    grid-template-columns: 26px minmax(0, 1fr) repeat(2, 58px) 14px;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .ps-row .hide-small {
+    display: none;
+  }
+}

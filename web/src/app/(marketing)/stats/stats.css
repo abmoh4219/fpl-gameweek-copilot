@@ -218,23 +218,11 @@
   height: auto;
 }
 
-.st-flag {
-  padding: 0 6px;
-  border-radius: 5px;
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 700;
-}
 
-.st-flag.doubt {
-  background: var(--warn-soft);
-  color: var(--warn);
-}
 
-.st-flag.out {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
+
+
+
 
 .st-table .st-main {
   min-width: 150px;
@@ -375,4 +363,16 @@
   .ins-note {
     margin-left: 0;
   }
+}
+
+.st-link {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.st-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

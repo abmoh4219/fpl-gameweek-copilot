@@ -1867,3 +1867,88 @@ a.kicker b {
   background: var(--bg-3);
   color: var(--text);
 }
+
+/* availability tags beside a player's name (stats, players) */
+
+.st-flag {
+  padding: 0 6px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.st-flag.doubt {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.st-flag.out {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* --------------------------------------------------------------- phone menu -- */
+
+.menu-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+@media (min-width: 860px) {
+  .menu-toggle {
+    display: none;
+  }
+}
+
+.menu-panel {
+  display: grid;
+  margin: 0 12px;
+  padding: 8px;
+  border-radius: 18px;
+  background: var(--bg-2);
+  box-shadow: 0 0 0 1px var(--line-2), 0 24px 60px -24px rgba(var(--shadow-rgb), 0.7);
+  animation: rise 0.25s var(--ease-out);
+}
+
+.menu-panel a {
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.menu-panel a:hover {
+  background: rgba(var(--ink-rgb), 0.05);
+}
+
+@media (min-width: 860px) {
+  .menu-panel {
+    display: none;
+  }
+}
+
+/* on a phone the GitHub pill lives in the menu, so the header fits */
+@media (max-width: 559px) {
+  .site-actions .gh-pill {
+    display: none;
+  }
+}
+
+.menu-panel .menu-gh {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 12px 12px;
+  color: var(--muted);
+}

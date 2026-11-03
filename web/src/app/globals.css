@@ -67,6 +67,13 @@
   --chart-lo: #4d86ee;
   --chart-base: rgba(var(--ink-rgb), 0.34);
   --chart-grid: rgba(var(--ink-rgb), 0.07);
+  /* categorical slots (points breakdown), validated on --bg-1; colour follows the stat, never its rank */
+  --cat-1: #3987e5;
+  --cat-2: #d95926;
+  --cat-3: #199e70;
+  --cat-4: #c98500;
+  --cat-5: #d55181;
+  --cat-6: #9085e9;
 
   /* scene: the sky above the hero, the floodlight colour, the tactics-board art */
   --sky: #0a2416;
@@ -709,6 +716,12 @@ textarea {
   --chart-hi: #e8531a;
   --chart-lo: #2f6fe0;
   --chart-base: rgba(var(--ink-rgb), 0.3);
+  --cat-1: #2a78d6;
+  --cat-2: #eb6834;
+  --cat-3: #1baf7a;
+  --cat-4: #eda100;
+  --cat-5: #e87ba4;
+  --cat-6: #6250d6;
 
   --sky: #e8efe3;
   --beam: 255, 255, 255;

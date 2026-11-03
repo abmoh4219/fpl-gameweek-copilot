@@ -20,6 +20,7 @@ export function SiteFooter() {
             <h4>Product</h4>
             <ul>
               <li><a href="/#features">Features</a></li>
+              <li><Link href="/players">Players</Link></li>
               <li><Link href="/stats">Stats</Link></li>
               <li><Link href="/fixtures">Fixture planner</Link></li>
               <li><Link href="/prices">Price watch</Link></li>

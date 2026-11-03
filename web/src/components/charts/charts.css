@@ -185,3 +185,147 @@
     padding: 16px 14px 18px;
   }
 }
+
+/* ---------------------------------------------------------- column chart -- */
+
+.col-hit {
+  fill: transparent;
+}
+
+.col:focus-visible {
+  outline: none;
+}
+
+.col.is-hover .col-hit {
+  fill: rgba(var(--ink-rgb), 0.04);
+}
+
+.col-bar.hi { fill: var(--chart-hi); }
+.col-bar.lo { fill: var(--chart-lo); }
+.col-bar.neg { fill: var(--danger); }
+
+.col-blank {
+  stroke: var(--faint);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.chart-base {
+  stroke: rgba(var(--ink-rgb), 0.25);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+/* ------------------------------------------------------------- price line -- */
+
+.line-path {
+  fill: none;
+  stroke: var(--chart-hi);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.line-wash {
+  fill: var(--chart-hi);
+  opacity: 0.1;
+}
+
+/* ------------------------------------------------------------------- ring -- */
+
+.ring {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+}
+
+.ring-track {
+  fill: none;
+  stroke: rgba(var(--ink-rgb), 0.08);
+  stroke-width: 8;
+}
+
+.ring-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.8s var(--ease-out);
+}
+
+.ring-hi .ring-fill { stroke: var(--chart-hi); }
+.ring-lo .ring-fill { stroke: var(--chart-lo); }
+.ring-warn .ring-fill { stroke: var(--warn); }
+.ring-danger .ring-fill { stroke: var(--danger); }
+
+.ring-value {
+  fill: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ring figcaption {
+  display: grid;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.ring figcaption small {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+/* -------------------------------------------------------- segmented bar -- */
+
+.seg-bar {
+  display: flex;
+  gap: 2px;
+  height: 28px;
+}
+
+.seg-part {
+  display: flex;
+  align-items: center;
+  min-width: 3px;
+  padding-left: 8px;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 12.5px;
+  overflow: hidden;
+}
+
+.seg-part b {
+  font-weight: 700;
+}
+
+.seg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.seg-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seg-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.seg-legend b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.seg-total {
+  margin-left: auto;
+}

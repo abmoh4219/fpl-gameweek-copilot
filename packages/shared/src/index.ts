@@ -14,3 +14,4 @@ export * from "./plan.ts";
 export * from "./stats.ts";
 export * from "./fixtures-grid.ts";
 export * from "./prices.ts";
+export * from "./player.ts";
