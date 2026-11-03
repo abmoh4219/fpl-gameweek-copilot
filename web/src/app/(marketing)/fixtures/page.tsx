@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { fixtureGrid, type CongestionMark, type RunScore, type TeamRun, type TickerViewRow } from "@fpl/shared";
+import { fixtureGrid, type CongestionMark, type RunScore, type TeamRun, type TeamTarget, type TickerViewRow } from "@fpl/shared";
 import { FixturePlanner } from "@/components/fixtures/FixturePlanner";
+import { TeamTargets } from "@/components/fixtures/TeamTargets";
 import { readView } from "@/lib/supabase";
 import "./fixtures.css";
 
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 async function plannerData() {
-  const [ticker, runRows, congestion] = await Promise.all([
+  const [ticker, runRows, congestion, xgRows] = await Promise.all([
     readView<TickerViewRow>(
       "fixture_ticker",
       "select=team_fpl_id,team_short_name,gameweek,kickoff_utc,is_home,opponent_short_name,difficulty,is_blank&order=gameweek",
@@ -22,6 +23,11 @@ async function plannerData() {
     readView<{ team_fpl_id: number; kickoff_utc: string; days_since_cl: number | null }>(
       "cl_congestion",
       "select=team_fpl_id,kickoff_utc,days_since_cl&is_after_cl=is.true",
+      3600,
+    ).catch(() => []),
+    readView<{ team_fpl_id: number; team_short_name: string; expected_goals: number | string }>(
+      "player_current",
+      "select=team_fpl_id,team_short_name,expected_goals",
       3600,
     ).catch(() => []),
   ]);
@@ -36,11 +42,22 @@ async function plannerData() {
       band5: r.run.long.band,
     }));
   const marks: CongestionMark[] = congestion.map((c) => ({ teamFplId: c.team_fpl_id, kickoffUtc: c.kickoff_utc, daysSinceCl: c.days_since_cl }));
-  return fixtureGrid(ticker, runs, marks);
+  // A club's season attack: its players' xG summed (players who left are still counted).
+  const xgByTeam = new Map<number, { team: string; xg: number }>();
+  for (const r of xgRows) {
+    const t = xgByTeam.get(r.team_fpl_id) ?? { team: r.team_short_name, xg: 0 };
+    t.xg += Number(r.expected_goals) || 0;
+    xgByTeam.set(r.team_fpl_id, t);
+  }
+  const targets: TeamTarget[] = runs.flatMap((r) => {
+    const t = xgByTeam.get(r.teamFplId);
+    return t ? [{ teamFplId: r.teamFplId, team: t.team, xg: Math.round(t.xg * 10) / 10, next5: r.next5 }] : [];
+  });
+  return { ...fixtureGrid(ticker, runs, marks), targets };
 }
 
 export default async function FixturesPage() {
-  const { gameweeks, rows } = await plannerData();
+  const { gameweeks, rows, targets } = await plannerData();
   return (
     <section className="block fixtures-page">
       <div className="wrap">
@@ -57,6 +74,7 @@ export default async function FixturesPage() {
             also weighs opponent strength and home advantage. Run scores are estimates.
           </p>
         </div>
+        {targets.length > 0 && <TeamTargets targets={targets} />}
         {rows.length > 0 ? (
           <FixturePlanner gameweeks={gameweeks} rows={rows} />
         ) : (

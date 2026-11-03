@@ -96,3 +96,39 @@ export function fixtureGrid(ticker: readonly TickerViewRow[], runs: readonly Run
 export function sortGrid(rows: readonly GridRow[], by: GridSort): GridRow[] {
   return [...rows].sort((a, b) => (by === "name" ? 0 : a[by] - b[by]) || a.team.localeCompare(b.team));
 }
+
+/** A club's season attack and its next-5 run, for the "teams to target" chart. */
+export interface TeamTarget {
+  teamFplId: number;
+  team: string;
+  /** Season xG, summed over the club's players. */
+  xg: number;
+  /** The engine's adjusted difficulty of the next five gameweeks (lower is easier). */
+  next5: number;
+}
+
+/**
+ * Teams to target: attack against fixtures. Each measure is scaled to 0-1
+ * across the twenty clubs (most xG = 1, easiest run = 1) and the two are
+ * added, so a club must be good at BOTH to lead; adding ranks instead ties a
+ * club that is great at one and poor at the other with one good at both.
+ */
+export function teamTargetChart(teams: readonly TeamTarget[], picks = 5): { fplId: number; x: number; y: number; label: string; sub: string; tone: "base" | "hi"; labelled: boolean }[] {
+  const byXg = [...teams].sort((a, b) => b.xg - a.xg).map((t) => t.teamFplId);
+  const byRun = [...teams].sort((a, b) => a.next5 - b.next5).map((t) => t.teamFplId);
+  const unit = (v: number, lo: number, hi: number) => (hi > lo ? (v - lo) / (hi - lo) : 0.5);
+  const xs = teams.map((t) => t.xg);
+  const runs = teams.map((t) => t.next5);
+  const score = (t: TeamTarget) => unit(t.xg, Math.min(...xs), Math.max(...xs)) + unit(-t.next5, -Math.max(...runs), -Math.min(...runs));
+  const top = new Set([...teams].sort((a, b) => score(b) - score(a) || a.team.localeCompare(b.team)).slice(0, picks).map((t) => t.teamFplId));
+  return teams.map((t) => ({
+    fplId: t.teamFplId,
+    x: t.xg,
+    y: t.next5,
+    label: t.team,
+    sub: `Attack rank ${byXg.indexOf(t.teamFplId) + 1} · fixtures rank ${byRun.indexOf(t.teamFplId) + 1}`,
+    tone: top.has(t.teamFplId) ? "hi" : "base",
+    // Twenty clubs: every name fits and every club is a reader's question.
+    labelled: true,
+  }));
+}

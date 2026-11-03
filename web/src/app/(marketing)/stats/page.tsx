@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { STAT_COLUMNS, statRowFromView, type StatRow, type StatViewRow } from "@fpl/shared";
 import { StatsHub } from "@/components/stats/StatsHub";
+import { StatsInsights } from "@/components/stats/StatsInsights";
 import { readView } from "@/lib/supabase";
 import "./stats.css";
 
@@ -48,7 +49,11 @@ export default async function StatsPage() {
           </p>
         </div>
         {rows.length > 0 ? (
-          <StatsHub rows={rows} />
+          <>
+            <StatsInsights rows={rows} />
+            <h2 className="stats-h2">Leaderboards</h2>
+            <StatsHub rows={rows} />
+          </>
         ) : (
           <div className="notice error">The stats aren&apos;t available right now. Try again in a few minutes.</div>
         )}

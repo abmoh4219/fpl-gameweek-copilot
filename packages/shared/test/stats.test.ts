@@ -90,3 +90,52 @@ describe("formatting", () => {
     expect(formatStat(-800, "signed")).toBe("-800");
   });
 });
+
+describe("chart data", () => {
+  it("finishing: labels the biggest over- and under-performers, and ignores cameos and keepers", async () => {
+    const { finishingChart } = await import("../src/index.ts");
+    const rows = [
+      row({ fplId: 1, webName: "Lucky", goals: 9, xg: 4 }),
+      row({ fplId: 2, webName: "Unlucky", goals: 1, xg: 6 }),
+      row({ fplId: 3, webName: "Fair", goals: 5, xg: 5 }),
+      row({ fplId: 4, webName: "Cameo", goals: 2, xg: 0.1, minutes: 20 }),
+      row({ fplId: 5, webName: "Keeper", position: "GKP", goals: 0, xg: 0.01 }),
+    ];
+    const pts = finishingChart(rows);
+    expect(pts.map((p) => p.label).sort()).toEqual(["Fair", "Lucky", "Unlucky"]);
+    expect(pts.find((p) => p.label === "Lucky")).toMatchObject({ tone: "hi", labelled: true, x: 4, y: 9 });
+    expect(pts.find((p) => p.label === "Unlucky")).toMatchObject({ tone: "lo", labelled: true });
+    expect(pts.find((p) => p.label === "Fair")).toMatchObject({ tone: "base", labelled: false });
+  });
+
+  it("value: highlights the most points per million", async () => {
+    const { valueChart } = await import("../src/index.ts");
+    const rows = Array.from({ length: 10 }, (_, i) => row({ fplId: i + 1, webName: `P${i}`, priceM: 10 - i * 0.5, totalPoints: 40 }));
+    const hi = valueChart(rows).filter((p) => p.tone === "hi").map((p) => p.label);
+    // Same points, cheaper is better value: the cheapest are the picks.
+    expect(hi).toContain("P9");
+    expect(hi).not.toContain("P0");
+  });
+
+  it("differentials: only players under the ownership line can be picks", async () => {
+    const { differentialChart } = await import("../src/index.ts");
+    const rows = [
+      row({ fplId: 1, webName: "Template", ownership: 55, form: 9 }),
+      row({ fplId: 2, webName: "Hidden gem", ownership: 3.2, form: 7.5 }),
+      row({ fplId: 3, webName: "Unowned", ownership: 0, form: 2 }),
+    ];
+    const pts = differentialChart(rows);
+    expect(pts.find((p) => p.label === "Template")!.tone).toBe("base");
+    expect(pts.find((p) => p.label === "Hidden gem")!.tone).toBe("hi");
+    // 0% is drawn at the log axis floor rather than vanishing.
+    expect(pts.find((p) => p.label === "Unowned")!.x).toBeGreaterThan(0);
+  });
+
+  it("headlines: one leader per measure", async () => {
+    const { statHeadlines } = await import("../src/index.ts");
+    const rows = [row({ fplId: 1, webName: "Scorer", goals: 9, ownership: 20 }), row({ fplId: 2, webName: "Popular", goals: 2, ownership: 60 })];
+    const h = statHeadlines(rows);
+    expect(h.find((x) => x.id === "goals")!.row.webName).toBe("Scorer");
+    expect(h.find((x) => x.id === "owned")).toMatchObject({ value: "60.0%" });
+  });
+});

@@ -193,6 +193,12 @@ export const INSIGHT_CONFIG = {
     minMinutesPer90: 270,
     /** Rows shown per leaderboard. */
     rows: 25,
+    /** Charts plot players with at least this many minutes (two full matches). */
+    chartMinMinutes: 180,
+    /** Points labelled on each side of a chart's story (over/under, best value...). */
+    chartLabels: 4,
+    /** A differential: owned by fewer than this share of managers. */
+    differentialOwnership: 10,
   },
 
   preview: {

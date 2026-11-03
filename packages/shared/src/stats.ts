@@ -155,3 +155,81 @@ export function formatStat(value: number, format: StatFormat): string {
       return `${value > 0 ? "+" : ""}${Math.round(value).toLocaleString("en-GB")}`;
   }
 }
+
+// --------------------------------------------------------------- charts --
+
+export interface ChartPoint {
+  fplId: number;
+  x: number;
+  y: number;
+  label: string;
+  sub: string;
+  /** "hi" and "lo" are the two sides of the chart's story; "base" is context. */
+  tone: "base" | "hi" | "lo";
+  /** Direct-labelled on the chart (sparingly). */
+  labelled: boolean;
+}
+
+const sub = (r: StatRow) => `${r.team} · ${r.position} · £${r.priceM.toFixed(1)}m`;
+
+function chartPool(rows: readonly StatRow[], position: StatPosition | null): StatRow[] {
+  return rows.filter((r) => r.minutes >= INSIGHT_CONFIG.stats.chartMinMinutes && (!position || r.position === position));
+}
+
+function mark(points: ChartPoint[], ids: Set<number>, tone: "hi" | "lo") {
+  for (const p of points) if (ids.has(p.fplId)) Object.assign(p, { tone, labelled: true });
+}
+
+/**
+ * Finishing: goals against xG. Above the diagonal a player has scored more
+ * than their chances suggest ("hi"), below it fewer ("lo"). The biggest gaps
+ * each way are labelled. Goalkeepers are left out (no xG to speak of).
+ */
+export function finishingChart(rows: readonly StatRow[], position: StatPosition | null = null): ChartPoint[] {
+  const pool = chartPool(rows, position).filter((r) => r.position !== "GKP" && (r.xg > 0 || r.goals > 0));
+  const points: ChartPoint[] = pool.map((r) => ({ fplId: r.fplId, x: r.xg, y: r.goals, label: r.webName, sub: sub(r), tone: "base", labelled: false }));
+  const n = INSIGHT_CONFIG.stats.chartLabels;
+  const gap = (r: StatRow) => r.goals - r.xg;
+  const over = [...pool].filter((r) => gap(r) > 0).sort((a, b) => gap(b) - gap(a)).slice(0, n);
+  const under = [...pool].filter((r) => gap(r) < 0).sort((a, b) => gap(a) - gap(b)).slice(0, n);
+  mark(points, new Set(over.map((r) => r.fplId)), "hi");
+  mark(points, new Set(under.map((r) => r.fplId)), "lo");
+  return points;
+}
+
+/** Value: season points against price. The best points per £m are labelled. */
+export function valueChart(rows: readonly StatRow[], position: StatPosition | null = null): ChartPoint[] {
+  const pool = chartPool(rows, position);
+  const points: ChartPoint[] = pool.map((r) => ({ fplId: r.fplId, x: r.priceM, y: r.totalPoints, label: r.webName, sub: sub(r), tone: "base", labelled: false }));
+  const perM = (r: StatRow) => (r.priceM > 0 ? r.totalPoints / r.priceM : 0);
+  const best = [...pool].sort((a, b) => perM(b) - perM(a) || b.totalPoints - a.totalPoints).slice(0, INSIGHT_CONFIG.stats.chartLabels + 2);
+  mark(points, new Set(best.map((r) => r.fplId)), "hi");
+  return points;
+}
+
+/**
+ * Differentials: form against ownership. The in-form players owned by fewer
+ * than `differentialOwnership`% of managers are the story.
+ */
+export function differentialChart(rows: readonly StatRow[], position: StatPosition | null = null): ChartPoint[] {
+  const { differentialOwnership, chartLabels } = INSIGHT_CONFIG.stats;
+  // Ownership goes on a log axis, so a floor keeps 0.0% players drawable.
+  const pool = chartPool(rows, position).filter((r) => r.form > 0);
+  const points: ChartPoint[] = pool.map((r) => ({ fplId: r.fplId, x: Math.max(r.ownership, 0.1), y: r.form, label: r.webName, sub: sub(r), tone: "base", labelled: false }));
+  const picks = [...pool].filter((r) => r.ownership < differentialOwnership).sort((a, b) => b.form - a.form || a.ownership - b.ownership).slice(0, chartLabels + 1);
+  mark(points, new Set(picks.map((r) => r.fplId)), "hi");
+  return points;
+}
+
+/** The headline tiles: one leader per measure, with the value it leads on. */
+export function statHeadlines(rows: readonly StatRow[]): { id: string; label: string; row: StatRow; value: string }[] {
+  const lead = (f: (r: StatRow) => number, pool = rows) => [...pool].sort((a, b) => f(b) - f(a) || b.totalPoints - a.totalPoints)[0];
+  const regular = rows.filter((r) => r.minutes >= INSIGHT_CONFIG.stats.minMinutesPer90);
+  const out: { id: string; label: string; row: StatRow; value: string }[] = [];
+  const add = (id: string, label: string, row: StatRow | undefined, value: (r: StatRow) => string) => row && out.push({ id, label, row, value: value(row) });
+  add("goals", "Top scorer", lead((r) => r.goals), (r) => `${r.goals} goals`);
+  add("xgi", "Most xGI", lead((r) => r.xgi), (r) => `${r.xgi.toFixed(1)} xGI`);
+  add("value", "Best value", lead((r) => r.totalPoints / Math.max(r.priceM, 0.1), regular), (r) => `${(r.totalPoints / r.priceM).toFixed(1)} pts/£m`);
+  add("owned", "Most owned", lead((r) => r.ownership), (r) => `${r.ownership.toFixed(1)}%`);
+  return out;
+}

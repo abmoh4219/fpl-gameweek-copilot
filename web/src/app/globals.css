@@ -62,6 +62,12 @@
   --pitch-line: rgba(255, 255, 255, 0.1);
   --bench-bg: rgba(0, 40, 16, 0.45);
 
+  /* charts: a warm/cool pair validated for CVD separation and contrast on --bg-1 */
+  --chart-hi: #de6f2b;
+  --chart-lo: #4d86ee;
+  --chart-base: rgba(var(--ink-rgb), 0.34);
+  --chart-grid: rgba(var(--ink-rgb), 0.07);
+
   /* scene: the sky above the hero, the floodlight colour, the tactics-board art */
   --sky: #0a2416;
   --beam: 238, 255, 226;
@@ -700,6 +706,9 @@ textarea {
 
   --fdr-3: #d8d3c6;
   --bench-bg: #dde8dc;
+  --chart-hi: #e8531a;
+  --chart-lo: #2f6fe0;
+  --chart-base: rgba(var(--ink-rgb), 0.3);
 
   --sky: #e8efe3;
   --beam: 255, 255, 255;

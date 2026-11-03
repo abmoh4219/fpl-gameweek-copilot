@@ -1,0 +1,187 @@
+/* Charts: hairline grid, ringed dots, text in text tokens (never the data colour). */
+
+.chart {
+  position: relative;
+  width: 100%;
+}
+
+.chart svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+}
+
+.chart-grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.chart-tick {
+  fill: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.chart-axis {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.chart-diagonal {
+  stroke: rgba(var(--ink-rgb), 0.28);
+  stroke-width: 1.5;
+}
+
+.chart-zone {
+  fill: rgba(var(--ink-rgb), 0.045);
+}
+
+.chart-zone-label {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* every dot wears a 2px ring in the card's surface colour */
+.chart-dot {
+  stroke: var(--bg-1);
+  stroke-width: 2;
+  outline: none;
+  transition: r 0.15s;
+}
+
+.chart-dot.base { fill: var(--chart-base); }
+.chart-dot.hi { fill: var(--chart-hi); }
+.chart-dot.lo { fill: var(--chart-lo); }
+
+.chart-dot.is-hover,
+.chart-dot:focus-visible {
+  r: 7.5px;
+  stroke: var(--text);
+}
+
+.chart-dot.base.is-hover {
+  fill: rgba(var(--ink-rgb), 0.6);
+}
+
+.chart-label {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  paint-order: stroke;
+  stroke: var(--bg-1);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.chart-tip {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: 2px;
+  min-width: 170px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--bg-3);
+  box-shadow: 0 0 0 1px var(--line-2), 0 16px 40px -16px rgba(var(--shadow-rgb), 0.6);
+  font-size: 12.5px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.chart-tip > b {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.chart-tip small {
+  margin-bottom: 4px;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.chart-tip span b {
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+
+.chart-tip em {
+  margin-top: 4px;
+  font-style: normal;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chart-empty {
+  margin: 0;
+  padding: 40px 0;
+  text-align: center;
+  color: var(--faint);
+}
+
+/* the key under a chart: a dot beside text, never coloured text */
+.chart-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.chart-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-key i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.chart-key .hi { background: var(--chart-hi); }
+.chart-key .lo { background: var(--chart-lo); }
+.chart-key .base { background: var(--chart-base); }
+.chart-key .line {
+  width: 16px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(var(--ink-rgb), 0.4);
+}
+
+/* a chart's card, title and how-to-read line (stats and fixtures) */
+
+.ins-card {
+  padding: 20px 22px 22px;
+  border-radius: 20px;
+  background: var(--bg-1);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.ins-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ins-how {
+  max-width: 720px;
+  margin: 6px 0 14px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .ins-card {
+    padding: 16px 14px 18px;
+  }
+}

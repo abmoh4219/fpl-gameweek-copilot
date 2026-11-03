@@ -52,3 +52,18 @@ describe("the fixture grid", () => {
     expect(sortGrid(rows, "name").map((r) => r.team)).toEqual(["ARS", "BOU", "CHE"]);
   });
 });
+
+describe("teams to target", () => {
+  it("picks clubs that both create a lot and face easy runs", async () => {
+    const { teamTargetChart } = await import("../src/index.ts");
+    const teams = [
+      { teamFplId: 1, team: "ATT", xg: 20, next5: 3.6 }, // great attack, hard run
+      { teamFplId: 2, team: "EZY", xg: 6, next5: 2.0 }, // weak attack, easy run
+      { teamFplId: 3, team: "BTH", xg: 18, next5: 2.2 }, // both
+      { teamFplId: 4, team: "NON", xg: 5, next5: 3.8 }, // neither
+    ];
+    const pts = teamTargetChart(teams, 1);
+    expect(pts.filter((p) => p.tone === "hi").map((p) => p.label)).toEqual(["BTH"]);
+    expect(pts.find((p) => p.label === "NON")!.sub).toBe("Attack rank 4 · fixtures rank 4");
+  });
+});

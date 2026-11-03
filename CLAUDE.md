@@ -110,12 +110,16 @@ confirmed, every price-watch output is labelled an **estimate**.
 - `/stats` — season leaderboards (goals, assists, xG/xA/xGI, points, form,
   value, bonus, BPS, clean sheets, ownership), filtered by position and price;
   pure functions in `packages/shared/src/stats.ts`, read from
-  `api.player_current`
+  `api.player_current`. Above them, insight charts (finishing vs xG, value,
+  differentials) drawn by the hand-built SVG `ScatterPlot`
+  (`web/src/components/charts/`), with chart colours validated for colour
+  blindness and contrast in both themes
 
 - `/fixtures` — the fixture planner: every club's next five gameweeks by FPL
   difficulty, sorted by the engine's adjusted run (next 3 / next 5), with
   Champions League congestion marked; assembled by
-  `packages/shared/src/fixtures-grid.ts`
+  `packages/shared/src/fixtures-grid.ts`, with a "teams to target" chart
+  (season xG against next-5 difficulty)
 
 - `/prices` — price watch: the players closest to a rise or fall from FPL's
   own fields (labelled estimates; past 100% is never a confirmed change; a
