@@ -26,25 +26,25 @@ export function SegmentedBar({ parts, total, summary }: { parts: BreakdownPart[]
   const ink = (id: string) => (["assists", "clean_sheets", "bonus"].includes(id) ? "#10140f" : "#fff");
 
   return (
-    <div className="seg">
-      <div className="seg-bar" role="img" aria-label={summary}>
+    <div className="pts-split">
+      <div className="pts-split-bar" role="img" aria-label={summary}>
         {shown.map((p) => {
           const share = p.points / sum;
           return (
-            <span key={p.id} className="seg-part" style={{ flexGrow: p.points, background: colour(p.id), color: ink(p.id) }} title={`${p.label}: ${p.points} pts`}>
+            <span key={p.id} className="pts-split-part" style={{ flexGrow: p.points, background: colour(p.id), color: ink(p.id) }} title={`${p.label}: ${p.points} pts`}>
               {share >= 0.09 && <b>{p.points}</b>}
             </span>
           );
         })}
       </div>
-      <ul className="seg-legend">
+      <ul className="pts-split-legend">
         {shown.map((p) => (
           <li key={p.id}>
             <i style={{ background: colour(p.id) }} />
             {p.label} <b>{p.points}</b>
           </li>
         ))}
-        <li className="seg-total">
+        <li className="pts-split-total">
           Total <b>{total}</b>
         </li>
       </ul>

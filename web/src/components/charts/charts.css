@@ -277,13 +277,13 @@
 
 /* -------------------------------------------------------- segmented bar -- */
 
-.seg-bar {
+.pts-split-bar {
   display: flex;
   gap: 2px;
   height: 28px;
 }
 
-.seg-part {
+.pts-split-part {
   display: flex;
   align-items: center;
   min-width: 3px;
@@ -294,11 +294,11 @@
   overflow: hidden;
 }
 
-.seg-part b {
+.pts-split-part b {
   font-weight: 700;
 }
 
-.seg-legend {
+.pts-split-legend {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 18px;
@@ -309,23 +309,23 @@
   color: var(--muted);
 }
 
-.seg-legend li {
+.pts-split-legend li {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
-.seg-legend i {
+.pts-split-legend i {
   width: 10px;
   height: 10px;
   border-radius: 3px;
 }
 
-.seg-legend b {
+.pts-split-legend b {
   color: var(--text);
   font-weight: 600;
 }
 
-.seg-total {
+.pts-split-total {
   margin-left: auto;
 }
