@@ -41,7 +41,8 @@ const player = (c: SiteCard, slot: number, captain = false) => ({
 });
 const squad: Squad = {
   entryId: 1, teamName: "Test XI", managerName: "Tester", gameweek: 8, gameweekPoints: 48, totalPoints: 548, overallRank: 1,
-  bankM: 0.7, valueM: 101.6, activeChip: null, starters: [player(haaland, 11, true), player(cherki, 8)], bench: [], missing: [],
+  bankM: 0.7, valueM: 101.6, activeChip: null, benchPoints: 0, transfers: 0, transfersCost: 0,
+  starters: [player(haaland, 11, true), player(cherki, 8)], bench: [], missing: [],
 };
 const runs: TeamRun[] = [
   { version: 1, teamFplId: 13, team: "MCI", short: { ...run, horizon: 3 }, long: run },

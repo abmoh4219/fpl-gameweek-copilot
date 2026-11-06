@@ -39,6 +39,7 @@ describe.skipIf(!stack)(`Data API security (${stack ? "local Supabase" : SKIP_ME
     "player_cards",
     "team_runs",
     "previews",
+    "gameweeks",
   ])("anon CAN read api.%s", async (view) => {
     const res = await fetch(url(`${view}?select=*&limit=1`), { headers: anonHeaders });
     expect(res.status).toBe(200);
