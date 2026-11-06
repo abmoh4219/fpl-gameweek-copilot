@@ -174,7 +174,7 @@ new stat tables, accessibility fixes, better models. Start with
 
 ## License
 
-[MIT](LICENSE) © Abdelah Mohammed Aliy. Built by [Abdelah](https://abdelah-portfolio.vercel.app/).
+[MIT](LICENSE) © Abdelah Mohammed Aliy. Built by [Abdelah](https://abdela.dev/).
 
 ---
 
