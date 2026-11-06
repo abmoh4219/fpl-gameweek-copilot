@@ -230,19 +230,39 @@ function radarPts(values: readonly number[], cx: number, cy: number, r: number):
     .join(" ");
 }
 
-export function CompareCard({ lines, axes }: { lines: CompareLine[]; axes: readonly string[] }) {
-  const size = 400;
+const FDR_HEX: Record<number, [string, string]> = {
+  1: ["#257d5a", "#ffffff"],
+  2: ["#00e07a", "#062b17"],
+  3: ["#3a3a3f", "#ededed"],
+  4: ["#ff1751", "#ffffff"],
+  5: ["#80072d", "#ffffff"],
+};
+
+export interface CompareFixture {
+  gameweek: number;
+  label: string;
+  difficulty: number | null;
+}
+
+/** The compare card: a compact radar beside the full table from the site, so the picture carries every number. */
+export function CompareCard({ lines, axes, fixtures }: { lines: CompareLine[]; axes: readonly string[]; fixtures: Record<number, CompareFixture[]> }) {
+  const size = 300;
   const c = size / 2;
-  const r = 128;
+  const r = 96;
   const n = axes.length;
+  const col = lines.length === 3 ? 196 : 250;
+  const rows: { label: string; cells: (l: CompareLine, k: number) => string; axis?: number }[] = [
+    ...axes.map((label, k) => ({ label, axis: k, cells: (l: CompareLine) => `${l.raw[k]}` })),
+    { label: "Owned", cells: (l: CompareLine) => `${l.row.ownership.toFixed(1)}%` },
+  ];
   return (
-    <CardFrame kicker="Percentile among every outfield player with 270+ minutes" title={lines.map((l) => l.row.webName).join(" vs ") || "Compare players"}>
+    <CardFrame kicker="Percentiles among every outfield player with 270+ minutes" title={lines.map((l) => l.row.webName).join(" vs ") || "Compare players"}>
       {lines.length === 0 ? (
         <Empty text="Pick players to compare" />
       ) : (
-        <div style={{ display: "flex", flex: 1, alignItems: "center", gap: 24 }}>
-          <div style={{ display: "flex", position: "relative", width: size, height: size - 40 }}>
-            <svg width={size} height={size - 40} viewBox={`0 20 ${size} ${size - 40}`}>
+        <div style={{ display: "flex", flex: 1, alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", position: "relative", width: size, height: size }}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
               {[25, 50, 75, 100].map((ring) => (
                 <polygon key={ring} points={radarPts(Array(n).fill(ring), c, c, r)} fill="none" stroke="rgba(237,237,237,0.1)" strokeWidth="1" />
               ))}
@@ -251,38 +271,68 @@ export function CompareCard({ lines, axes }: { lines: CompareLine[]; axes: reado
                 return <line key={i} x1={c} y1={c} x2={c + r * Math.cos(a)} y2={c + r * Math.sin(a)} stroke="rgba(237,237,237,0.1)" strokeWidth="1" />;
               })}
               {lines.map((l, i) => (
-                <polygon key={l.row.fplId} points={radarPts(l.percentiles, c, c, r)} fill={SERIES_HEX[i]} fillOpacity="0.14" stroke={SERIES_HEX[i]} strokeWidth="3" strokeLinejoin="round" />
+                <polygon key={l.row.fplId} points={radarPts(l.percentiles, c, c, r)} fill={SERIES_HEX[i]} fillOpacity="0.14" stroke={SERIES_HEX[i]} strokeWidth="2.5" strokeLinejoin="round" />
               ))}
             </svg>
             {axes.map((label, i) => {
               const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
-              const x = c + (r + 34) * Math.cos(a);
-              const y = c + (r + 34) * Math.sin(a) - 20;
+              const x = c + (r + 26) * Math.cos(a);
+              const y = c + (r + 22) * Math.sin(a);
               return (
-                <div key={label} style={{ position: "absolute", left: x - 70, top: y - 11, width: 140, display: "flex", justifyContent: "center", fontSize: 16, color: C.muted }}>
+                <div key={label} style={{ position: "absolute", left: x - 60, top: y - 9, width: 120, display: "flex", justifyContent: "center", fontSize: 13, color: C.muted }}>
                   {label}
                 </div>
               );
             })}
           </div>
-          <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 12 }}>
-            {lines.map((l, i) => (
-              <div key={l.row.fplId} style={{ display: "flex", flexDirection: "column", padding: "12px 18px", borderRadius: 12, background: C.panel, borderLeft: `4px solid ${SERIES_HEX[i]}` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Shirt teamCode={l.row.teamCode} position={l.row.position} size={30} />
-                  <div style={{ display: "flex", fontSize: 26 }}>{l.row.webName}</div>
-                  <div style={{ display: "flex", fontSize: 18, color: C.faint }}>
-                    {l.row.team} · £{l.row.priceM.toFixed(1)}m
+          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            {/* header: one column per player */}
+            <div style={{ display: "flex", paddingBottom: 6, borderBottom: `1px solid ${C.line}` }}>
+              <div style={{ display: "flex", width: 150 }} />
+              {lines.map((l, i) => (
+                <div key={l.row.fplId} style={{ display: "flex", alignItems: "center", gap: 8, width: col }}>
+                  <div style={{ display: "flex", width: 10, height: 10, borderRadius: 5, background: SERIES_HEX[i] }} />
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", fontSize: 20 }}>{l.row.webName}</div>
+                    <div style={{ display: "flex", fontSize: 14, color: C.faint }}>
+                      {l.row.team} · £{l.row.priceM.toFixed(1)}m
+                    </div>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 22, marginTop: 6, fontSize: 18, color: C.muted }}>
-                  <span style={{ display: "flex" }}>{l.raw[0]} pts</span>
-                  <span style={{ display: "flex" }}>form {l.raw[1]}</span>
-                  <span style={{ display: "flex" }}>{l.raw[2]} xGI/90</span>
-                  <span style={{ display: "flex" }}>{l.raw[3]} G+A</span>
+              ))}
+            </div>
+            {rows.map((row) => {
+              const best = row.axis !== undefined && lines.length > 1 ? Math.max(...lines.map((l) => l.percentiles[row.axis!]!)) : null;
+              return (
+                <div key={row.label} style={{ display: "flex", alignItems: "center", height: 33, borderBottom: `1px solid ${C.line}` }}>
+                  <div style={{ display: "flex", width: 150, fontSize: 15, color: C.muted }}>{row.label}</div>
+                  {lines.map((l) => {
+                    const lead = best !== null && l.percentiles[row.axis!] === best;
+                    return (
+                      <div key={l.row.fplId} style={{ display: "flex", alignItems: "baseline", gap: 8, width: col }}>
+                        <div style={{ display: "flex", fontSize: 18, color: lead ? C.accent : C.text }}>{row.cells(l, 0)}</div>
+                        {row.axis !== undefined && <div style={{ display: "flex", fontSize: 13, color: lead ? C.up : C.faint }}>{l.percentiles[row.axis]}th pct</div>}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            ))}
+              );
+            })}
+            <div style={{ display: "flex", alignItems: "center", height: 40 }}>
+              <div style={{ display: "flex", width: 150, fontSize: 15, color: C.muted }}>Next five</div>
+              {lines.map((l) => (
+                <div key={l.row.fplId} style={{ display: "flex", gap: 3, width: col }}>
+                  {(fixtures[l.row.fplId] ?? []).map((f) => {
+                    const [bg, ink] = f.difficulty === null ? [C.raised, C.faint] : FDR_HEX[f.difficulty] ?? [C.raised, C.text];
+                    return (
+                      <div key={f.gameweek} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: lines.length === 3 ? 34 : 42, height: 22, borderRadius: 4, background: bg, color: ink, fontSize: 11 }}>
+                        {f.label}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
