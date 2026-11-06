@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SiteAnalytics } from "@/components/site/SiteAnalytics";
 import "./globals.css";
 
 // One family (ADR-0018): Geist for the interface, Geist Mono for figures.
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         {children}
+        <SiteAnalytics />
       </body>
     </html>
   );

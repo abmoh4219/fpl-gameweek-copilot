@@ -1028,3 +1028,37 @@ had to be built within FPL politeness and the free tiers.
   change after a deadline, so later views are free.
 - Leagues are shown from public FPL data only, and their pages are kept out of
   search engines.
+
+## ADR-0022 — Anonymous page counts with Vercel Web Analytics
+
+*Date: 2026-11-06 · Status: accepted*
+
+### Context
+
+After the X launch we need to know which tools people use and where they come
+from. The privacy promise is no cookies, nothing that identifies a visitor,
+and no paid services.
+
+### Decision
+
+- **Vercel Web Analytics** (`@vercel/analytics`, the only new dependency) via
+  `web/src/components/site/SiteAnalytics.tsx` in the root layout.
+  - No cookies.
+  - The Hobby plan includes 50,000 events a month and pauses collection when
+    the limit is reached, rather than charging.
+  - Counting visits ourselves in Supabase was rejected: it adds a write per
+    visit and breaks "visits cost nothing".
+  - Cloudflare Web Analytics was rejected: it limits sites not proxied through
+    Cloudflare, and it's a second dashboard.
+- **Every page is counted.** Addresses with a personal ID are grouped
+  (`/team/[id]`, `/league/[id]`, `/wrapped/[id]`), and query strings are
+  dropped. The dashboard shows which tools are used, never whose team.
+- **Nothing is shown on the site for now:** small launch-week numbers make
+  poor social proof. Revisit once the numbers are worth showing.
+- The privacy page says what is counted and by whom.
+
+### Consequences
+
+- You turn it on in Vercel: Project → Analytics → Enable.
+- If traffic ever passes about 50,000 page views a month, collection pauses
+  until the next month. Nothing on the site breaks.

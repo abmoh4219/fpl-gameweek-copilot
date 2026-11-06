@@ -51,7 +51,9 @@ export default function Privacy() {
       <h2>What we do not do</h2>
       <ul>
         <li>
-          <b>No tracking.</b> No advertising, no analytics trackers, no selling or sharing of data, no cookies.
+          <b>No tracking you.</b> No advertising, no cookies, no selling or sharing of data. We count page views
+          anonymously with Vercel Web Analytics, which uses no cookies and keeps nothing that identifies you. Team, league
+          and wrapped pages are counted together, never by team.
         </li>
         <li>
           <b>No AI on your squad.</b> The Gaffer&apos;s checks run on our server from your public FPL team, and the
@@ -67,7 +69,8 @@ export default function Privacy() {
 
       <h2>Who processes data</h2>
       <p>
-        Armband runs on <b>Vercel</b> (the website) and <b>Supabase</b> (the football database). Football data comes
+        Armband runs on <b>Vercel</b> (the website and its anonymous page counts) and <b>Supabase</b> (the football
+        database). Football data comes
         from Fantasy Premier League&apos;s public data and football-data.org.
       </p>
 
