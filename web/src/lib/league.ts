@@ -34,7 +34,15 @@ async function inBatches<T, R>(items: readonly T[], size: number, run: (item: T)
   return out;
 }
 
-export async function loadLeague(id: number, me: number | null): Promise<(LeagueSpy & { gameweek: number }) | null> {
+/** Your own line in a league, from your entry (cached): rank, team name, gameweek and total points. */
+export interface YourLine {
+  rank: number;
+  team: string;
+  gameweek: number;
+  total: number;
+}
+
+export async function loadLeague(id: number, me: number | null): Promise<(LeagueSpy & { gameweek: number; yourLine: YourLine | null }) | null> {
   const standings = await fetchLeague(id);
   const first = standings.standings.results[0];
   if (!first) return null;
@@ -48,5 +56,11 @@ export async function loadLeague(id: number, me: number | null): Promise<(League
   const you = me ? (picked.find((p) => p?.entry === me) ?? null) : null;
   const names = new Map<number, PlayerName>();
   for (const [fplId, { card, teamCode }] of cards) names.set(fplId, { name: card.webName, team: card.team, teamCode, position: card.position });
-  return { ...leagueSpy(standings, rivals, names, you), gameweek };
+  let yourLine: YourLine | null = null;
+  if (me) {
+    const entry = await fetchEntry(me).catch(() => null);
+    const rank = entry?.leagues?.classic.find((l) => l.id === id)?.entry_rank ?? null;
+    if (entry && rank) yourLine = { rank, team: entry.name, gameweek: entry.summary_event_points ?? 0, total: entry.summary_overall_points ?? 0 };
+  }
+  return { ...leagueSpy(standings, rivals, names, you), gameweek, yourLine };
 }

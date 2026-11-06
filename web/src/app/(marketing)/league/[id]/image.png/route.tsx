@@ -14,5 +14,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return null;
   });
   if (!spy) return new Response("This league isn't available right now", { status: 404 });
-  return new ImageResponse(<LeagueCard spy={spy} />, { ...CARD_SIZE, headers: { "cache-control": "public, max-age=900, s-maxage=1800" } });
+  return new ImageResponse(<LeagueCard spy={spy} me={me} />, { ...CARD_SIZE, headers: { "cache-control": "public, max-age=900, s-maxage=1800" } });
 }

@@ -125,6 +125,18 @@ export default async function League(props: Props) {
                   </tr>
                 ))}
               </tbody>
+              {spy.yourLine && !spy.table.some((r) => r.entry === me) && (
+                <tfoot>
+                  <tr className="is-you">
+                    <td className="lg-rank">{spy.yourLine.rank.toLocaleString("en-GB")}</td>
+                    <td>
+                      You · {spy.yourLine.team}
+                      <small>Your place in this league</small>
+                    </td>
+                    <td colSpan={3} />
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
 

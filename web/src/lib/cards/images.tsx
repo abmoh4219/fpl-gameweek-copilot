@@ -414,57 +414,78 @@ export function CompareCard({ lines, axes, fixtures }: { lines: CompareLine[]; a
 
 function MiniBars({ title, items, max = 4 }: { title: string; items: LeagueCount[]; max?: number }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div style={{ display: "flex", fontSize: 15, color: C.muted }}>{title}</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <div style={{ display: "flex", height: 22, fontSize: 14, color: C.muted }}>{title}</div>
       {items.slice(0, max).map((c) => (
-        <div key={c.fplId} style={{ display: "flex", alignItems: "center", gap: 8, height: 26 }}>
-          <Shirt teamCode={c.teamCode} position={c.position} size={20} />
-          <div style={{ display: "flex", width: 120, fontSize: 16 }}>{c.name}</div>
-          <div style={{ display: "flex", flex: 1, height: 6, borderRadius: 3, background: C.raised }}>
-            <div style={{ display: "flex", width: `${Math.max(3, c.share)}%`, height: 6, borderRadius: 3, background: C.accent }} />
+        <div key={c.fplId} style={{ display: "flex", alignItems: "center", gap: 8, height: 24 }}>
+          <Shirt teamCode={c.teamCode} position={c.position} size={18} />
+          <div style={{ display: "flex", width: 118, fontSize: 15 }}>{c.name.length > 14 ? `${c.name.slice(0, 13)}…` : c.name}</div>
+          <div style={{ display: "flex", flex: 1, height: 5, borderRadius: 3, background: C.raised }}>
+            <div style={{ display: "flex", width: `${Math.max(3, c.share)}%`, height: 5, borderRadius: 3, background: C.accent }} />
           </div>
-          <div style={{ display: "flex", width: 44, justifyContent: "flex-end", fontSize: 15 }}>{c.share}%</div>
+          <div style={{ display: "flex", width: 40, justifyContent: "flex-end", fontSize: 14 }}>{c.share}%</div>
         </div>
       ))}
-      {items.length === 0 && <div style={{ display: "flex", fontSize: 14, color: C.faint }}>None</div>}
+      {items.length === 0 && <div style={{ display: "flex", height: 24, fontSize: 13, color: C.faint }}>None</div>}
     </div>
   );
 }
 
-export function LeagueCard({ spy }: { spy: LeagueSpy & { gameweek: number } }) {
-  const rows = spy.table.slice(0, 8);
+const CHIP_SHORT: Record<string, string> = { bboost: "BB", "3xc": "TC", freehit: "FH", wildcard: "WC", manager: "AM" };
+
+export function LeagueCard({ spy, me = null }: { spy: LeagueSpy & { gameweek: number; yourLine?: { rank: number; team: string; gameweek: number; total: number } | null }; me?: number | null }) {
+  const rows = spy.table.slice(0, 10);
+  const more = spy.table.length > rows.length ? ` · top 10 of ${spy.table.length}${spy.table.length >= 50 ? "+" : ""}` : "";
   return (
-    <CardFrame kicker={`Mini-league · Gameweek ${spy.gameweek} · ${spy.analysed} teams read`} title={spy.name}>
+    <CardFrame kicker={`Mini-league · Gameweek ${spy.gameweek} · shares from ${spy.analysed} teams${more}`} title={spy.name.length > 36 ? `${spy.name.slice(0, 35)}…` : spy.name}>
       <div style={{ display: "flex", flex: 1, gap: 28 }}>
-        <div style={{ display: "flex", flexDirection: "column", width: 600 }}>
-          <div style={{ display: "flex", height: 24, fontSize: 13, color: C.faint, borderBottom: `1px solid ${C.line}` }}>
-            <div style={{ display: "flex", width: 50 }}>#</div>
+        <div style={{ display: "flex", flexDirection: "column", width: 640 }}>
+          <div style={{ display: "flex", alignItems: "center", height: 22, fontSize: 12, color: C.faint, borderBottom: `1px solid ${C.line}` }}>
+            <div style={{ display: "flex", width: 48 }}>#</div>
             <div style={{ display: "flex", flex: 1 }}>Team</div>
-            <div style={{ display: "flex", width: 50, justifyContent: "flex-end" }}>GW</div>
-            <div style={{ display: "flex", width: 70, justifyContent: "flex-end" }}>Total</div>
-            <div style={{ display: "flex", width: 130, paddingLeft: 18 }}>Captain</div>
+            <div style={{ display: "flex", width: 48, justifyContent: "flex-end" }}>GW</div>
+            <div style={{ display: "flex", width: 66, justifyContent: "flex-end" }}>Total</div>
+            <div style={{ display: "flex", width: 150, paddingLeft: 18 }}>Captain</div>
           </div>
           {rows.map((r) => (
-            <div key={r.entry} style={{ display: "flex", alignItems: "center", height: 40, borderBottom: `1px solid ${C.line}`, fontSize: 17 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 4, width: 50 }}>
+            <div
+              key={r.entry}
+              style={{ display: "flex", alignItems: "center", height: 32, borderBottom: `1px solid ${C.line}`, fontSize: 16, color: r.entry === me ? C.accent : C.text }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 4, width: 48 }}>
                 {r.rank}
-                {r.move !== 0 && <span style={{ display: "flex", fontSize: 11, color: r.move > 0 ? C.up : C.down }}>{r.move > 0 ? "▲" : "▼"}</span>}
+                {r.move !== 0 && <span style={{ display: "flex", fontSize: 10, color: r.move > 0 ? C.up : C.down }}>{r.move > 0 ? "▲" : "▼"}</span>}
               </div>
-              <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>{r.team.length > 26 ? `${r.team.slice(0, 25)}…` : r.team}</div>
-              <div style={{ display: "flex", width: 50, justifyContent: "flex-end" }}>{r.gameweek}</div>
-              <div style={{ display: "flex", width: 70, justifyContent: "flex-end", color: C.muted }}>{r.total.toLocaleString("en-GB")}</div>
-              <div style={{ display: "flex", width: 130, paddingLeft: 18, fontSize: 15, color: C.muted }}>{r.captain ?? "—"}</div>
+              <div style={{ display: "flex", flex: 1 }}>{r.team.length > 28 ? `${r.team.slice(0, 27)}…` : r.team}</div>
+              <div style={{ display: "flex", width: 48, justifyContent: "flex-end" }}>{r.gameweek}</div>
+              <div style={{ display: "flex", width: 66, justifyContent: "flex-end", color: C.muted }}>{r.total.toLocaleString("en-GB")}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, width: 150, paddingLeft: 18, fontSize: 14, color: C.muted }}>
+                {r.captain ?? "—"}
+                {r.chip && (
+                  <span style={{ display: "flex", padding: "0 5px", borderRadius: 4, background: C.raised, fontSize: 11, color: C.accent }}>{CHIP_SHORT[r.chip] ?? r.chip}</span>
+                )}
+              </div>
             </div>
           ))}
+          {spy.yourLine && !rows.some((r) => r.entry === me) && (
+            <div style={{ display: "flex", alignItems: "center", height: 34, marginTop: 4, padding: "0 0 0 0", fontSize: 16, color: C.accent }}>
+              <div style={{ display: "flex", width: 48, fontSize: 14 }}>{spy.yourLine.rank.toLocaleString("en-GB")}</div>
+              <div style={{ display: "flex", flex: 1 }}>
+                You · {spy.yourLine.team.length > 22 ? `${spy.yourLine.team.slice(0, 21)}…` : spy.yourLine.team}
+              </div>
+              <div style={{ display: "flex", width: 264, justifyContent: "flex-end", fontSize: 13, color: C.faint }}>your place in this league</div>
+            </div>
+          )}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 18 }}>
-          <MiniBars title="Captains this gameweek" items={spy.captains} />
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 12 }}>
+          <MiniBars title="Captains this gameweek" items={spy.captains} max={4} />
           {spy.you ? (
-            <>
-              <MiniBars title="Your differentials" items={spy.you.differentials} max={3} />
-            </>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <MiniBars title="Your differentials" items={spy.you.differentials} max={4} />
+              <MiniBars title="Most of them own, you don't" items={spy.you.threats} max={3} />
+            </div>
           ) : (
-            <MiniBars title="Most owned in the league" items={spy.owned} max={3} />
+            <MiniBars title="Most owned in the league" items={spy.owned} max={6} />
           )}
         </div>
       </div>
