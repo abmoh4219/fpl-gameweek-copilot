@@ -23,6 +23,8 @@ export function SiteFooter() {
               <li><Link href="/players">Players</Link></li>
               <li><Link href="/stats">Stats</Link></li>
               <li><Link href="/fixtures">Fixture planner</Link></li>
+              <li><Link href="/league">Mini-league spy</Link></li>
+              <li><Link href="/compare">Compare players</Link></li>
               <li><Link href="/prices">Price watch</Link></li>
               <li><a href="/#gaffer">The Gaffer</a></li>
               <li><Link href="/cards">Cards</Link></li>

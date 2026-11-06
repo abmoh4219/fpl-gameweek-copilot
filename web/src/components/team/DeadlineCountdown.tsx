@@ -8,7 +8,7 @@ export interface DeadlineItem {
 }
 
 /** "GW11 deadline in 1d 4h": the next deadline still ahead, ticking once a minute. Null in the off-season. */
-export function DeadlineCountdown({ deadlines, withTime = false }: { deadlines: DeadlineItem[]; withTime?: boolean }) {
+export function DeadlineCountdown({ deadlines, withTime = false, prefix = "" }: { deadlines: DeadlineItem[]; withTime?: boolean; prefix?: string }) {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     setNow(Date.now());
@@ -27,7 +27,7 @@ export function DeadlineCountdown({ deadlines, withTime = false }: { deadlines: 
   const soon = mins < 24 * 60;
   return (
     <span className={`countdown${soon ? " soon" : ""}`}>
-      GW{next.gameweek} deadline in <b>{left}</b>
+      {prefix}GW{next.gameweek} deadline in <b>{left}</b>
       {withTime && (
         <span className="countdown-at">
           {" "}

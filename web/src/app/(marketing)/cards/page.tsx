@@ -11,6 +11,8 @@ const CARDS = [
   { slug: "transfers", title: "The transfer radar", sub: "Who managers are buying and selling this gameweek" },
   { slug: "template", title: "The template XI", sub: "The most-owned team, on a pitch" },
   { slug: "prices", title: "Tonight's price watch", sub: "Closest to a rise or fall tonight, an estimate" },
+  { slug: "best-xi", title: "The gameweek's best XI", sub: "The highest-scoring XI of the latest gameweek" },
+  { slug: "swings", title: "Fixture swings", sub: "Whose run turns easier or harder" },
 ] as const;
 
 export default function Cards() {
@@ -35,6 +37,10 @@ export default function Cards() {
           <Link href="/team" className="card-tile">
             <b>Your gameweek, wrapped</b>
             <span>Your points against the average, your captain, the bench and your rank. Open your team, then share it</span>
+          </Link>
+          <Link href="/league" className="card-tile">
+            <b>Your mini-league</b>
+            <span>The table, this gameweek&apos;s captains and your differentials against your rivals</span>
           </Link>
           <Link href="/compare" className="card-tile">
             <b>Compare players</b>

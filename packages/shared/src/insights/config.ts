@@ -224,6 +224,15 @@ export const INSIGHT_CONFIG = {
     priceSize: 7,
   },
 
+  league: {
+    /** Rival teams analysed per league, from the top: each is one cached FPL call. */
+    rivals: 20,
+    /** One of your players is a differential when at most this share of the analysed rivals own him. */
+    differentialMax: 25,
+    /** A player you don't own is a threat when at least this share of the analysed rivals do. */
+    threatMin: 50,
+  },
+
   squadWatch: {
     /** A squad player shows under "Tonight" once FPL has them this far toward a change (an estimate). */
     tonightMinPercent: 50,

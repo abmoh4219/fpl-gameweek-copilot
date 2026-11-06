@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { squadTonight, type Squad } from "@fpl/shared";
+import { chipsUsed, chipWeeks, squadTonight, type Squad } from "@fpl/shared";
 import { Dugout } from "@/components/copilot/Dugout";
 import { SquadCheck } from "@/components/copilot/SquadCheck";
+import { ChipPlanner } from "@/components/team/ChipPlanner";
 import { DeadlineCountdown } from "@/components/team/DeadlineCountdown";
 import { RememberTeam } from "@/components/team/RememberTeam";
 import { SquadWatch } from "@/components/team/SquadWatch";
 import { TeamShell } from "@/components/team/TeamShell";
-import { FplUnavailableError, parseTeamId, TeamNotFoundError } from "@/lib/fpl";
+import { fetchEntry, fetchSeason, FplUnavailableError, parseTeamId, TeamNotFoundError } from "@/lib/fpl";
 import { deadlines, watchRows } from "@/lib/cards/data";
 import { gafferData } from "@/lib/gaffer";
 import { loadSquad } from "@/lib/squad";
@@ -42,7 +43,15 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function TeamPage({ params }: Params) {
   const id = parseTeamId((await params).id);
   if (!id) notFound();
-  const [result, watch, upcoming] = await Promise.all([squadOrError(id), watchRows(), deadlines()]);
+  const [result, watch, upcoming, entry, season] = await Promise.all([
+    squadOrError(id),
+    watchRows(),
+    deadlines(),
+    fetchEntry(id).catch(() => null),
+    fetchSeason(id).catch(() => null),
+  ]);
+  // Private and invitational leagues only (FPL's system leagues are huge), smallest first.
+  const leagues = (entry?.leagues?.classic ?? []).filter((l) => l.league_type === "x").sort((a, b) => (a.rank_count ?? 0) - (b.rank_count ?? 0)).slice(0, 6);
   const gaffer = "squad" in result ? await gafferData(result.squad).catch(() => null) : null;
 
   return (
@@ -60,7 +69,8 @@ export default async function TeamPage({ params }: Params) {
           <header className="page-head">
             <div>
               <span className="page-kicker">
-                Team {id} · <DeadlineCountdown deadlines={upcoming} withTime />
+                Team {id}
+                <DeadlineCountdown deadlines={upcoming} withTime prefix=" · " />
               </span>
               <h1 className="page-title">{result.squad.teamName}</h1>
               <p className="page-sub">
@@ -71,11 +81,23 @@ export default async function TeamPage({ params }: Params) {
               <p className="team-share">
                 <Link href={`/wrapped/${id}`}>Share your Gameweek {result.squad.gameweek}, wrapped</Link>
               </p>
+              {leagues.length > 0 && (
+                <p className="team-leagues">
+                  <span>Your leagues</span>
+                  {leagues.map((l) => (
+                    <Link key={l.id} href={`/league/${l.id}?me=${id}`}>
+                      {l.name}
+                      {l.entry_rank ? <small>#{l.entry_rank.toLocaleString("en-GB")}</small> : null}
+                    </Link>
+                  ))}
+                </p>
+              )}
             </div>
           </header>
           <SquadWatch squad={result.squad} tonight={squadTonight(result.squad, watch)} />
           <Dugout squad={result.squad} gaffer={gaffer} mode="live" />
           <SquadCheck squad={result.squad} />
+          <ChipPlanner weeks={chipWeeks(result.squad)} used={chipsUsed(season?.chips ?? [])} />
         </>
       )}
     </TeamShell>

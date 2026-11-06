@@ -31,15 +31,15 @@ export interface TemplateXi {
 const ORDER: StatPosition[] = ["GKP", "DEF", "MID", "FWD"];
 
 /**
- * The most-owned legal XI: the template most FPL managers are running. One
- * keeper, then FPL's formation rules (3-5 defenders, 2-5 midfielders, 1-3
- * forwards), filled by ownership. Picking greedily by ownership under the
- * per-position limits gives the highest total ownership possible.
+ * The best legal XI by any number: one keeper, then FPL's formation rules
+ * (3-5 defenders, 2-5 midfielders, 1-3 forwards), filled by that number.
+ * Picking greedily under the per-position limits gives the highest total.
+ * Players with a value of 0 or less are never picked.
  */
-export function templateXi(rows: readonly StatRow[]): TemplateXi | null {
+export function bestXiBy(rows: readonly StatRow[], value: (r: StatRow) => number): TemplateXi | null {
   const { formation } = INSIGHT_CONFIG.lineup;
-  const owned = (pos: StatPosition) => rows.filter((r) => r.position === pos && r.ownership > 0).sort((a, b) => b.ownership - a.ownership || a.webName.localeCompare(b.webName));
-  const pools = { GKP: owned("GKP"), DEF: owned("DEF"), MID: owned("MID"), FWD: owned("FWD") };
+  const ranked = (pos: StatPosition) => rows.filter((r) => r.position === pos && value(r) > 0).sort((a, b) => value(b) - value(a) || a.webName.localeCompare(b.webName));
+  const pools = { GKP: ranked("GKP"), DEF: ranked("DEF"), MID: ranked("MID"), FWD: ranked("FWD") };
   if (pools.GKP.length < 1 || pools.DEF.length < formation.DEF.min || pools.MID.length < formation.MID.min || pools.FWD.length < formation.FWD.min) return null;
 
   const take: Record<StatPosition, number> = { GKP: 1, DEF: formation.DEF.min, MID: formation.MID.min, FWD: formation.FWD.min };
@@ -48,11 +48,16 @@ export function templateXi(rows: readonly StatRow[]): TemplateXi | null {
   while (free > 0) {
     const next = (["DEF", "MID", "FWD"] as const)
       .filter((p) => take[p] < max[p] && pools[p][take[p]])
-      .sort((a, b) => pools[b][take[b]]!.ownership - pools[a][take[a]]!.ownership)[0];
+      .sort((a, b) => value(pools[b][take[b]]!) - value(pools[a][take[a]]!))[0];
     if (!next) return null;
     take[next] += 1;
     free -= 1;
   }
   const players = ORDER.flatMap((p) => pools[p].slice(0, take[p]));
   return { formation: `${take.DEF}-${take.MID}-${take.FWD}`, players };
+}
+
+/** The most-owned legal XI: the template most FPL managers are running. */
+export function templateXi(rows: readonly StatRow[]): TemplateXi | null {
+  return bestXiBy(rows, (r) => r.ownership);
 }

@@ -1,4 +1,4 @@
-import { EntryPicksSchema, EntrySchema, EntrySeasonSchema, type Entry, type EntryPicks, type EntrySeason } from "@fpl/shared";
+import { EntryPicksSchema, EntrySchema, EntrySeasonSchema, LeagueStandingsSchema, type Entry, type EntryPicks, type EntrySeason, type LeagueStandings } from "@fpl/shared";
 
 /**
  * The ONLY live FPL call a visitor can cause (CLAUDE.md §7): a manager's
@@ -15,15 +15,22 @@ export class TeamNotFoundError extends Error {}
 export class FplUnavailableError extends Error {}
 
 async function getJson(path: string, revalidateSeconds: number): Promise<unknown> {
-  let res: Response;
-  try {
-    res = await fetch(`${FPL}${path}`, {
+  const attempt = () =>
+    fetch(`${FPL}${path}`, {
       headers: { "user-agent": UA, accept: "application/json" },
       next: { revalidate: revalidateSeconds },
       signal: AbortSignal.timeout(15_000),
     });
+  let res: Response;
+  try {
+    res = await attempt();
   } catch {
-    throw new FplUnavailableError("FPL did not answer");
+    // One retry for a dropped connection or a timeout; an HTTP error answer is never retried.
+    try {
+      res = await attempt();
+    } catch {
+      throw new FplUnavailableError("FPL did not answer");
+    }
   }
   if (res.status === 404) throw new TeamNotFoundError("No FPL team with that id");
   if (!res.ok) throw new FplUnavailableError(`FPL answered ${res.status}`);
@@ -52,6 +59,13 @@ export async function fetchPicks(id: number, gameweek: number): Promise<EntryPic
 export async function fetchSeason(id: number): Promise<EntrySeason> {
   const parsed = EntrySeasonSchema.safeParse(await getJson(`/entry/${id}/history/`, 1800));
   if (!parsed.success) throw new FplUnavailableError("Unexpected history shape from FPL");
+  return parsed.data;
+}
+
+/** A classic league's first page of standings (50 managers), cached half an hour (ADR-0021). */
+export async function fetchLeague(id: number): Promise<LeagueStandings> {
+  const parsed = LeagueStandingsSchema.safeParse(await getJson(`/leagues-classic/${id}/standings/`, 1800));
+  if (!parsed.success) throw new FplUnavailableError("Unexpected league shape from FPL");
   return parsed.data;
 }
 

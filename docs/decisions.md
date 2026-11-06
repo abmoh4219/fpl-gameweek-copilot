@@ -977,3 +977,54 @@ numbers for both, but nothing that tells the story or is easy to post.
   compare adds none.
 - The migration must be pushed before wrapped shows the average. Without it,
   the card still renders, without the comparison.
+
+## ADR-0021 — Mini-league spy, chip planner, fixture swings and best XI cards
+
+*Date: 2026-11-06 · Status: accepted*
+
+### Context
+
+The paid FPL tools win on mini-leagues and planning. Armband is free, so these
+had to be built within FPL politeness and the free tiers.
+
+### Decision
+
+- **Mini-league spy** (`/league`, `/league/<id>?me=<team>`, card at
+  `/league/<id>/image.png`). It shows:
+  - the league's first page of standings (`leagues-classic/{id}/standings/`,
+    cached 30 minutes)
+  - **up to 20 rival teams from the top**
+    (`INSIGHT_CONFIG.league.rivals`), read 5 at a time
+  - this gameweek's captains and chips, and the most-owned players
+  - with `me`, **your differentials** (owned by at most 25% of the rivals
+    read) and **the players at least half of them own that you don't**
+
+  Shares are always out of the teams actually read, and the page says how
+  many. The current gameweek comes from FPL's own entry response, with our
+  database as the fallback. The logic is `leagueSpy` in
+  `packages/shared/src/league.ts`.
+- **"Your leagues" on the team page**, from the entry FPL already returns. It
+  lists private leagues only (FPL's system leagues have millions of entries),
+  smallest first.
+- **Chip planner on the team page.** It lists the chips played (from
+  `entry/{id}/history`) and, for each of the next five gameweeks, how many of
+  the 15 play, have a double or blank, plus the XI's average FPL difficulty.
+  It describes the facts, never makes a call; FPL's rules decide which chips
+  are left. The logic is `chipWeeks` and `chipsUsed` in `chip-planner.ts`.
+- **Two public cards:**
+  - **Fixture swings**, from the fixtures page's own swing logic.
+  - **The gameweek's best XI**, the highest-scoring legal XI of the latest
+    gameweek, from `api.player_gameweeks`.
+
+  The template XI and the best XI now share one tested function:
+  `bestXiBy(rows, value)`.
+- **FPL requests retry once** after a dropped connection or a timeout; HTTP
+  error answers are never retried.
+
+### Consequences
+
+- A league costs FPL at most 1 standings call and 21 picks calls (20 rivals
+  plus you) the first time. Picks are cached for a day, because they never
+  change after a deadline, so later views are free.
+- Leagues are shown from public FPL data only, and their pages are kept out of
+  search engines.

@@ -20,3 +20,5 @@ export * from "./cards.ts";
 export * from "./squad-watch.ts";
 export * from "./wrapped.ts";
 export * from "./compare.ts";
+export * from "./league.ts";
+export * from "./chip-planner.ts";

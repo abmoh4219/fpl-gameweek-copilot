@@ -143,6 +143,10 @@ confirmed, every price-watch output is labelled an **estimate**.
   rank move); `/compare?p=a,b,c` — up to three players on a radar of
   percentiles, with a card (ADR-0020)
 
+- `/league/[id]` — mini-league spy (ADR-0021): the table, captains, chips,
+  most-owned and, with `?me=`, your differentials; up to 20 rival teams read,
+  cached. The team page lists your private leagues and a chip planner
+
 - `/players` — search every player by name or club; `/players/[id]` — one
   player's season: points and xGI per gameweek, FPL's own points breakdown
   (`api.player_gameweeks`), price history rebuilt from confirmed changes,

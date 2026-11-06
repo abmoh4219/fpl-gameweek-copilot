@@ -391,7 +391,8 @@
 
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* two by two: the captain card is narrow, and "Medium" needs room */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
   padding: 8px 8px 14px;
 }
@@ -832,4 +833,103 @@
 
 .team-share a::after {
   content: " →";
+}
+
+.team-leagues {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+.team-leagues > span {
+  color: var(--faint);
+}
+
+.team-leagues a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  height: 32px;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--bg-1);
+  transition: border-color 0.15s var(--ease-out);
+}
+
+.team-leagues a:hover {
+  border-color: var(--line-3);
+}
+
+.team-leagues small {
+  font-size: 12px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------- chip planner -- */
+
+.cp {
+  margin-bottom: 24px;
+}
+
+.cp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-table th,
+.cp-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.cp-table thead th {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--faint);
+}
+
+.cp-table tbody th {
+  font-weight: 500;
+}
+
+.cp-table small {
+  color: var(--faint);
+}
+
+.cp-table .up {
+  color: var(--up);
+}
+
+.cp-table .down {
+  color: var(--danger);
+}
+
+.cp-fdr {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cp-fdr.d1 { background: var(--fdr-1); color: var(--fdr-ink-1); }
+.cp-fdr.d2 { background: var(--fdr-2); color: var(--fdr-ink-2); }
+.cp-fdr.d3 { background: var(--fdr-3); color: var(--fdr-ink-3); }
+.cp-fdr.d4 { background: var(--fdr-4); color: var(--fdr-ink-4); }
+.cp-fdr.d5 { background: var(--fdr-5); color: var(--fdr-ink-5); }
+
+.cp-used {
+  margin-top: 12px;
 }

@@ -1,11 +1,16 @@
 import {
+  fixtureGrid,
   PRICE_WATCH_COLUMNS,
   STAT_COLUMNS,
   statRowFromView,
   watchRowFromView,
+  type GridRow,
   type PriceWatchViewRow,
+  type RunScore,
   type StatRow,
   type StatViewRow,
+  type TeamRun,
+  type TickerViewRow,
   type WatchRow,
 } from "@fpl/shared";
 import { allCards } from "../cards";
@@ -81,4 +86,35 @@ export async function fixturesFor(ids: readonly number[], n = 3): Promise<Record
     }));
   }
   return out;
+}
+
+/** Every club's next five gameweeks as the fixtures page builds them (without congestion marks, which no card shows). */
+export async function fixtureGridData(): Promise<{ gameweeks: number[]; rows: GridRow[] }> {
+  const [ticker, runRows] = await Promise.all([
+    readView<TickerViewRow>(
+      "fixture_ticker",
+      "select=team_fpl_id,team_short_name,gameweek,kickoff_utc,is_home,opponent_short_name,difficulty,is_blank&order=gameweek",
+      3600,
+    ).catch(() => []),
+    readView<{ team_fpl_id: number; team_code: number; run: TeamRun }>("team_runs", "select=team_fpl_id,team_code,run", 3600).catch(() => []),
+  ]);
+  const runs: RunScore[] = runRows
+    .filter((r) => r.run?.short && r.run?.long)
+    .map((r) => ({ teamFplId: r.team_fpl_id, teamCode: r.team_code, next3: r.run.short.adjustedDifficulty, next5: r.run.long.adjustedDifficulty, band3: r.run.short.band, band5: r.run.long.band }));
+  return fixtureGrid(ticker, runs);
+}
+
+/**
+ * The latest gameweek with points, and every player's points in it. Uses the
+ * finished flag from api.gameweeks when that view exists, else the latest
+ * gameweek the stats cover.
+ */
+export async function latestGameweekPoints(): Promise<{ gameweek: number; finished: boolean; points: Map<number, number> } | null> {
+  const done = await readView<{ gameweek: number }>("gameweeks", "select=gameweek&finished=is.true&order=gameweek.desc&limit=1", 1800).catch(() => []);
+  const latest = done[0]?.gameweek ?? (await readView<{ gameweek: number }>("player_gameweeks", "select=gameweek&order=gameweek.desc&limit=1", 1800).catch(() => []))[0]?.gameweek;
+  if (!latest) return null;
+  const rows = await readView<{ fpl_id: number; total_points: number }>("player_gameweeks", `select=fpl_id,total_points&gameweek=eq.${latest}`, 3600).catch(() => []);
+  const points = new Map<number, number>();
+  for (const r of rows) points.set(r.fpl_id, (points.get(r.fpl_id) ?? 0) + r.total_points);
+  return { gameweek: latest, finished: done.length > 0, points };
 }

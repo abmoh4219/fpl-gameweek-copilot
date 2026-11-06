@@ -1,4 +1,4 @@
-import type { CompareLine, GameweekWrapped, StatRow, TemplateXi, TransferRadar, WatchRow } from "@fpl/shared";
+import type { CompareLine, FixtureSwing, GameweekWrapped, GridRow, LeagueCount, LeagueSpy, StatRow, TemplateXi, TransferRadar, WatchRow } from "@fpl/shared";
 import { C, CardFrame, FdrChips, Shirt, compact, type FixtureChip } from "./frame";
 
 /** The shareable cards, drawn for next/og (ADR-0019). Pure: data in, picture out. */
@@ -61,27 +61,24 @@ export function TransferRadarCard({ radar, gameweek, date, fixtures }: { radar: 
 
 // ---------------------------------------------------------- template XI --
 
-function PitchPlayer({ p }: { p: StatRow }) {
+function PitchPlayer({ p, label }: { p: StatRow; label: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, width: 220 }}>
       <Shirt teamCode={p.teamCode} position={p.position} size={32} />
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", padding: "1px 8px", borderRadius: 6, background: "rgba(14,14,16,0.82)", fontSize: 16 }}>{p.webName}</div>
-        <div style={{ display: "flex", marginTop: 2, paddingLeft: 8, fontSize: 13, color: C.accent }}>
-          {p.ownership.toFixed(1)}% · £{p.priceM.toFixed(1)}m
-        </div>
+        <div style={{ display: "flex", marginTop: 2, paddingLeft: 8, fontSize: 13, color: C.accent }}>{label}</div>
       </div>
     </div>
   );
 }
 
-export function TemplateXiCard({ xi, gameweek }: { xi: TemplateXi | null; gameweek: number | null }) {
-  if (!xi) return <CardFrame kicker="Most-owned XI" title="The template XI"><Empty text="Ownership isn't available right now" /></CardFrame>;
+/** An XI on a pitch laid on its side (our goal left, attacking right), one label under each name. */
+function PitchCard({ xi, kicker, title, label, empty }: { xi: TemplateXi | null; kicker: string; title: string; label: (p: StatRow) => string; empty: string }) {
+  if (!xi) return <CardFrame kicker={kicker} title={title}><Empty text={empty} /></CardFrame>;
   const lines = (["GKP", "DEF", "MID", "FWD"] as const).map((pos) => xi.players.filter((p) => p.position === pos));
-  const total = xi.players.reduce((s, p) => s + p.ownership, 0) / xi.players.length;
   return (
-    <CardFrame kicker={`${gameweek ? `Gameweek ${gameweek} · ` : ""}${xi.formation} · average ownership ${total.toFixed(1)}%`} title="The template XI">
-      {/* the pitch on its side: our goal on the left, attacking right */}
+    <CardFrame kicker={kicker} title={title}>
       <div
         style={{
           display: "flex",
@@ -97,11 +94,90 @@ export function TemplateXiCard({ xi, gameweek }: { xi: TemplateXi | null; gamewe
         {lines.map((line, i) => (
           <div key={i} style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", height: "100%", padding: "8px 0" }}>
             {line.map((p) => (
-              <PitchPlayer key={p.fplId} p={p} />
+              <PitchPlayer key={p.fplId} p={p} label={label(p)} />
             ))}
           </div>
         ))}
       </div>
+    </CardFrame>
+  );
+}
+
+export function TemplateXiCard({ xi, gameweek }: { xi: TemplateXi | null; gameweek: number | null }) {
+  const avg = xi ? xi.players.reduce((s, p) => s + p.ownership, 0) / xi.players.length : 0;
+  return (
+    <PitchCard
+      xi={xi}
+      kicker={`${gameweek ? `Gameweek ${gameweek} · ` : ""}${xi ? `${xi.formation} · average ownership ${avg.toFixed(1)}%` : "Most-owned XI"}`}
+      title="The template XI"
+      label={(p) => `${p.ownership.toFixed(1)}% · £${p.priceM.toFixed(1)}m`}
+      empty="Ownership isn't available right now"
+    />
+  );
+}
+
+export function BestXiCard({ xi, gameweek, finished, points }: { xi: TemplateXi | null; gameweek: number; finished: boolean; points: ReadonlyMap<number, number> }) {
+  const total = xi ? xi.players.reduce((s, p) => s + (points.get(p.fplId) ?? 0), 0) : 0;
+  return (
+    <PitchCard
+      xi={xi}
+      kicker={`${xi ? `${xi.formation} · ${total} points between them` : "Highest-scoring XI"}${finished ? "" : " · live, points so far"}`}
+      title={`Gameweek ${gameweek}'s best XI`}
+      label={(p) => `${points.get(p.fplId) ?? 0} pts · ${p.ownership.toFixed(1)}% owned`}
+      empty="No points in yet for this gameweek"
+    />
+  );
+}
+
+// -------------------------------------------------------------- swings --
+
+function SwingColumn({ title, swings, rows, tone }: { title: string; swings: FixtureSwing[]; rows: ReadonlyMap<number, GridRow>; tone: "easier" | "harder" }) {
+  const colour = tone === "easier" ? C.up : C.down;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, height: 26, fontSize: 16, color: C.muted }}>
+        <div style={{ display: "flex", width: 8, height: 8, borderRadius: 4, background: colour }} />
+        {title}
+      </div>
+      {swings.map((s) => {
+        const row = rows.get(s.teamFplId);
+        const chips: FixtureChip[] = (row?.cells ?? []).map((c, i) => {
+          const f = c.fixtures[0];
+          return { gameweek: s.gameweeks[i] ?? i, label: f ? (f.isHome ? f.opponent : f.opponent.toLowerCase()) : "–", difficulty: s.difficulty[i] === null ? null : Math.round(s.difficulty[i]!) };
+        });
+        return (
+          <div key={s.teamFplId} style={{ display: "flex", alignItems: "center", gap: 12, height: 62, borderBottom: `1px solid ${C.line}` }}>
+            <Shirt teamCode={s.teamCode} position="MID" size={30} />
+            <div style={{ display: "flex", width: 56, fontSize: 19 }}>{s.team}</div>
+            <FdrChips fixtures={chips} width={40} />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", flex: 1 }}>
+              <div style={{ display: "flex", fontSize: 16, color: C.text }}>
+                {s.early?.toFixed(1) ?? "–"} → <span style={{ display: "flex", marginLeft: 6, color: colour }}>{s.late?.toFixed(1) ?? "–"}</span>
+              </div>
+              <div style={{ display: "flex", fontSize: 12, color: C.faint }}>5-game avg {s.overall?.toFixed(1) ?? "–"}</div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function FixtureSwingsCard({ easier, harder, rows, from }: { easier: FixtureSwing[]; harder: FixtureSwing[]; rows: ReadonlyMap<number, GridRow>; from: number | null }) {
+  return (
+    <CardFrame
+      kicker={`FPL difficulty, next two gameweeks → the three after${from ? ` (from GW${from})` : ""} · lower is easier`}
+      title="Fixture swings"
+      note="FPL's own difficulty rating, which ignores form · an estimate"
+    >
+      {easier.length + harder.length === 0 ? (
+        <Empty text="No big swings in the next five gameweeks" />
+      ) : (
+        <div style={{ display: "flex", flex: 1, gap: 32 }}>
+          <SwingColumn title="Gets easier" swings={easier} rows={rows} tone="easier" />
+          <SwingColumn title="Gets harder" swings={harder} rows={rows} tone="harder" />
+        </div>
+      )}
     </CardFrame>
   );
 }
@@ -330,6 +406,68 @@ export function CompareCard({ lines, axes, fixtures }: { lines: CompareLine[]; a
           </div>
         </div>
       )}
+    </CardFrame>
+  );
+}
+
+// -------------------------------------------------------------- league --
+
+function MiniBars({ title, items, max = 4 }: { title: string; items: LeagueCount[]; max?: number }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ display: "flex", fontSize: 15, color: C.muted }}>{title}</div>
+      {items.slice(0, max).map((c) => (
+        <div key={c.fplId} style={{ display: "flex", alignItems: "center", gap: 8, height: 26 }}>
+          <Shirt teamCode={c.teamCode} position={c.position} size={20} />
+          <div style={{ display: "flex", width: 120, fontSize: 16 }}>{c.name}</div>
+          <div style={{ display: "flex", flex: 1, height: 6, borderRadius: 3, background: C.raised }}>
+            <div style={{ display: "flex", width: `${Math.max(3, c.share)}%`, height: 6, borderRadius: 3, background: C.accent }} />
+          </div>
+          <div style={{ display: "flex", width: 44, justifyContent: "flex-end", fontSize: 15 }}>{c.share}%</div>
+        </div>
+      ))}
+      {items.length === 0 && <div style={{ display: "flex", fontSize: 14, color: C.faint }}>None</div>}
+    </div>
+  );
+}
+
+export function LeagueCard({ spy }: { spy: LeagueSpy & { gameweek: number } }) {
+  const rows = spy.table.slice(0, 8);
+  return (
+    <CardFrame kicker={`Mini-league · Gameweek ${spy.gameweek} · ${spy.analysed} teams read`} title={spy.name}>
+      <div style={{ display: "flex", flex: 1, gap: 28 }}>
+        <div style={{ display: "flex", flexDirection: "column", width: 600 }}>
+          <div style={{ display: "flex", height: 24, fontSize: 13, color: C.faint, borderBottom: `1px solid ${C.line}` }}>
+            <div style={{ display: "flex", width: 50 }}>#</div>
+            <div style={{ display: "flex", flex: 1 }}>Team</div>
+            <div style={{ display: "flex", width: 50, justifyContent: "flex-end" }}>GW</div>
+            <div style={{ display: "flex", width: 70, justifyContent: "flex-end" }}>Total</div>
+            <div style={{ display: "flex", width: 130, paddingLeft: 18 }}>Captain</div>
+          </div>
+          {rows.map((r) => (
+            <div key={r.entry} style={{ display: "flex", alignItems: "center", height: 40, borderBottom: `1px solid ${C.line}`, fontSize: 17 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, width: 50 }}>
+                {r.rank}
+                {r.move !== 0 && <span style={{ display: "flex", fontSize: 11, color: r.move > 0 ? C.up : C.down }}>{r.move > 0 ? "▲" : "▼"}</span>}
+              </div>
+              <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>{r.team.length > 26 ? `${r.team.slice(0, 25)}…` : r.team}</div>
+              <div style={{ display: "flex", width: 50, justifyContent: "flex-end" }}>{r.gameweek}</div>
+              <div style={{ display: "flex", width: 70, justifyContent: "flex-end", color: C.muted }}>{r.total.toLocaleString("en-GB")}</div>
+              <div style={{ display: "flex", width: 130, paddingLeft: 18, fontSize: 15, color: C.muted }}>{r.captain ?? "—"}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 18 }}>
+          <MiniBars title="Captains this gameweek" items={spy.captains} />
+          {spy.you ? (
+            <>
+              <MiniBars title="Your differentials" items={spy.you.differentials} max={3} />
+            </>
+          ) : (
+            <MiniBars title="Most owned in the league" items={spy.owned} max={3} />
+          )}
+        </div>
+      </div>
     </CardFrame>
   );
 }

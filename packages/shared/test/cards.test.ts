@@ -37,3 +37,19 @@ describe("the template XI", () => {
     expect(templateXi([row("GK1", "GKP", 40), row("D1", "DEF", 50)])).toBeNull();
   });
 });
+
+describe("the best XI by any number", () => {
+  it("builds a gameweek's best XI from its points, never picking a zero", async () => {
+    const { bestXiBy } = await import("../src/index.ts");
+    const pts: [string, StatPosition, number][] = [
+      ["GK", "GKP", 6], ["D1", "DEF", 9], ["D2", "DEF", 8], ["D3", "DEF", 2], ["D4", "DEF", 0], ["D5", "DEF", 4],
+      ["M1", "MID", 15], ["M2", "MID", 12], ["M3", "MID", 3], ["F1", "FWD", 13], ["F2", "FWD", 11], ["F3", "FWD", 10], ["F4", "FWD", 1],
+    ];
+    const rows = pts.map(([n, p]) => row(n, p, 1));
+    const points = new Map(rows.map((r, i) => [r.fplId, pts[i]![2]]));
+    const xi = bestXiBy(rows, (r) => points.get(r.fplId) ?? 0)!;
+    // Forwards cap at 3, so the last places go to D3 and M3; D4 scored nothing and is never picked.
+    expect(xi.formation).toBe("4-3-3");
+    expect(xi.players.map((p) => p.webName)).toEqual(["GK", "D1", "D2", "D5", "D3", "M1", "M2", "M3", "F1", "F2", "F3"]);
+  });
+});
