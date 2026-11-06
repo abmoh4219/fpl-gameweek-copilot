@@ -25,12 +25,12 @@ const SITE = process.env["NEXT_PUBLIC_SITE_URL"] ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
-  title: { default: "Armband — the Gaffer does your FPL homework", template: "%s · Armband" },
+  title: { default: "Armband — free FPL stats, fixtures and price watch", template: "%s · Armband" },
   description:
-    "Connect your Fantasy Premier League team. See your squad, then ask the Gaffer — Armband's AI manager — to pick your XI, make transfers and choose a captain, with the numbers behind every call.",
+    "Free, open-source tools for Fantasy Premier League: player stats and charts, a fixture planner, tonight's price watch and a page for every player. Connect your team to see your fifteen on the pitch.",
   openGraph: {
     title: "Armband",
-    description: "Your FPL team, managed by the Gaffer.",
+    description: "Free FPL stats, fixtures and price watch, with every number shown.",
     type: "website",
   },
 };

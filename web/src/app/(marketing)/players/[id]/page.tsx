@@ -128,44 +128,55 @@ export default async function PlayerPage({ params }: Params) {
             note={`${row.minutes.toLocaleString("en-GB")} of ${(latestGw * 90).toLocaleString("en-GB")} possible`}
             tone="lo"
           />
+          {/* FPL leaves the chance empty when there is no flag: that means "no injury news", not "certain to play". */}
           <RingMeter
             value={chance === null ? 1 : chance / 100}
             label="Chance of playing"
-            display={chance === null ? "100%" : `${chance}%`}
-            note={chance === null ? "No flag" : "Next gameweek, from FPL"}
+            display={chance === null ? "Fit" : `${chance}%`}
+            note={chance === null ? "No injury flag from FPL" : "Next gameweek, from FPL"}
             tone={chance === null || chance >= 75 ? "lo" : chance >= 50 ? "warn" : "danger"}
           />
         </div>
 
         <div className="pp-grid">
-          <div className="ins-card pp-wide">
-            <h2 className="ins-title">Points per gameweek</h2>
-            <p className="ins-how">FPL points in each gameweek this season. Hover a column for minutes, goals and assists.</p>
-            <ColumnChart
-              columns={series.map((g) => ({
-                key: String(g.gameweek),
-                label: `GW${g.gameweek}`,
-                value: g.points,
-                detail: [`${g.minutes} minutes`, `${g.goals} goals · ${g.assists} assists`, `${g.xgi.toFixed(2)} xGI`],
-              }))}
-              format="int"
-              summary={`${row.webName}'s points per gameweek: ${series.map((g) => `GW${g.gameweek} ${g.points}`).join(", ")}.`}
-            />
-          </div>
+          {row.minutes > 0 ? (
+            <>
+              <div className="ins-card pp-wide">
+                <h2 className="ins-title">Points per gameweek</h2>
+                <p className="ins-how">FPL points in each gameweek this season. Hover a column for minutes, goals and assists.</p>
+                <ColumnChart
+                  columns={series.map((g) => ({
+                    key: String(g.gameweek),
+                    label: `GW${g.gameweek}`,
+                    value: g.points,
+                    detail: [`${g.minutes} minutes`, `${g.goals} goals · ${g.assists} assists`, `${g.xgi.toFixed(2)} xGI`],
+                  }))}
+                  format="int"
+                  summary={`${row.webName}'s points per gameweek: ${series.map((g) => `GW${g.gameweek} ${g.points}`).join(", ")}.`}
+                />
+              </div>
 
-          <div className="ins-card">
-            <h2 className="ins-title">Expected goal involvements</h2>
-            <p className="ins-how">xG plus xA per gameweek: the quality of chances, whether or not they went in.</p>
-            <ColumnChart
-              columns={series.map((g) => ({ key: String(g.gameweek), label: `GW${g.gameweek}`, value: Math.round(g.xgi * 100) / 100, detail: [`${g.minutes} minutes`] }))}
-              format="dec2"
-              summary={`${row.webName}'s xGI per gameweek.`}
-              height={180}
-              tone="lo"
-            />
-          </div>
+              <div className="ins-card">
+                <h2 className="ins-title">Expected goal involvements</h2>
+                <p className="ins-how">xG plus xA per gameweek: the quality of chances, whether or not they went in.</p>
+                <ColumnChart
+                  columns={series.map((g) => ({ key: String(g.gameweek), label: `GW${g.gameweek}`, value: Math.round(g.xgi * 100) / 100, detail: [`${g.minutes} minutes`] }))}
+                  format="dec2"
+                  summary={`${row.webName}'s xGI per gameweek.`}
+                  height={180}
+                  tone="lo"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="ins-card pp-wide">
+              <h2 className="ins-title">Season so far</h2>
+              <p className="chart-empty">{row.webName} hasn&apos;t played a minute yet this season.</p>
+            </div>
+          )}
 
-          <div className="ins-card">
+          {/* On its own (a player with no minutes) the price card takes the full row. */}
+          <div className={`ins-card${row.minutes > 0 ? "" : " pp-wide"}`}>
             <h2 className="ins-title">Price this season</h2>
             <p className="ins-how">Every confirmed price change since we started tracking.</p>
             <PriceLine points={prices} summary={`${row.webName}'s price: ${prices.map((x) => `£${x.priceM.toFixed(1)}m on ${x.date}`).join(", ")}.`} />

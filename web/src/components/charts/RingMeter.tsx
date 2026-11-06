@@ -12,14 +12,10 @@ export function RingMeter({ value, label, display, note, tone = "hi" }: { value:
     <figure className={`ring ring-${tone}`}>
       <svg viewBox="0 0 80 80" width="80" height="80" role="img" aria-label={`${label}: ${display}`}>
         <circle cx="40" cy="40" r={r} className="ring-track" />
-        <circle
-          cx="40"
-          cy="40"
-          r={r}
-          className="ring-fill"
-          strokeDasharray={`${c * v} ${c}`}
-          transform="rotate(-90 40 40)"
-        />
+        {/* At 0 a round line cap would still paint a dot, so nothing is drawn. */}
+        {v > 0 && (
+          <circle cx="40" cy="40" r={r} className="ring-fill" strokeDasharray={`${c * v} ${c}`} transform="rotate(-90 40 40)" />
+        )}
         <text x="40" y="45" textAnchor="middle" className="ring-value">
           {display}
         </text>
