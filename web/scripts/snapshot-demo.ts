@@ -8,7 +8,7 @@
  * sources the site uses, so the plans in the answers match the pitch.
  *
  *   cd web && NEXT_PUBLIC_SUPABASE_URL=… NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=… \
- *     ../jobs/node_modules/.bin/tsx scripts/snapshot-demo.ts [https://armband-one.vercel.app]
+ *     ../jobs/node_modules/.bin/tsx scripts/snapshot-demo.ts [https://armband.abdela.dev]
  */
 import { writeFileSync } from "node:fs";
 import type { AgentEvent } from "@fpl/shared";
@@ -17,7 +17,7 @@ import { DEMO_QUESTIONS } from "../src/lib/demo.ts";
 import type { DemoSnapshot } from "../src/lib/demo-snapshot.ts";
 import { loadSquad } from "../src/lib/squad.ts";
 
-const site = process.argv[2] ?? "https://armband-one.vercel.app";
+const site = process.argv[2] ?? "https://armband.abdela.dev";
 
 const squad = await loadSquad(DEMO_TEAM_ID);
 const answers: AgentEvent[][] = [];

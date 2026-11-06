@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/abmoh4219/fpl-gameweek-copilot/actions/workflows/ci.yml/badge.svg)](https://github.com/abmoh4219/fpl-gameweek-copilot/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Live](https://img.shields.io/badge/live-armband--one.vercel.app-ff6a3d.svg)](https://armband-one.vercel.app)
+[![Live](https://img.shields.io/badge/live-armband.abdela.dev-ff6a3d.svg)](https://armband.abdela.dev)
 
 **Free, open-source tools for Fantasy Premier League.** Season stats, a
 fixture planner, a price watch and a page for every player, with every number
@@ -16,8 +16,8 @@ and puts its plan on your pitch for you to apply or revert.
 Behind it, a data pipeline watches FPL every few hours, detects price changes
 and injury news, and posts the ones that matter to a Telegram channel.
 
-**[Live site](https://armband-one.vercel.app)** ·
-**[Try the demo](https://armband-one.vercel.app/demo)** ·
+**[Live site](https://armband.abdela.dev)** ·
+**[Try the demo](https://armband.abdela.dev/demo)** ·
 [The agent (switched off)](docs/agent.md) ·
 [Architecture decisions](docs/decisions.md)
 
