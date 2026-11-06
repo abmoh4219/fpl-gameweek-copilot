@@ -151,8 +151,16 @@ export default async function League(props: Props) {
                 <Bars title="Most of them own, you don't" items={spy.you.threats} empty={`No player is owned by ${cfg.threatMin}% or more of them that you don't own.`} />
               </>
             )}
-            <Bars title="Captains this gameweek" items={spy.captains.slice(0, 6)} empty="Captains show once the gameweek's teams are locked." />
-            <Bars title="Most owned in this league" items={spy.owned.slice(0, 6)} empty="Ownership isn't available right now." />
+            <Bars title="Captains this gameweek" items={spy.captains} empty="Captains show once the gameweek's teams are locked." />
+            <section className="ins-card lg-bars">
+              <h2 className="ins-title">Chips this gameweek</h2>
+              <p className="lg-chips">
+                {spy.chips.length === 0
+                  ? `None of the ${spy.analysed} teams read has played a chip.`
+                  : spy.chips.map((c) => `${chipName(c.chip)} ×${c.count}`).join(" · ")}
+              </p>
+            </section>
+            <Bars title="Most owned in this league" items={spy.owned} empty="Ownership isn't available right now." />
           </div>
         </div>
 

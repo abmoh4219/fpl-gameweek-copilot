@@ -23,6 +23,7 @@ describe("the mini-league spy", () => {
     expect(spy.owned[0]).toMatchObject({ name: "Haaland", share: 100 });
     expect(spy.table[0]).toMatchObject({ team: "T10", move: 1, captain: "Haaland" });
     expect(spy.table[1]).toMatchObject({ move: -1, chip: "3xc" });
+    expect(spy.chips).toEqual([{ chip: "3xc", count: 1 }]);
   });
 
   it("finds your differentials and the players most rivals own that you don't", () => {

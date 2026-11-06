@@ -51,6 +51,8 @@ export interface LeagueSpy {
   analysed: number;
   table: LeagueRow[];
   captains: LeagueCount[];
+  /** Chips played this gameweek by the teams read, most played first, with their count. */
+  chips: { chip: string; count: number }[];
   owned: LeagueCount[];
   /** Present when "you" are given and your picks are known. */
   you: { differentials: LeagueCount[]; threats: LeagueCount[]; captain: LeagueCount | null } | null;
@@ -108,7 +110,10 @@ export function leagueSpy(
     const captain = you.captain ? (captains.find((c) => c.fplId === you.captain) ?? blank(you.captain)) : null;
     mine = { differentials, threats, captain };
   }
-  return { name: standings.league.name, analysed, table, captains, owned: owned.slice(0, 10), you: mine };
+  const chipTally = new Map<string, number>();
+  for (const p of analysedPicks) if (p.chip) chipTally.set(p.chip, (chipTally.get(p.chip) ?? 0) + 1);
+  const chips = [...chipTally].map(([chip, count]) => ({ chip, count })).sort((a, b) => b.count - a.count || a.chip.localeCompare(b.chip));
+  return { name: standings.league.name, analysed, table, captains, chips, owned: owned.slice(0, 10), you: mine };
 }
 
 /** A league ID, or a pasted FPL league address (".../leagues/123/standings/c"). */

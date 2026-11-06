@@ -125,3 +125,9 @@
     padding: 8px 6px;
   }
 }
+
+.lg-chips {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
