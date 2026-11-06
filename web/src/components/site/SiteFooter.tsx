@@ -30,10 +30,9 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4>Account</h4>
+            <h4>Your team</h4>
             <ul>
-              <li><Link href="/sign-in">Log in</Link></li>
-              <li><Link href="/sign-up">Create account</Link></li>
+              <li><Link href="/team">Find your team</Link></li>
               <li><Link href="/privacy">Privacy</Link></li>
               <li><Link href="/terms">Terms</Link></li>
             </ul>

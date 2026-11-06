@@ -5,8 +5,3 @@ export function supabaseEnv(): { url: string; key: string } {
   if (!url || !key) throw new Error("Supabase is not configured (NEXT_PUBLIC_SUPABASE_URL / _PUBLISHABLE_KEY)");
   return { url, key };
 }
-
-/** Only allow same-site relative redirects, so ?next= cannot send users elsewhere. */
-export function safeNext(next: string | null | undefined, fallback = "/app"): string {
-  return next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : fallback;
-}

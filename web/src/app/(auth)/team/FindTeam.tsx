@@ -1,18 +1,25 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { kitImageUrl } from "@fpl/shared";
-import { connectTeam, previewTeam, type TeamPreview } from "./actions";
+import { readMyTeam, saveMyTeam, type MyTeam } from "@/lib/my-team";
+import { previewTeam, type TeamPreview } from "./actions";
 
 const fmt = new Intl.NumberFormat("en-GB");
 
-/** Step one: find the team. Step two: "Is this you?" — then save it. */
-export function ConnectTeam({ current }: { current: number | null }) {
+/** Step one: find the team. Step two: "Is this you?" — then remember it in this browser and open the dugout. */
+export function FindTeam() {
+  const router = useRouter();
+  const [mine, setMine] = useState<MyTeam | null>(null);
   const [raw, setRaw] = useState("");
   const [team, setTeam] = useState<TeamPreview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [looking, startLooking] = useTransition();
   const [saving, startSaving] = useTransition();
+
+  useEffect(() => setMine(readMyTeam()), []);
 
   function find(e: React.FormEvent) {
     e.preventDefault();
@@ -28,10 +35,9 @@ export function ConnectTeam({ current }: { current: number | null }) {
   function confirm() {
     if (!team) return;
     setError(null);
-    startSaving(async () => {
-      // On success the action redirects to the app; we only see failures.
-      const result = await connectTeam(team.id);
-      if (result && !result.ok) setError(result.error);
+    startSaving(() => {
+      saveMyTeam({ id: team.id, name: team.teamName });
+      router.push(`/team/${team.id}`);
     });
   }
 
@@ -101,6 +107,11 @@ export function ConnectTeam({ current }: { current: number | null }) {
 
   return (
     <form className="form" onSubmit={find} noValidate>
+      {mine && (
+        <Link href={`/team/${mine.id}`} className="btn btn-accent btn-block">
+          Continue to {mine.name}
+        </Link>
+      )}
       <div className="field">
         <label htmlFor="team">Your FPL team ID</label>
         <input
@@ -111,7 +122,7 @@ export function ConnectTeam({ current }: { current: number | null }) {
           autoFocus
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          placeholder={current ? String(current) : "e.g. 7653564"}
+          placeholder="e.g. 7653564"
           aria-invalid={error ? true : undefined}
           aria-describedby="team-help"
         />
@@ -126,8 +137,8 @@ export function ConnectTeam({ current }: { current: number | null }) {
         </div>
       )}
 
-      <button type="submit" className="btn btn-accent btn-block" disabled={looking || !raw.trim()}>
-        {looking ? <span className="spinner" /> : "Find my team"}
+      <button type="submit" className={`btn btn-block${mine ? "" : " btn-accent"}`} disabled={looking || !raw.trim()}>
+        {looking ? <span className="spinner" /> : mine ? "Find another team" : "Find my team"}
       </button>
 
       <details className="where">

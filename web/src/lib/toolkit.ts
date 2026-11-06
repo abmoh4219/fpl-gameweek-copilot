@@ -9,7 +9,7 @@ import {
   type SiteCard,
   type Squad,
 } from "@fpl/shared";
-import { readView } from "./supabase";
+import { allCards } from "./cards";
 
 /**
  * The free toolkit: the same tested lineup engine the Gaffer's tools call,
@@ -19,9 +19,11 @@ import { readView } from "./supabase";
 
 /** The published cards for a squad's fifteen, by FPL id. */
 export async function squadCards(squad: Squad): Promise<Map<number, SiteCard>> {
-  const ids = [...squad.starters, ...squad.bench].map((p) => p.fplId).join(",");
-  const rows = await readView<{ fpl_id: number; card: SiteCard }>("player_cards", `select=fpl_id,card&fpl_id=in.(${ids})`);
-  return new Map(rows.filter((r) => r.card?.version === 1).map((r) => [r.fpl_id, r.card]));
+  const every = await allCards();
+  return new Map([...squad.starters, ...squad.bench].flatMap((p) => {
+    const row = every.get(p.fplId);
+    return row ? [[p.fplId, row.card] as const] : [];
+  }));
 }
 
 function poolOf(squad: Squad, cards: ReadonlyMap<number, SiteCard>): LineupPlayer[] {

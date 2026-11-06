@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createBrowserAuthClient } from "@/lib/auth/browser";
 import { GitHubIcon } from "./GitHubIcon";
 import { compactCount } from "@/lib/github";
+import { readMyTeam, type MyTeam } from "@/lib/my-team";
 import { GITHUB_URL } from "./links";
 import { Mark, Wordmark } from "./Mark";
 import { ThemeToggle } from "./ThemeToggle";
@@ -22,16 +22,18 @@ const NAV = [
 
 export function SiteHeader({ stars }: { stars: number | null }) {
   const [scrolled, setScrolled] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
+  const [myTeam, setMyTeam] = useState<MyTeam | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Read from this browser's own session cookie — no network call, and the
+  // The remembered team lives in this browser (no accounts, ADR-0017), so the
   // landing page stays a cached static page for everyone.
   useEffect(() => {
-    void createBrowserAuthClient()
-      .auth.getSession()
-      .then(({ data }) => setSignedIn(data.session !== null));
+    const sync = () => setMyTeam(readMyTeam());
+    sync();
+    window.addEventListener("armband:my-team", sync);
+    return () => window.removeEventListener("armband:my-team", sync);
   }, []);
+  const teamHref = myTeam ? `/team/${myTeam.id}` : "/team";
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -85,20 +87,9 @@ export function SiteHeader({ stars }: { stars: number | null }) {
               {menuOpen ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
             </svg>
           </button>
-          {signedIn ? (
-            <Link href="/app" className="btn btn-accent">
-              Open app
-            </Link>
-          ) : (
-            <>
-              <Link href="/sign-in" className="nav-login hide-mobile">
-                Log in
-              </Link>
-              <Link href="/sign-up" className="btn btn-accent">
-                Get started
-              </Link>
-            </>
-          )}
+          <Link href={teamHref} className="btn btn-accent">
+            My team
+          </Link>
         </div>
       </div>
       {menuOpen && (
@@ -108,9 +99,6 @@ export function SiteHeader({ stars }: { stars: number | null }) {
               {label}
             </Link>
           ))}
-          <Link href={signedIn ? "/app" : "/sign-in"} onClick={() => setMenuOpen(false)}>
-            {signedIn ? "Open app" : "Log in"}
-          </Link>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="menu-gh">
             <GitHubIcon size={16} /> Star on GitHub
           </a>

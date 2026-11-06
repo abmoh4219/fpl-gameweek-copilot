@@ -8,7 +8,7 @@
 
 **Free, open-source tools for Fantasy Premier League.** Season stats, a
 fixture planner, a price watch and a page for every player, with every number
-shown. Connect your FPL team and Armband shows your fifteen on the pitch, next
+shown. Enter your FPL team ID (no sign-up) and Armband shows your fifteen on the pitch, next
 to the **Gaffer**: five checks computed in code (best XI, lineup rating,
 captain, transfers within your bank, injuries). Each check shows its numbers
 and puts its plan on your pitch for you to apply or revert.
@@ -17,7 +17,7 @@ Behind it, a data pipeline watches FPL every few hours, detects price changes
 and injury news, and posts the ones that matter to a Telegram channel.
 
 **[Live site](https://armband-one.vercel.app)** ·
-**[Try the demo](https://armband-one.vercel.app/demo)** (no account needed) ·
+**[Try the demo](https://armband-one.vercel.app/demo)** ·
 [The agent (switched off)](docs/agent.md) ·
 [Architecture decisions](docs/decisions.md)
 
@@ -93,7 +93,7 @@ Measured on the real model: a best-XI answer took two model turns, about
                             ▼
                     Next.js on Vercel
                  landing · stats · fixtures · prices · players ·
-                 accounts · dugout with the Gaffer's checks · demo,
+                 your team by ID (no accounts) · the Gaffer · demo,
                  all from read-only views
 ```
 
@@ -122,7 +122,7 @@ handful of modules and a month of alerts fits well inside the free plan's
 | | |
 | --- | --- |
 | Language | TypeScript (strict), Zod at every external boundary |
-| Web | Next.js 16 · React 19 · Supabase Auth (email and Google) |
+| Web | Next.js 16 · React 19 · no accounts: your team by its public FPL ID |
 | Agent (switched off) | Claude Haiku 5.5 · Anthropic TypeScript SDK · our own streaming tool loop |
 | Data | Supabase Postgres: three schemas, RLS, owner-privileged read views |
 | Jobs | GitHub Actions cron · `tsx` |
@@ -133,7 +133,7 @@ handful of modules and a month of alerts fits well inside the free plan's
 
 | Path | |
 | --- | --- |
-| [`web/`](web) | Next.js app: landing, accounts, the dugout, the demo |
+| [`web/`](web) | Next.js app: landing, tool pages, your team's dugout, the demo |
 | [`agent/`](agent) | The Claude agent (switched off): tools, prompt, spend guards |
 | [`jobs/`](jobs) | Sync, change detection, reports, delivery, alerts |
 | [`packages/shared/`](packages/shared) | Schemas, the insight engine, squads and plans |
@@ -157,7 +157,7 @@ pnpm --filter @fpl/web dev    # http://localhost:3000
 
 ## Docs
 
-- [Architecture decisions](docs/decisions.md): sixteen ADRs, from storage to
+- [Architecture decisions](docs/decisions.md): seventeen ADRs, from storage to
   the agent
 - [The agent](docs/agent.md): the switched-off Claude agent: tools, plans, limits, testing
 - [Database](docs/database.md): schemas, security model, retention

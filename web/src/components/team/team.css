@@ -702,3 +702,21 @@
     grid-template-columns: minmax(0, 1.15fr) minmax(380px, 1fr);
   }
 }
+
+/* "This is my team" (ADR-0017): a quiet inline action in the page subtitle */
+.remember {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.remember.on {
+  color: var(--muted);
+  text-decoration: none;
+  cursor: default;
+}

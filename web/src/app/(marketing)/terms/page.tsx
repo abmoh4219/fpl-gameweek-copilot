@@ -17,8 +17,7 @@ export default function Terms() {
         Terms, <em>plainly</em>
       </h1>
       <p className="legal-lede">
-        Armband is a free, independent tool for Fantasy Premier League managers. By creating an account you agree to these
-        terms.
+        Armband is a free, independent tool for Fantasy Premier League managers. By using it you agree to these terms.
       </p>
 
       <h2>What Armband is</h2>
@@ -42,18 +41,9 @@ export default function Terms() {
       </p>
 
       <h2>Fair use</h2>
-      <ul>
-        <li>One account per person.</li>
-        <li>
-          Do not overload the service or scrape it.
-        </li>
-      </ul>
-      <p>Accounts that break these rules may be suspended or deleted.</p>
-
-      <h2>Your account</h2>
       <p>
-        You can delete your account at any time from <Link href="/app/settings">Settings</Link>. What we store and how we
-        handle it is set out in the <Link href="/privacy">privacy page</Link>.
+        Do not overload the service or scrape it. The code is open source: to run Armband at scale, run your own copy.
+        What we store (nothing about you) is set out on the <Link href="/privacy">privacy page</Link>.
       </p>
 
       <h2>Not affiliated</h2>

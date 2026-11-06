@@ -102,12 +102,13 @@ confirmed, every price-watch output is labelled an **estimate**.
 
 - `/` — landing page: a live best-XI demo built from the demo squad, the
   overnight ticker, "Explore" cards (one live number per tool page), FAQ
-- `/sign-up`, `/sign-in`, `/onboarding` — accounts (email or Google), then
-  connect an FPL team with an "Is this you?" check
-- `/app` — the dugout: the squad on an FPL-style pitch with official kits, the
-  Gaffer (five checks in code: best XI, lineup rating, captain, transfers,
-  injuries; `packages/shared/src/gaffer.ts`, ADR-0016) and a computed squad
-  check; `/app/settings`
+- `/team` — find your team by FPL ID with an "Is this you?" check. **No
+  accounts (ADR-0017):** the chosen team is remembered in the browser only.
+  `/sign-in`, `/sign-up`, `/onboarding`, `/app` redirect here
+- `/team/[id]` — the dugout: the squad on an FPL-style pitch with official
+  kits, the Gaffer (five checks in code: best XI, lineup rating, captain,
+  transfers, injuries; `packages/shared/src/gaffer.ts`, ADR-0016) and a
+  computed squad check. Not indexed by search engines
 - `/demo` — the demo team with the same five checks, live
 - `/stats` — season leaderboards (goals, assists, xG/xA/xGI, points, form,
   value, bonus, BPS, clean sheets, ownership), filtered by position and price;
@@ -159,8 +160,8 @@ unused.
                        |  snapshot + diff + score
                        v
                    Supabase  (Postgres: snapshots, changes,
-                       |      players, fixtures, previews,
-                       |      accounts; read-only views for web)
+                       |      players, fixtures, previews;
+                       |      read-only views for web)
                        |
         +--------------+---------------------+
         |                                    |
@@ -456,8 +457,11 @@ the pipeline; the website and bot read what the pipeline already produced.
   back on, its limits (5 questions per account, a daily budget) come back
   with it.
 - **A manager's squad is the only live FPL call:** their entry and picks,
-  cached per team (entry 10 minutes, picks 1 hour), for signed-in users and
-  the demo team only.
+  cached per team (entry 30 minutes; picks a day, since a gameweek's picks
+  never change after its deadline). Player data for squads comes from ONE
+  shared cached read of every card (`web/src/lib/cards.ts`), never a
+  per-team database read, so Supabase egress stays flat with traffic
+  (ADR-0017).
 - **Personal reports use templates, not AI.**
 - **Daily AI budget cap** in code. On reaching the cap, or on any Gemini
   error, fall back to the template version — the report still ships.
@@ -478,8 +482,9 @@ before taking money:
   charging.
 - **The Gemini free tier may use our inputs** — check the terms before
   sending anything that must stay private, and before charging.
-- Keep the data model ready for **Supabase Auth** and **free/pro plans**
-  (user IDs, plan column, per-plan limits) even while everything is public.
+- Accounts were removed (ADR-0017): Armband stores nothing about visitors.
+  Charging would mean bringing accounts back; until then, every feature must
+  work without one.
 
 ---
 
@@ -489,7 +494,7 @@ before taking money:
 | --- | --- |
 | `jobs/` | TypeScript scripts run by GitHub Actions cron: sync, detect changes, post the webhook, send failure alerts |
 | `agent/` | The Claude agent (ADR-0014), switched off since ADR-0016: Claude on the Messages API with our FPL tools, the tool loop, the prompt and spend guards |
-| `web/` | Next.js app on Vercel: landing, tool pages, accounts, the dugout with the Gaffer's checks, the demo; `/api/agent` and `/api/demo` are off |
+| `web/` | Next.js app on Vercel: landing, tool pages, `/team` and the dugout with the Gaffer's checks, the demo; `/api/agent` and `/api/demo` are off |
 | `packages/shared/` | Zod schemas, database types, and the insight engine — shared by `jobs/` and `web/`, unit tested |
 | `supabase/migrations/` | Versioned SQL: tables, snapshot schema, read-only views the web app reads |
 | `.github/workflows/` | Cron and CI workflow definitions |

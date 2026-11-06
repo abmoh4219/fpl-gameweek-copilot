@@ -3,7 +3,7 @@ import { Mark, Wordmark } from "@/components/site/Mark";
 import "./auth.css";
 
 /**
- * Sign-in, sign-up and onboarding: the form on the left, a floodlit panel on
+ * Finding your team (/team): the form on the left, a floodlit panel on
  * the right with the promise in three lines. The panel hides on small screens.
  */
 export default function AuthLayout({ children }: { children: React.ReactNode }) {

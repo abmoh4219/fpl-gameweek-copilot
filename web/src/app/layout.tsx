@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: { default: "Armband — free FPL stats, fixtures and price watch", template: "%s · Armband" },
   description:
-    "Free, open-source tools for Fantasy Premier League: player stats and charts, a fixture planner, tonight's price watch and a page for every player. Connect your team to see your fifteen on the pitch.",
+    "Free, open-source tools for Fantasy Premier League: player stats and charts, a fixture planner, tonight's price watch and a page for every player. Enter your team ID to see your fifteen on the pitch, no sign-up.",
   openGraph: {
     title: "Armband",
     description: "Free FPL stats, fixtures and price watch, with every number shown.",

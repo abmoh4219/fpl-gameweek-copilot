@@ -1,4 +1,4 @@
-import "../app/app.css";
+import "@/components/team/team.css";
 
 /** While the squad loads from FPL: the dugout's shape, in dark plates. */
 export default function Loading() {

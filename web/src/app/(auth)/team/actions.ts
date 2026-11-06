@@ -1,8 +1,6 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { fetchEntry, FplUnavailableError, parseTeamInput, TeamNotFoundError } from "@/lib/fpl";
-import { createAuthClient } from "@/lib/auth/server";
 import { loadSquad } from "@/lib/squad";
 
 export interface TeamPreview {
@@ -18,19 +16,12 @@ export interface TeamPreview {
 
 export type PreviewResult = { ok: true; team: TeamPreview } | { ok: false; error: string };
 
-async function signedIn(): Promise<boolean> {
-  const supabase = await createAuthClient();
-  const { data } = await supabase.auth.getUser();
-  return data.user !== null;
-}
-
 function managerName(entry: { player_first_name: string; player_last_name: string }) {
   return `${entry.player_first_name} ${entry.player_last_name}`.trim();
 }
 
 /** Look a team up on FPL so the manager can confirm it is theirs. */
 export async function previewTeam(raw: string): Promise<PreviewResult> {
-  if (!(await signedIn())) return { ok: false, error: "Your session has ended. Log in again." };
   const id = parseTeamInput(raw);
   if (id === null) {
     return { ok: false, error: "That isn't a team ID. It's the number after /entry/ in your FPL Points page address." };
@@ -69,29 +60,4 @@ export async function previewTeam(raw: string): Promise<PreviewResult> {
     }
     return { ok: false, error: "Something went wrong looking that team up. Please try again." };
   }
-}
-
-/**
- * Save the confirmed team. The names are fetched again HERE, on the server,
- * so what is stored is what FPL says — never what the browser sent.
- */
-export async function connectTeam(id: number): Promise<{ ok: false; error: string }> {
-  const supabase = await createAuthClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return { ok: false, error: "Your session has ended. Log in again." };
-  if (!Number.isInteger(id) || id < 1 || id > 999_999_999) return { ok: false, error: "That team ID isn't valid." };
-
-  let entry;
-  try {
-    entry = await fetchEntry(id);
-  } catch {
-    return { ok: false, error: "FPL isn't answering right now. Try again in a few minutes." };
-  }
-  const { error } = await supabase.rpc("connect_team", {
-    p_team_id: id,
-    p_team_name: entry.name.slice(0, 60),
-    p_manager_name: managerName(entry).slice(0, 80),
-  });
-  if (error) return { ok: false, error: "We couldn't save your team. Please try again." };
-  redirect("/app?welcome=1");
 }

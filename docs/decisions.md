@@ -756,3 +756,63 @@ model chose which tool to call and wrote the sentences around the result.
   and a hard limit is a poor first impression.
 - **Delete the agent.** It is working, tested code and a reference for turning
   the AI back on, so it stays, switched off.
+
+## ADR-0017 — No accounts: the dugout opens by FPL team ID
+
+*Date: 2026-11-06 · Status: accepted · Supersedes ADR-0008's account flow*
+
+### Context
+
+After ADR-0016 an account did one thing: remember a manager's FPL team ID,
+which FPL already publishes. Accounts still carried every cost of having
+users. Bots could sign up, because email confirmation is off. Password resets
+need an email provider. Google sign-in needs maintaining. And we held personal
+data we had to protect and explain. The goal is a well-known free FPL
+assistant and stats hub on free tiers only, so the sign-up step was the
+biggest barrier and the biggest liability.
+
+Separately, each dugout render read that squad's rows from Supabase. On the
+free plan's ~5 GB monthly egress, about a thousand active managers would have
+used most of it.
+
+### Decision
+
+- **`/team`** finds a team by ID with the existing "Is this you?" check.
+  **`/team/[id]`** is that team's dugout: the pitch, the Gaffer's checks and
+  the squad check. It can be bookmarked and is kept out of search engines.
+- **The chosen team is remembered in the browser only**
+  (`web/src/lib/my-team.ts`). The header's **My team** opens it. Nothing about
+  a visitor is stored on our side.
+- **Removed:** sign-in, sign-up, onboarding, settings, the OAuth callback,
+  sign-out and the session middleware (`proxy.ts`), which also saves a
+  function run on every page request. The old routes redirect to `/team`.
+  `/app` sends anyone still holding a session to their team once.
+- **`lib/auth/server.ts` stays**, only for the switched-off `/api/agent`
+  route (ADR-0016). Turning the agent back on would also need accounts back.
+- **Shared reads, flat egress.** Squads, the Gaffer and its market all read
+  ONE cached copy of every player card (`web/src/lib/cards.ts`, ~1.4 MB,
+  under the fetch cache's 2 MB item limit), refreshed every 3 hours to match
+  the pipeline. That's about 330 MB of egress a month at any traffic. No page
+  reads per-team rows any more.
+- **Longer FPL caching.** Picks are cached for a day, since a gameweek's
+  picks are locked at its deadline and a new gameweek is a new URL. The
+  entry summary is cached for 30 minutes.
+
+### Consequences
+
+- No sign-up and no personal data. Supabase holds only football data.
+- Supabase egress and FPL calls stay roughly flat as traffic grows.
+- A different device needs the team ID again, or the bookmarked link.
+- Anyone can open any team. FPL makes every team public already, and our
+  caching means repeat visits cost FPL nothing. A script looping through IDs
+  would pass uncached calls through us; if that happens, we add a limit then.
+- Existing account data stays in `auth.users` and the `app` tables until a
+  purge migration deletes it. The privacy page says so.
+
+### Alternatives considered
+
+- **Keep accounts, add a captcha and an email provider.** That fixes the bot
+  and reset problems but keeps the personal data, the sign-up friction and
+  more services to run.
+- **Optional accounts for cross-device sync.** The bookmarkable `/team/[id]`
+  link already does that job.

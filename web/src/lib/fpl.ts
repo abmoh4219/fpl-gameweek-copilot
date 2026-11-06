@@ -31,14 +31,16 @@ async function getJson(path: string, revalidateSeconds: number): Promise<unknown
 }
 
 export async function fetchEntry(id: number): Promise<Entry> {
-  const parsed = EntrySchema.safeParse(await getJson(`/entry/${id}/`, 600));
+  // The summary moves with live points and the deadline; half an hour keeps FPL calls low.
+  const parsed = EntrySchema.safeParse(await getJson(`/entry/${id}/`, 1800));
   if (!parsed.success) throw new FplUnavailableError("Unexpected entry shape from FPL");
   return parsed.data;
 }
 
 export async function fetchPicks(id: number, gameweek: number): Promise<EntryPicks> {
-  // Picks for a gameweek only change at a deadline; an hour is plenty fresh.
-  const parsed = EntryPicksSchema.safeParse(await getJson(`/entry/${id}/event/${gameweek}/picks/`, 3600));
+  // Picks for a gameweek are locked at its deadline and never change after it;
+  // a new gameweek is a new URL, so a day-long cache is never stale.
+  const parsed = EntryPicksSchema.safeParse(await getJson(`/entry/${id}/event/${gameweek}/picks/`, 86_400));
   if (!parsed.success) throw new FplUnavailableError("Unexpected picks shape from FPL");
   return parsed.data;
 }

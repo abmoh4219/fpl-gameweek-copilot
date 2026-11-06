@@ -193,7 +193,7 @@ const FEATURES = [
     art: <SquadArt />,
     wide: true,
     title: "Your squad, on the pitch",
-    body: "Connect your team ID and your fifteen line up in their kits: captain, bench order, injury flags and every player's next fixture. Tap anyone for form, minutes risk and the fixture run ahead.",
+    body: "Enter your team ID and your fifteen line up in their kits: captain, bench order, injury flags and every player's next fixture. Tap anyone for form, minutes risk and the fixture run ahead.",
   },
   {
     art: <TraceArt />,
@@ -214,7 +214,7 @@ const FEATURES = [
 ];
 
 const FAQ: [string, string][] = [
-  ["What is Armband?", "Free, open-source tools for Fantasy Premier League. Connect your team and see your fifteen with the numbers that matter (form, expected goal involvement, minutes risk, fixture difficulty), then pick your best XI, rate your lineup, choose a captain and find transfers that fit your bank. The Gaffer runs those checks in one tap each, all of it computed in code."],
+  ["What is Armband?", "Free, open-source tools for Fantasy Premier League, with no sign-up. Enter your team ID and see your fifteen with the numbers that matter (form, expected goal involvement, minutes risk, fixture difficulty), then pick your best XI, rate your lineup, choose a captain and find transfers that fit your bank. The Gaffer runs those checks in one tap each, all of it computed in code."],
   ["Is it free?", "Yes, and it stays free. Every tool is free with no limits and no ads. The code is open source, so anyone can check how it works or run their own copy."],
   ["Is it open source?", "Yes. All of Armband is on GitHub under the MIT license: the website, the data pipeline, the insight engine and the Gaffer. Read how every number is computed, run it yourself, or contribute."],
   ["Does it change my real FPL team?", "No — Armband only reads your team and never asks for your FPL password. When the Gaffer picks your XI, makes a transfer or changes your captain, it shows the plan on your pitch. You apply or revert it in Armband, then make the changes in the FPL app."],
@@ -224,7 +224,7 @@ const FAQ: [string, string][] = [
   ["What does \"estimate\" mean?", "Anything about the future — fixture difficulty, goal threat, price rises and falls — is our best computed estimate, never a guarantee. We label it every time."],
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
   ["Is this the official FPL app?", "No. Armband is an independent project, not affiliated with, endorsed by or connected to the Premier League or Fantasy Premier League. It uses public data only; the club kits on the pitch belong to their clubs."],
-  ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your login and your connected team immediately and permanently."],
+  ["Do I need an account?", "No. There is no sign-up. Enter your FPL team ID and your dugout opens at its own address, which you can bookmark or open on your phone. Choose \"This is my team\" and \"My team\" opens it next time. That is kept in your browser only: Armband stores nothing about you."],
 ];
 
 function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null; codes: Map<string, number> }) {
@@ -249,7 +249,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
               The overnight, <em>already read</em>
             </>
           }
-          sub={`Straight from our pipeline's report for ${daily.payload.date}. Connect your team and the injury check reads it against your fifteen.`}
+          sub={`Straight from our pipeline's report for ${daily.payload.date}. Find your team and the injury check reads it against your fifteen.`}
         />
         <div className="boards">
           <div className="board reveal">
@@ -359,15 +359,15 @@ export default async function Landing() {
               lineup and finds transfers that fit your bank. Every number computed, every working shown.
             </p>
             <div className="ctas">
-              <Link href="/sign-up" className="btn btn-accent">
-                Connect your team <Arrow />
+              <Link href="/team" className="btn btn-accent">
+                Find your team <Arrow />
               </Link>
               <Link href="/demo" className="btn">
                 Try the demo
               </Link>
             </div>
             <ul className="hero-facts">
-              <li>No FPL password</li>
+              <li>No sign-up</li>
               <li>Refreshed every 3 hours</li>
               <li>Free, forever</li>
             </ul>
@@ -512,10 +512,10 @@ export default async function Landing() {
           <h2 className="display huge reveal">
             The deadline <em>won&apos;t wait</em>
           </h2>
-          <p className="sub">Connect your team in under a minute. Free, open source, and every number shown.</p>
+          <p className="sub">Your team ID is all it takes. No sign-up, free, open source, and every number shown.</p>
           <div className="ctas center">
-            <Link href="/sign-up" className="btn btn-accent">
-              Connect your team <Arrow />
+            <Link href="/team" className="btn btn-accent">
+              Find your team <Arrow />
             </Link>
             <Link href="/demo" className="btn">
               Try the demo

@@ -70,78 +70,30 @@ Limits). That is the hard ceiling under all of our own limits.
 
 ---
 
-## 2. Sign-in: Supabase Auth and Google (10 min)
+## 2. Sign-in: not needed any more
 
-### 2a. Supabase Auth settings
-
-Go to Supabase → **Authentication**.
-
-- **Sign In / Providers → User Signups**: **Allow new users to sign up** on,
-  **Confirm email** off. Without our own email provider, Supabase's built-in
-  mailer only reaches your own team, so confirmation emails would never
-  arrive. Accounts start signed in straight away.
-- **Sign In / Providers → Email → Minimum password length**: `8`, to match
-  the site and the tests.
-- **URL Configuration**:
-  - **Site URL**: your production URL
-  - **Redirect URLs**: `https://<your-domain>/**` (and `http://localhost:3000/**`
-    for local work)
-
-### 2b. Google sign-in
-
-1. **console.cloud.google.com** → create (or pick) a project.
-2. **Google Auth Platform** (formerly *OAuth consent screen*):
-   - Audience **External**, app name **Armband**, plus your support email.
-   - Scopes: the defaults (`email`, `profile`, `openid`). No verification is
-     needed for these.
-   - **Branding**: application home page `https://<your-domain>`, privacy
-     policy `https://<your-domain>/privacy`, terms of service
-     `https://<your-domain>/terms`, authorized domain `<your-domain>`.
-     Google requires the home page and privacy policy before publishing.
-     **Leave the logo empty**: uploading one sends the app to Google's manual
-     verification.
-   - **Audience → Publish app**, so anyone can sign in, not only test users.
-     Until then, add your own email under **Test users** to try it.
-3. **Clients → Create client**. One client serves local development and
-   production:
-   - Type: **Web application**
-   - **Authorized JavaScript origins**: `http://localhost:3000` and your
-     production URL
-   - **Authorized redirect URIs** (Supabase's address, not the website's):
-     `http://localhost:54321/auth/v1/callback` and
-     `https://<project-ref>.supabase.co/auth/v1/callback`
-4. Copy the **Client ID** and **Client secret** into Supabase →
-   **Authentication → Sign In / Providers → Google**, then enable it and
-   **Save**. Locally, the same pair goes in `supabase/.env` (gitignored).
-
-The Google secret lives only in Supabase and `supabase/.env`. Never in Vercel
-or git.
+Armband has no accounts since ADR-0017: managers open their team by its FPL
+ID. Supabase Auth and Google sign-in need no setup. On an existing
+deployment, turn off **Authentication → Sign In / Providers → Allow new users
+to sign up**, and you can delete the Google OAuth client.
 
 ---
 
-## 3. Smoke test, then warm up the demo (5 min)
+## 3. Smoke test (5 min)
 
 On your phone, on the production URL:
 
-1. **Get started** → create an account with email and password → you land on
-   *Now, your team*.
-2. Enter `7653564` → the *Is this you?* card shows the team and its 15 kits →
-   **Yes** → your dugout.
-3. Ask the Gaffer *Pick my best XI and captain for this gameweek* → the lookup
-   appears, the pitch redraws with **Apply / Revert**, and the counter reads
-   **4 of 5 questions left**.
-4. Settings → *1 of 5 questions used*. Sign out, then log in with Google.
-5. **Warm up the demo:** open `/demo` and click each of the four questions
-   once.
-   - Those four clicks are the demo's only agent runs **for this gameweek**.
-   - Every visitor after you gets the recorded answers.
-   - Do this before you share the link, so the first visitor doesn't wait.
-6. Anthropic Console → **Usage** shows what those runs cost (about a tenth of
-   a cent each).
+1. **My team** → enter `7653564` → the *Is this you?* card shows the team and
+   its 15 kits → **Yes** → the dugout at `/team/7653564`.
+2. Run each of the Gaffer's five checks. **Show it on the pitch** and **Try on
+   pitch** redraw the pitch with **Apply / Revert**.
+3. Back on the landing page, the header button reads **My team** and opens
+   the same team.
+4. `/demo` shows the demo team with the same checks.
 
 ---
 
-## What the Gaffer can spend
+## What the agent could spend (switched off, ADR-0016)
 
 | Guard | Value | Where |
 | --- | --- | --- |
