@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LeagueIdBox } from "@/components/league/LeagueIdBox";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/league" },
   title: "Mini-league spy",
   description: "See your FPL mini-league's captains, chips and most-owned players, and your differentials against your rivals. Free, no sign-up.",
 };

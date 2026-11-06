@@ -3,6 +3,7 @@ import Link from "next/link";
 import "@/components/cards/cards.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/cards" },
   title: "Cards",
   description: "Shareable FPL cards from Armband: the transfer radar, the template XI and tonight's price watch, updated with every data refresh.",
 };

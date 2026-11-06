@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { FindTeam } from "./FindTeam";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/team" },
   title: "Find your team",
   description: "Enter your FPL team ID to see your squad on the pitch with the Gaffer's five free checks. No sign-up, no FPL password.",
 };

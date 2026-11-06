@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TELEGRAM_URL } from "@/components/site/links";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terms" },
   title: "Terms",
   description: "The terms for using Armband, in plain words.",
 };

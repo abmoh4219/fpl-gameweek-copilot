@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { TELEGRAM_URL } from "@/components/site/links";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Privacy",
   description: "What Armband stores about you, why, and how to delete it.",
 };

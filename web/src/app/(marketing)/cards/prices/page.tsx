@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CardPage } from "@/components/cards/CardPage";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/cards/prices" },
   title: "Tonight's price watch",
   description: "The FPL players closest to a price rise or fall tonight, as a card to share. An estimate.",
   openGraph: { images: [{ url: "/cards/prices/image.png", width: 1200, height: 630, alt: "Tonight's FPL price watch: the players closest to a rise or a fall, an estimate, from Armband" }] },

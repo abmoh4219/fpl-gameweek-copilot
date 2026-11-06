@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CardPage } from "@/components/cards/CardPage";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/cards/swings" },
   title: "Fixture swings",
   description: "The FPL clubs whose fixtures turn easier or harder over the next five gameweeks, as a card to share.",
   openGraph: { images: [{ url: "/cards/swings/image.png", width: 1200, height: 630, alt: "Fixture swings: clubs whose FPL difficulty turns easier or harder, from Armband" }] },

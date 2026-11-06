@@ -7,6 +7,7 @@ import { readView } from "@/lib/supabase";
 import "./fixtures.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/fixtures" },
   title: "FPL fixture planner",
   description: "Every Premier League club's next five gameweeks, colour-coded by difficulty and sorted by the easiest run, with Champions League congestion marked.",
 };

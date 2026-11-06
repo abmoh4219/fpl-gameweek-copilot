@@ -23,7 +23,8 @@ export async function generateMetadata({ searchParams }: Search): Promise<Metada
   const chosen = ids((await searchParams).p);
   const image = chosen.length ? `/compare/image.png?p=${chosen.join(",")}` : null;
   return {
-    title: "Compare players",
+    title: "Compare FPL players",
+    alternates: { canonical: "/compare" },
     description: "Compare up to three FPL players side by side: points, form, xGI per 90, goals and assists, minutes and value, with their next five fixtures.",
     ...(image ? { openGraph: { images: [{ url: image, width: 1200, height: 630 }] }, twitter: { card: "summary_large_image", images: [image] } } : {}),
   };

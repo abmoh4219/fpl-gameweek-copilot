@@ -6,9 +6,10 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live](https://img.shields.io/badge/live-armband.abdela.dev-ff6a3d.svg)](https://armband.abdela.dev)
 
-**Free, open-source tools for Fantasy Premier League.** Season stats, a
-fixture planner, a price watch and a page for every player, with every number
-shown. Enter your FPL team ID (no sign-up) and Armband shows your fifteen on the pitch, next
+**Free, open-source FPL stats hub for Fantasy Premier League managers.**
+Season stats, a fixture planner, tonight's price watch, a mini-league spy,
+player comparisons and a page for every player, with every number shown, plus
+shareable cards for X (transfer radar, template XI, gameweek wrapped). Enter your FPL team ID (no sign-up) and Armband shows your fifteen on the pitch, next
 to the **Gaffer**: five checks computed in code (best XI, lineup rating,
 captain, transfers within your bank, injuries). Each check shows its numbers
 and puts its plan on your pitch for you to apply or revert.
@@ -25,6 +26,14 @@ and injury news, and posts the ones that matter to a Telegram channel.
 
 ## Highlights
 
+- **Shareable cards, made for X.** Transfer radar, template XI, tonight's
+  price watch, fixture swings, the gameweek's best XI, your gameweek wrapped,
+  player compare on a radar chart and your mini-league. Each is an image drawn
+  from FPL's data with a watermark, and has its own page so a shared link shows
+  the card ([ADR-0019](docs/decisions.md)).
+- **Mini-league spy.** Your league's captains, chips and most-owned players
+  this gameweek, and your differentials against your rivals
+  ([ADR-0021](docs/decisions.md)).
 - **The Gaffer: five checks, no limits.** Best XI, lineup rating, captain,
   transfers and injuries, computed in code from FPL's data. The same squad
   always gets the same answer, and every plan shows on the pitch with

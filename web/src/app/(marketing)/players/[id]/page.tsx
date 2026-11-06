@@ -53,7 +53,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = id ? await player(id) : null;
   if (!p) return { title: "Player not found" };
   return {
-    title: `${p.row.webName} — FPL stats`,
+    title: `${p.row.webName} FPL stats: points, xG, price and fixtures`,
+    alternates: { canonical: `/players/${id}` },
     description: `${p.row.webName} (${p.row.team}, ${p.row.position}, £${p.row.priceM.toFixed(1)}m): ${p.row.totalPoints} FPL points, ${p.row.goals} goals, ${p.row.assists} assists. Points per gameweek, how the points were scored, price history and the next five fixtures.`,
   };
 }

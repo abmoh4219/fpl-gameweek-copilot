@@ -1062,3 +1062,34 @@ and no paid services.
 - You turn it on in Vercel: Project → Analytics → Enable.
 - If traffic ever passes about 50,000 page views a month, collection pauses
   until the next month. Nothing on the site breaks.
+
+## ADR-0023 — Search engines: sitemap, robots, canonical addresses, structured data
+
+*Date: 2026-11-07 · Status: accepted*
+
+### Context
+
+The site had no `robots.txt`, no sitemap, no canonical addresses and no
+structured data, so search engines found it by chance. Each of the 670 player
+pages answers a real search ("<player> FPL stats").
+
+### Decision
+
+- **`app/robots.ts`:** crawl everything public. Keep `/api/` and personal pages
+  (`/team/`, `/league/`, `/wrapped/`, already marked noindex) out. Point to the
+  sitemap.
+- **`app/sitemap.ts`:** every public page and every player page, from
+  `api.player_current` (cached a day). Players who have played get the higher
+  priority.
+- **A canonical address on every public page**, so query-string variants never
+  split ranking.
+- **Structured data on the landing page:** a `WebSite` with a `SearchAction`
+  into the player search, and a free `WebApplication`.
+- **Player page titles match how people search:** "<player> FPL stats: points,
+  xG, price and fixtures".
+
+### Consequences
+
+- No new services and no new data reads beyond the cached player list.
+- To finish: verify the domain in Google Search Console and submit
+  `/sitemap.xml`; Bing Webmaster Tools can import it from Google.

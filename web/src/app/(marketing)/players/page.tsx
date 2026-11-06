@@ -5,6 +5,7 @@ import { readView } from "@/lib/supabase";
 import "./players.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/players" },
   title: "Find a player",
   description: "Search every Fantasy Premier League player: points, form, price and ownership, with a page for each player.",
 };

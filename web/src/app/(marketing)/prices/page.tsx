@@ -8,6 +8,7 @@ import "@/components/charts/charts.css";
 import "./prices.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/prices" },
   title: "FPL price watch",
   description: "Which Fantasy Premier League players are closest to a price rise or fall tonight, from FPL's own price-change data, plus every confirmed change this week.",
 };

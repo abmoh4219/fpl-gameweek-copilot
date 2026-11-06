@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { kitImageUrl, type ReportPayload, type ReportSection, type Squad, type TeamRun } from "@fpl/shared";
 import { ExploreTools, type ExploreFacts } from "@/components/landing/ExploreTools";
@@ -14,6 +15,39 @@ import { readView } from "@/lib/supabase";
 import { bestXi, squadCards } from "@/lib/toolkit";
 
 export const revalidate = 900;
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
+
+const SITE = process.env["NEXT_PUBLIC_SITE_URL"] ?? "http://localhost:3000";
+
+/**
+ * What Armband is, for search engines (ADR-0023): a free web app, and a site
+ * search that goes straight to the player search, so Google can offer a
+ * search box under the result.
+ */
+const STRUCTURED = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE}/#website`,
+      url: SITE,
+      name: "Armband",
+      description: "Free, open-source FPL stats hub: player stats, fixture planner, price watch, mini-league spy and shareable cards.",
+      potentialAction: { "@type": "SearchAction", target: `${SITE}/players?q={search_term_string}`, "query-input": "required name=search_term_string" },
+    },
+    {
+      "@type": "WebApplication",
+      name: "Armband",
+      url: SITE,
+      applicationCategory: "SportsApplication",
+      operatingSystem: "Any",
+      isAccessibleForFree: true,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+      description: "Fantasy Premier League tools with every number shown: stats, fixtures, price changes, your team on the pitch, and cards to share.",
+    },
+  ],
+};
 
 // ------------------------------------------------------------------- data --
 
@@ -332,6 +366,8 @@ export default async function Landing() {
 
   return (
     <>
+      {/* Structured data: our own constant, so serialising it is safe. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED) }} />
       <section className="hero">
         <div className="floodlights" aria-hidden="true">
           <i className="beam left" />

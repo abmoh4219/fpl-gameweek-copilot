@@ -7,6 +7,7 @@ import { readView } from "@/lib/supabase";
 import "./stats.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/stats" },
   title: "FPL stats",
   description: "Free Fantasy Premier League leaderboards: goals, assists, xG, xA, xGI per 90, points, form, value, bonus, clean sheets and ownership, filtered by position and price.",
 };
