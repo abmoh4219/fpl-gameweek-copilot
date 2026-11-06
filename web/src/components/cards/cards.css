@@ -1,0 +1,84 @@
+/* Shareable cards (ADR-0019). Class names start with card- / share- because
+   Next bundles route CSS together in production. */
+
+.card-shot {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  background: var(--bg-1);
+}
+
+.card-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+}
+
+.share-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.card-more {
+  margin: 24px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.card-more a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--line-3);
+  text-underline-offset: 3px;
+}
+
+/* the hub: every card, newest data first */
+.card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 760px) {
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.card-tile {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  background: var(--bg-1);
+  transition: border-color 0.15s var(--ease-out);
+}
+
+.card-tile:hover {
+  border-color: var(--line-3);
+}
+
+.card-tile img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  border-radius: 8px;
+}
+
+.card-tile b {
+  padding: 0 4px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.card-tile span {
+  padding: 0 4px 4px;
+  font-size: 14px;
+  color: var(--muted);
+}

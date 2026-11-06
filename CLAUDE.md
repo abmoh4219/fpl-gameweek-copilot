@@ -134,6 +134,10 @@ confirmed, every price-watch output is labelled an **estimate**.
   diverging "tonight at a glance" board. Chart dots and player names link to
   `/players/[id]`
 
+- `/cards` — shareable cards (ADR-0019): the transfer radar, the template XI
+  and tonight's price watch, each a PNG at `/cards/<card>/image.png` with the
+  watermark, and a page whose link preview is the card
+
 - `/players` — search every player by name or club; `/players/[id]` — one
   player's season: points and xGI per gameweek, FPL's own points breakdown
   (`api.player_gameweeks`), price history rebuilt from confirmed changes,

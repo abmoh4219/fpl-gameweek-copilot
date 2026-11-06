@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { STAT_COLUMNS, statRowFromView, type StatRow, type StatViewRow } from "@fpl/shared";
 import { StatsHub } from "@/components/stats/StatsHub";
 import { StatsInsights } from "@/components/stats/StatsInsights";
@@ -38,6 +39,10 @@ export default async function StatsPage() {
         <header className="tool-head">
           <h1>Stats</h1>
           <p>Every player ranked on the numbers that matter for FPL{updated ? `, updated ${updatedLabel(updated)}` : ""}</p>
+          <p className="tool-share">
+            <Link href="/cards/transfers">Transfer radar card</Link>
+            <Link href="/cards/template">Template XI card</Link>
+          </p>
         </header>
         {rows.length > 0 ? (
           <>

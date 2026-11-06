@@ -2062,3 +2062,23 @@ a.kicker b {
     width: 100%;
   }
 }
+
+/* a tool page's cards, one tap from its head */
+.tool-share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 12px 0 0;
+  font-size: 14px;
+}
+
+.tool-share a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 3px;
+}
+
+.tool-share a::after {
+  content: " →";
+}

@@ -3,6 +3,9 @@ import { kitImageUrl, type ReportPayload, type ReportSection, type Squad, type T
 import { ExploreTools, type ExploreFacts } from "@/components/landing/ExploreTools";
 import { HeroShow } from "@/components/landing/HeroShow";
 import { TeamIdBox } from "@/components/landing/TeamIdBox";
+import { DeadlineCountdown } from "@/components/team/DeadlineCountdown";
+import { deadlines, nextDeadline } from "@/lib/cards/data";
+import "@/components/team/team.css";
 import { Ticker, type TickerItem } from "@/components/landing/Ticker";
 import { SquadArt, TraceArt, TransferArt, WatchArt } from "@/components/landing/TacticsArt";
 import { DEMO_TEAM_ID, TELEGRAM_URL } from "@/components/site/links";
@@ -25,7 +28,7 @@ interface FlaggedRow {
 }
 
 async function landingData() {
-  const [squad, reports, teams, flagged, scorers, risers, runs, ids] = await Promise.all([
+  const [squad, reports, teams, flagged, scorers, risers, runs, ids, upcoming] = await Promise.all([
     loadSquad(DEMO_TEAM_ID).catch(() => null),
     readView<{ report_type: string; payload: ReportPayload; created_at: string }>(
       "latest_reports",
@@ -48,6 +51,7 @@ async function landingData() {
     ).catch(() => []),
     readView<{ team_short_name: string; run: TeamRun }>("team_runs", "select=team_short_name,run").catch(() => []),
     readView<{ fpl_id: number }>("player_current", "select=fpl_id").catch(() => []),
+    deadlines(),
   ]);
   const codes = new Map(teams.map((t) => [t.team_short_name, t.team_code]));
   const result = squad ? await squadCards(squad).then((cards) => bestXi(squad, cards)).catch(() => null) : null;
@@ -58,7 +62,7 @@ async function landingData() {
     easiest: easiest ? { team: easiest.team_short_name, band: easiest.run.long.band } : null,
     players: ids.length,
   };
-  return { squad, daily: reports[0] ?? null, codes, flagged, result, explore };
+  return { squad, daily: reports[0] ?? null, codes, flagged, result, explore, upcoming };
 }
 
 type Of<K extends ReportSection["kind"]> = Extract<ReportSection, { kind: K }>;
@@ -299,7 +303,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
 // ------------------------------------------------------------------ page --
 
 export default async function Landing() {
-  const { squad, daily, codes, flagged, result, explore } = await landingData();
+  const { squad, daily, codes, flagged, result, explore, upcoming } = await landingData();
 
   const { risers, fallers, news } = overnight(daily?.payload);
   const kitFor = (team: string, position: string) => {
@@ -345,7 +349,7 @@ export default async function Landing() {
           <div className="hero-copy">
             <span className="kicker">
               <b>Free</b>
-              <span>No sign-up · refreshed every 3 hours</span>
+              <span>No sign-up · {nextDeadline(upcoming, new Date()) ? <DeadlineCountdown deadlines={upcoming} /> : "refreshed every 3 hours"}</span>
             </span>
             <h1 className="hero-title">
               <span className="line"><span>Your FPL team,</span></span>

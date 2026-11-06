@@ -720,3 +720,100 @@
   text-decoration: none;
   cursor: default;
 }
+
+/* ------------------------------------------- tonight + since last visit -- */
+
+.sq-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 860px) {
+  .sq-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sq-panel {
+  padding: 16px 20px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--bg-1);
+}
+
+.sq-panel h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.sq-panel h2 small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--faint);
+}
+
+.sq-panel ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sq-panel li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.sq-panel li:last-child {
+  border-bottom: 0;
+}
+
+.sq-panel li b {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.sq-panel .up,
+.sq-panel li.up span {
+  color: var(--up);
+}
+
+.sq-panel .down,
+.sq-panel li.down span {
+  color: var(--danger);
+}
+
+.sq-panel li.warn span {
+  color: var(--warn);
+}
+
+.sq-quiet {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* the deadline countdown, wherever it shows */
+.countdown b {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.countdown.soon b {
+  color: var(--warn);
+}
+
+.countdown-at {
+  color: var(--faint);
+}

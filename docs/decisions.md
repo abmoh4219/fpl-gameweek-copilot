@@ -880,3 +880,53 @@ and let club colours and the data carry the colour.
   starts light.
 - **On a phone, the fixtures grid fits all five gameweeks without scrolling.**
 
+
+## ADR-0019 — Shareable cards, squad watch and the deadline countdown
+
+*Date: 2026-11-06 · Status: accepted*
+
+### Context
+
+Armband grows only by word of mouth on X, and the plan is to post every
+gameweek. The official FPL app shows numbers but makes nothing worth sharing.
+The 3 S rule (simple, slightly addictive, sharable) asks for cards people want
+to post and for reasons to come back.
+
+### Decision
+
+- **Cards are images rendered by code.** Each card is drawn with `next/og` at
+  1200×630, which X, Telegram and WhatsApp all show uncropped. It is served at
+  a stable address, `/cards/<card>/image.png`, revalidated every 30–60
+  minutes. Each card has its own page, `/cards/<card>`, whose link preview is
+  the card, so a shared link shows the picture and brings people to the site.
+  `/cards` lists them all.
+- **Every card carries the watermark:** the Armband mark, `armband.abdela.dev`
+  and its data source. Shirts are drawn flat in club colours from our own kit
+  table, never official kit images.
+- **Sharing:** the phone's share sheet with the image itself (Web Share API,
+  where supported), "Post on X" (an intent link to the card's page), and
+  Download.
+- **The first cards:**
+  - the transfer radar (net transfers in and out this gameweek)
+  - the template XI (the most-owned legal XI, filled greedily by ownership
+    under FPL's formation rules)
+  - tonight's price watch (labelled an estimate; 100% is never shown as a
+    confirmed change)
+
+  The selections are pure functions in `packages/shared/src/cards.ts`, with
+  tests.
+- **Your team page gains "Tonight" and "Since your last visit"**
+  (`packages/shared/src/squad-watch.ts`):
+  - **Tonight:** your 15 players FPL has close to a price change.
+  - **Since your last visit:** compares the squad with a snapshot kept in the
+    browser only. A new baseline is taken once the last visit is three hours
+    old.
+- **A deadline countdown** on the landing page and the team page, from
+  `fixture_ticker.deadline_utc`, using the first deadline still ahead.
+
+### Consequences
+
+- No new FPL calls. The cards read the same cached views as the tool pages, so
+  their cost doesn't grow with how often they're shared.
+- Image renders run on Vercel functions, cached by revalidation.
+- Thresholds live in `INSIGHT_CONFIG.cards` and `INSIGHT_CONFIG.squadWatch`.

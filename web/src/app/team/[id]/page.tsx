@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { Squad } from "@fpl/shared";
+import { squadTonight, type Squad } from "@fpl/shared";
 import { Dugout } from "@/components/copilot/Dugout";
 import { SquadCheck } from "@/components/copilot/SquadCheck";
+import { DeadlineCountdown } from "@/components/team/DeadlineCountdown";
 import { RememberTeam } from "@/components/team/RememberTeam";
+import { SquadWatch } from "@/components/team/SquadWatch";
 import { TeamShell } from "@/components/team/TeamShell";
 import { FplUnavailableError, parseTeamId, TeamNotFoundError } from "@/lib/fpl";
+import { deadlines, watchRows } from "@/lib/cards/data";
 import { gafferData } from "@/lib/gaffer";
 import { loadSquad } from "@/lib/squad";
 
@@ -39,7 +42,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function TeamPage({ params }: Params) {
   const id = parseTeamId((await params).id);
   if (!id) notFound();
-  const result = await squadOrError(id);
+  const [result, watch, upcoming] = await Promise.all([squadOrError(id), watchRows(), deadlines()]);
   const gaffer = "squad" in result ? await gafferData(result.squad).catch(() => null) : null;
 
   return (
@@ -56,7 +59,9 @@ export default async function TeamPage({ params }: Params) {
         <>
           <header className="page-head">
             <div>
-              <span className="page-kicker">Gameweek {result.squad.gameweek + 1} next · team {id}</span>
+              <span className="page-kicker">
+                Team {id} · <DeadlineCountdown deadlines={upcoming} withTime />
+              </span>
               <h1 className="page-title">{result.squad.teamName}</h1>
               <p className="page-sub">
                 {result.squad.managerName}
@@ -65,6 +70,7 @@ export default async function TeamPage({ params }: Params) {
               </p>
             </div>
           </header>
+          <SquadWatch squad={result.squad} tonight={squadTonight(result.squad, watch)} />
           <Dugout squad={result.squad} gaffer={gaffer} mode="live" />
           <SquadCheck squad={result.squad} />
         </>

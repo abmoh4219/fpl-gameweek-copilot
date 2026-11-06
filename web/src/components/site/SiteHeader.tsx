@@ -17,6 +17,7 @@ const NAV = [
   ["/fixtures", "Fixtures"],
   ["/prices", "Prices"],
   ["/players", "Players"],
+  ["/cards", "Cards"],
 ] as const;
 
 function SearchIcon() {

@@ -16,3 +16,5 @@ export * from "./fixtures-grid.ts";
 export * from "./prices.ts";
 export * from "./player.ts";
 export * from "./gaffer.ts";
+export * from "./cards.ts";
+export * from "./squad-watch.ts";

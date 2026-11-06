@@ -51,6 +51,9 @@ export default async function PricesPage() {
         <header className="tool-head">
           <h1>Prices</h1>
           <p>Who is closest to a rise or fall tonight, from FPL&apos;s own data (an estimate), and every confirmed change</p>
+          <p className="tool-share">
+            <Link href="/cards/prices">Share tonight's price watch as a card</Link>
+          </p>
         </header>
 
         {rows.length > 0 && <PressureBoard rows={rows} />}

@@ -217,6 +217,18 @@ export const INSIGHT_CONFIG = {
     sendWithinHours: 36,
   },
 
+  cards: {
+    /** Players on each side of the transfer radar card. */
+    radarSize: 5,
+    /** Players on each side of tonight's price card. */
+    priceSize: 5,
+  },
+
+  squadWatch: {
+    /** A squad player shows under "Tonight" once FPL has them this far toward a change (an estimate). */
+    tonightMinPercent: 50,
+  },
+
   gaffer: {
     /** Captain options shown, best first, out of the starting XI. */
     captainOptions: 5,
