@@ -9,7 +9,11 @@ const config: NextConfig = {
   // /demo becomes its own page in phase C4; until then it opens the demo team.
   async redirects() {
     // Accounts are gone (ADR-0017): the old onboarding link finds your team instead.
-    return [{ source: "/onboarding", destination: "/team", permanent: false }];
+    return [
+      { source: "/onboarding", destination: "/team", permanent: false },
+      // The demo page is gone (ADR-0018): the landing page shows the demo team live.
+      { source: "/demo", destination: "/", permanent: false },
+    ];
   },
   async headers() {
     return [

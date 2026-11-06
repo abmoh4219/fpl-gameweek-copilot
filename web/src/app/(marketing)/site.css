@@ -1979,3 +1979,86 @@ a.kicker b {
   font-weight: 500;
   letter-spacing: -0.01em;
 }
+
+/* ----------------------------------------------------------- team ID box -- */
+/* The landing page's one action: type your team ID, open your team. */
+
+.idbox {
+  max-width: 480px;
+  margin-top: 32px;
+}
+
+.idbox.center {
+  margin-inline: auto;
+}
+
+.idbox-form {
+  display: flex;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--line-3);
+  border-radius: 14px;
+  background: var(--bg-1);
+  transition: border-color 0.15s var(--ease-out);
+}
+
+.idbox-form:focus-within {
+  border-color: var(--text);
+}
+
+.idbox-input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 12px;
+  border: 0;
+  outline: none;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.idbox-input::placeholder {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--faint);
+}
+
+.idbox .idbox-go {
+  height: 48px;
+  padding: 0 20px;
+  font-size: 15px;
+}
+
+.idbox-help {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--faint);
+}
+
+.idbox.center .idbox-help {
+  text-align: center;
+}
+
+.idbox-help a {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--line-3);
+  text-underline-offset: 3px;
+}
+
+.idbox-help.is-error {
+  color: var(--danger);
+}
+
+@media (max-width: 420px) {
+  .idbox-form {
+    flex-direction: column;
+  }
+  .idbox .idbox-go {
+    width: 100%;
+  }
+}

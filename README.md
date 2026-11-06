@@ -17,7 +17,7 @@ Behind it, a data pipeline watches FPL every few hours, detects price changes
 and injury news, and posts the ones that matter to a Telegram channel.
 
 **[Live site](https://armband.abdela.dev)** ·
-**[Try the demo](https://armband.abdela.dev/demo)** ·
+**[See an example team](https://armband.abdela.dev/team/7653564)** ·
 [The agent (switched off)](docs/agent.md) ·
 [Architecture decisions](docs/decisions.md)
 
@@ -75,7 +75,7 @@ Measured on the real model: a best-XI answer took two model turns, about
 | **Player cards** | **The squad check** |
 | ![A player card with season points, form and the next five fixtures](docs/images/player-card.png) | ![Captain, players to look at and a five-gameweek fixture grid](docs/images/squad-check.png) |
 
-<p align="center"><img src="docs/images/mobile.png" alt="The demo on a phone" width="300"></p>
+<p align="center"><img src="docs/images/mobile.png" alt="Armband on a phone" width="300"></p>
 
 ## How it works
 
@@ -93,7 +93,7 @@ Measured on the real model: a best-XI answer took two model turns, about
                             ▼
                     Next.js on Vercel
                  landing · stats · fixtures · prices · players ·
-                 your team by ID (no accounts) · the Gaffer · demo,
+                 your team by ID (no accounts) · the Gaffer,
                  all from read-only views
 ```
 
@@ -133,7 +133,7 @@ handful of modules and a month of alerts fits well inside the free plan's
 
 | Path | |
 | --- | --- |
-| [`web/`](web) | Next.js app: landing, tool pages, your team's dugout, the demo |
+| [`web/`](web) | Next.js app: landing, tool pages, your team's dugout |
 | [`agent/`](agent) | The Claude agent (switched off): tools, prompt, spend guards |
 | [`jobs/`](jobs) | Sync, change detection, reports, delivery, alerts |
 | [`packages/shared/`](packages/shared) | Schemas, the insight engine, squads and plans |

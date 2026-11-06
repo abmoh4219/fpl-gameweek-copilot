@@ -866,3 +866,17 @@ and let club colours and the data carry the colour.
 - No logic or data changed; the production build and every page QA passed in
   both themes, on phone and desktop.
 - The share card matches the site and needs no bundled font.
+
+**Addendum (same day).**
+- **The landing hero's action is a team ID box**
+  (`components/landing/TeamIdBox.tsx`): type an ID or paste a Points page
+  address, and **Open my team** goes straight to `/team/<id>`, which shows the
+  team's name and "This is my team". The same box closes the page.
+- **`/demo` is removed** and redirects to `/`. The hero already plays the demo
+  team's best XI live, and anyone can open their own team, so a separate demo
+  page was a detour. The landing page's Gaffer section links to an example
+  team's real dugout instead.
+- **Theme:** the phone or computer setting decides. With no setting, the site
+  starts light.
+- **On a phone, the fixtures grid fits all five gameweeks without scrolling.**
+

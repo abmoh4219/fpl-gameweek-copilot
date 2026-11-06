@@ -407,9 +407,17 @@
 
 .stat-row dd {
   margin: 2px 0 0;
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* on a phone the four figures sit two by two, so words like "Medium" never collide */
+@media (max-width: 560px) {
+  .stat-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .look-row {

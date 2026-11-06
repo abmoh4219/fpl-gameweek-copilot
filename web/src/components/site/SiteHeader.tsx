@@ -106,9 +106,6 @@ export function SiteHeader({ stars }: { stars: number | null }) {
               {label}
             </Link>
           ))}
-          <Link href="/demo" onClick={() => setMenuOpen(false)}>
-            Demo team
-          </Link>
           <div className="menu-row">
             <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="menu-gh">
               <GitHubIcon size={16} /> GitHub{stars !== null && stars >= SHOW_STARS_FROM ? ` · ${compactCount(stars)} stars` : ""}

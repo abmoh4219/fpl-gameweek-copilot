@@ -29,8 +29,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-// Runs before first paint: the saved choice, else the system setting. No flash of the wrong theme.
-const THEME_SCRIPT = `try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.dataset.theme=t}catch(e){}`;
+// Runs before first paint: the saved choice, else the phone or computer setting, else light. No flash of the wrong theme.
+const THEME_SCRIPT = `try{var t=localStorage.getItem("theme");if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

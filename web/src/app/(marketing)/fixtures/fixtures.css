@@ -200,7 +200,46 @@ td.fx-run .mono {
     padding-top: 104px;
   }
   .fx-table .fx-team {
-    padding-left: 14px;
+    padding-left: 12px;
+  }
+}
+
+/* On a phone all five gameweeks fit without scrolling, like a fixture list:
+   narrower cells, a smaller kit, and the run column folds away (rows are
+   already sorted by it). */
+@media (max-width: 560px) {
+  .fx-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+  .fx-table th,
+  .fx-table td {
+    padding: 4px 2px;
+  }
+  .fx-table .fx-team {
+    width: 72px;
+  }
+  .fx-who {
+    gap: 6px;
+    font-size: 12px;
+  }
+  .fx-who img {
+    width: 18px;
+  }
+  .fx-cell-wrap {
+    min-width: 0;
+  }
+  .fx-cell {
+    height: 32px;
+    border-radius: 6px;
+    font-size: 11px;
+  }
+  .fx-stack.is-double .fx-cell {
+    height: 24px;
+    font-size: 10px;
+  }
+  .fx-table .fx-run {
+    display: none;
   }
 }
 

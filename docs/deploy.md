@@ -89,7 +89,8 @@ On your phone, on the production URL:
    pitch** redraw the pitch with **Apply / Revert**.
 3. Back on the landing page, the header button reads **My team** and opens
    the same team.
-4. `/demo` shows the demo team with the same checks.
+4. On the landing page, type `7653564` in the hero box → **Open my team** opens
+   the same dugout. `/demo` redirects to the landing page.
 
 ---
 

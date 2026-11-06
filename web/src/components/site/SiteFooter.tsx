@@ -25,7 +25,6 @@ export function SiteFooter() {
               <li><Link href="/fixtures">Fixture planner</Link></li>
               <li><Link href="/prices">Price watch</Link></li>
               <li><a href="/#gaffer">The Gaffer</a></li>
-              <li><Link href="/demo">Demo</Link></li>
               <li><a href="/#faq">FAQ</a></li>
             </ul>
           </div>

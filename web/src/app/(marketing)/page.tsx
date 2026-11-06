@@ -2,6 +2,7 @@ import Link from "next/link";
 import { kitImageUrl, type ReportPayload, type ReportSection, type Squad, type TeamRun } from "@fpl/shared";
 import { ExploreTools, type ExploreFacts } from "@/components/landing/ExploreTools";
 import { HeroShow } from "@/components/landing/HeroShow";
+import { TeamIdBox } from "@/components/landing/TeamIdBox";
 import { Ticker, type TickerItem } from "@/components/landing/Ticker";
 import { SquadArt, TraceArt, TransferArt, WatchArt } from "@/components/landing/TacticsArt";
 import { DEMO_TEAM_ID, TELEGRAM_URL } from "@/components/site/links";
@@ -344,7 +345,7 @@ export default async function Landing() {
           <div className="hero-copy">
             <span className="kicker">
               <b>Free</b>
-              <span>Five squad checks, every number shown</span>
+              <span>No sign-up · refreshed every 3 hours</span>
             </span>
             <h1 className="hero-title">
               <span className="line"><span>Your FPL team,</span></span>
@@ -355,19 +356,7 @@ export default async function Landing() {
               Armband reads your fifteen against form, minutes, fixtures and prices, then picks your best XI, rates your
               lineup and finds transfers that fit your bank. Every number computed, every working shown.
             </p>
-            <div className="ctas">
-              <Link href="/team" className="btn btn-accent">
-                Find your team <Arrow />
-              </Link>
-              <Link href="/demo" className="btn">
-                Try the demo
-              </Link>
-            </div>
-            <ul className="hero-facts">
-              <li>No sign-up</li>
-              <li>Refreshed every 3 hours</li>
-              <li>Free, forever</li>
-            </ul>
+            <TeamIdBox id="hero-team" />
           </div>
 
           {result && (
@@ -435,8 +424,8 @@ export default async function Landing() {
               }
               sub="Best XI, lineup rating, captain, transfers and injuries, computed in code from FPL's data with no limits. Each check shows its numbers and puts its plan on your pitch for you to apply or revert."
             />
-            <Link href="/demo" className="text-link">
-              Try the checks on the demo team <Arrow />
+            <Link href={`/team/${DEMO_TEAM_ID}`} className="text-link">
+              See the checks on an example team <Arrow />
             </Link>
           </div>
           {squad && <Analysis squad={squad} />}
@@ -510,14 +499,7 @@ export default async function Landing() {
             The deadline <em>won&apos;t wait</em>
           </h2>
           <p className="sub">Your team ID is all it takes. No sign-up, free, open source, and every number shown.</p>
-          <div className="ctas center">
-            <Link href="/team" className="btn btn-accent">
-              Find your team <Arrow />
-            </Link>
-            <Link href="/demo" className="btn">
-              Try the demo
-            </Link>
-          </div>
+          <TeamIdBox id="final-team" center />
         </div>
       </section>
     </>

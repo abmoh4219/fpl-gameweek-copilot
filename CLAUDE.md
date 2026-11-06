@@ -109,7 +109,8 @@ confirmed, every price-watch output is labelled an **estimate**.
   kits, the Gaffer (five checks in code: best XI, lineup rating, captain,
   transfers, injuries; `packages/shared/src/gaffer.ts`, ADR-0016) and a
   computed squad check. Not indexed by search engines
-- `/demo` — the demo team with the same five checks, live
+- `/demo` was removed (ADR-0018) and redirects to `/`: the landing page shows
+  the demo team live, and its hero opens any team from a team ID box
 - `/stats` — season leaderboards (goals, assists, xG/xA/xGI, points, form,
   value, bonus, BPS, clean sheets, ownership), filtered by position and price;
   pure functions in `packages/shared/src/stats.ts`, read from
@@ -166,7 +167,7 @@ unused.
         +--------------+---------------------+
         |                                    |
    ONE webhook per run                  Next.js on Vercel
-   (only if important events)           - landing, tools, app, demo from views
+   (only if important events)           - landing, tools and team pages from views
         |                               - the Gaffer's checks run in code
         v                                 (ADR-0016; the agent is off)
     Make.com (2 scenarios)
@@ -494,7 +495,7 @@ before taking money:
 | --- | --- |
 | `jobs/` | TypeScript scripts run by GitHub Actions cron: sync, detect changes, post the webhook, send failure alerts |
 | `agent/` | The Claude agent (ADR-0014), switched off since ADR-0016: Claude on the Messages API with our FPL tools, the tool loop, the prompt and spend guards |
-| `web/` | Next.js app on Vercel: landing, tool pages, `/team` and the dugout with the Gaffer's checks, the demo; `/api/agent` and `/api/demo` are off |
+| `web/` | Next.js app on Vercel: landing, tool pages, `/team` and the dugout with the Gaffer's checks; `/api/agent` and `/api/demo` are off |
 | `packages/shared/` | Zod schemas, database types, and the insight engine — shared by `jobs/` and `web/`, unit tested |
 | `supabase/migrations/` | Versioned SQL: tables, snapshot schema, read-only views the web app reads |
 | `.github/workflows/` | Cron and CI workflow definitions |
