@@ -18,3 +18,5 @@ export * from "./player.ts";
 export * from "./gaffer.ts";
 export * from "./cards.ts";
 export * from "./squad-watch.ts";
+export * from "./wrapped.ts";
+export * from "./compare.ts";

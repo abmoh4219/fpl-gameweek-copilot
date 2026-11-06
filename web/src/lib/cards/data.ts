@@ -49,6 +49,18 @@ export function nextDeadline(list: readonly Deadline[], now: Date): Deadline | n
   return list.find((d) => new Date(d.deadlineUtc).getTime() > now.getTime()) ?? null;
 }
 
+/** FPL's average score and whether the gameweek is finished; null before the view exists or if unavailable. */
+export async function gameweekInfo(gameweek: number): Promise<{ average: number | null; finished: boolean } | null> {
+  const rows = await readView<{ average_entry_score: number | null; finished: boolean }>(
+    "gameweeks",
+    `select=average_entry_score,finished&gameweek=eq.${gameweek}`,
+    1800,
+  ).catch(() => []);
+  const r = rows[0];
+  // FPL reports 0 until the gameweek is scored: that is "not known yet", not an average of nothing.
+  return r ? { average: r.average_entry_score && r.average_entry_score > 0 ? r.average_entry_score : null, finished: r.finished } : null;
+}
+
 /** "6 November" — how the cards date their data. */
 export function dayLabel(iso: string | null): string {
   if (!iso) return "";

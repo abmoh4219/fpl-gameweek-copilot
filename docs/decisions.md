@@ -930,3 +930,50 @@ to post and for reasons to come back.
   their cost doesn't grow with how often they're shared.
 - Image renders run on Vercel functions, cached by revalidation.
 - Thresholds live in `INSIGHT_CONFIG.cards` and `INSIGHT_CONFIG.squadWatch`.
+
+## ADR-0020 — Gameweek wrapped and player compare
+
+*Date: 2026-11-06 · Status: accepted*
+
+### Context
+
+ADR-0019's cards are public. The most shared FPL posts are personal ("my
+gameweek") and comparisons ("Saka vs Palmer"). The official app shows the raw
+numbers for both, but nothing that tells the story or is easy to post.
+
+### Decision
+
+- **Gameweek wrapped** (`/wrapped/<team id>`, card at `/wrapped/<id>/image.png`).
+  It shows:
+  - FPL's gameweek points after hits, against FPL's average
+  - the captain's return, against the best captain in the XI (hindsight, not
+    advice)
+  - points left on the bench, transfers and hits
+  - overall rank and its move since last gameweek
+
+  The logic is `gameweekWrapped` in `packages/shared/src/wrapped.ts`. A live
+  gameweek is labelled "points so far". FPL reports an average of 0 until a
+  gameweek is scored; that is shown as unknown.
+- **New data:**
+  - `entry/{id}/history/` (`fetchSeason`, cached 30 minutes per team) for last
+    gameweek's rank and, later, the chips used.
+  - `Squad` gains bench points, transfers and their cost from the picks it
+    already loads.
+  - **A new view, `api.gameweeks`**, exposes FPL's average score. It's the
+    twelfth owner-privileged `api` view (the accepted Security Advisor finding
+    grows from eleven to twelve).
+- **Player compare** (`/compare?p=a,b,c`, card at `/compare/image.png?p=…`).
+  Up to three players on a radar chart. The six axes are points, form, xGI per
+  90, goals and assists, minutes and points per £m. Each axis is a percentile
+  among outfield players with at least 270 minutes, so the scales match. The
+  raw numbers, ownership and the next five fixtures in FPL's difficulty
+  colours sit beside the radar. The logic is `comparePlayers` in
+  `packages/shared/src/compare.ts`; the radar is hand-built SVG, with no new
+  dependency.
+
+### Consequences
+
+- FPL calls: wrapped adds at most one `history` call per team per 30 minutes;
+  compare adds none.
+- The migration must be pushed before wrapped shows the average. Without it,
+  the card still renders, without the comparison.

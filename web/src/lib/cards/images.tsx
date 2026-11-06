@@ -1,4 +1,4 @@
-import type { StatRow, TemplateXi, TransferRadar, WatchRow } from "@fpl/shared";
+import type { CompareLine, GameweekWrapped, StatRow, TemplateXi, TransferRadar, WatchRow } from "@fpl/shared";
 import { C, CardFrame, Shirt, compact } from "./frame";
 
 /** The shareable cards, drawn for next/og (ADR-0019). Pure: data in, picture out. */
@@ -145,6 +145,145 @@ export function PricesTonightCard({ rising, falling, date }: { rising: WatchRow[
         <div style={{ display: "flex", flex: 1, gap: 28 }}>
           <PriceColumn title="Closest to a rise" rows={rising} tone="rise" />
           <PriceColumn title="Closest to a fall" rows={falling} tone="fall" />
+        </div>
+      )}
+    </CardFrame>
+  );
+}
+
+// ------------------------------------------------------------- wrapped --
+
+function Tile({ label, value, sub, tone }: { label: string; value: string; sub?: string | undefined; tone?: "up" | "down" | "accent" | undefined }) {
+  const colour = tone === "up" ? C.up : tone === "down" ? C.down : tone === "accent" ? C.accent : C.text;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", width: 300, height: 150, padding: "0 22px", borderRadius: 14, background: C.panel }}>
+      <div style={{ display: "flex", fontSize: 19, color: C.muted }}>{label}</div>
+      <div style={{ display: "flex", marginTop: 6, fontSize: 32, color: colour }}>{value}</div>
+      {sub && <div style={{ display: "flex", marginTop: 4, fontSize: 18, color: C.faint }}>{sub}</div>}
+    </div>
+  );
+}
+
+export function WrappedCard({ w, team, finished }: { w: GameweekWrapped; team: string; finished: boolean }) {
+  const diff = w.average !== null ? w.net - w.average : null;
+  const rank = w.overallRank !== null ? w.overallRank.toLocaleString("en-GB") : "—";
+  return (
+    <CardFrame kicker={`${team}${w.chip ? ` · ${w.chip}` : ""}${finished ? "" : " · live, points so far"}`} title={`Gameweek ${w.gameweek}, wrapped`}>
+      <div style={{ display: "flex", flex: 1, gap: 28 }}>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", width: 440 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+            <div style={{ display: "flex", fontSize: 150, lineHeight: 1, letterSpacing: -6, color: C.accent }}>{w.net}</div>
+            <div style={{ display: "flex", fontSize: 30, color: C.muted }}>points</div>
+          </div>
+          <div style={{ display: "flex", marginTop: 14, fontSize: 26, color: C.muted }}>
+            {w.average !== null ? (
+              <>
+                Average {w.average} ·{" "}
+                <span style={{ display: "flex", marginLeft: 8, color: diff! >= 0 ? C.up : C.down }}>{diff! >= 0 ? `+${diff} above` : `${Math.abs(diff!)} below`}</span>
+              </>
+            ) : (
+              "This gameweek"
+            )}
+          </div>
+          <div style={{ display: "flex", marginTop: 10, fontSize: 24, color: C.muted }}>
+            Overall rank {rank}
+            {w.rankMove !== null && w.rankMove !== 0 && (
+              <span style={{ display: "flex", marginLeft: 10, color: w.rankMove > 0 ? C.up : C.down }}>
+                {w.rankMove > 0 ? "▲" : "▼"} {Math.abs(w.rankMove).toLocaleString("en-GB")}
+              </span>
+            )}
+          </div>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 16, flex: 1, alignContent: "center" }}>
+          <Tile label="Captain" value={w.captain ? `${w.captain.name}` : "—"} sub={w.captain ? `${w.captain.points} pts with the armband` : undefined} />
+          <Tile
+            label="Best captain in your XI"
+            value={w.bestCaptain ? (w.bestCaptain.isYours ? "You picked it" : w.bestCaptain.name) : "—"}
+            sub={w.bestCaptain ? `${w.bestCaptain.points} pts with the armband` : undefined}
+            tone={w.bestCaptain?.isYours ? "up" : undefined}
+          />
+          <Tile label="Left on the bench" value={`${w.benchPoints} pts`} tone={w.benchPoints >= 10 ? "down" : undefined} />
+          <Tile
+            label="Transfers"
+            value={w.transfers === 0 ? "None" : `${w.transfers} made`}
+            sub={w.hits > 0 ? `−${w.hits} pts in hits` : "No hits"}
+            tone={w.hits > 0 ? "down" : undefined}
+          />
+        </div>
+      </div>
+    </CardFrame>
+  );
+}
+
+// ------------------------------------------------------------- compare --
+
+const SERIES_HEX = [C.accent, "#3987e5", "#d95926"] as const;
+
+function radarPts(values: readonly number[], cx: number, cy: number, r: number): string {
+  const n = values.length;
+  return values
+    .map((v, i) => {
+      const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+      const d = (Math.max(0, Math.min(100, v)) / 100) * r;
+      return `${(cx + d * Math.cos(a)).toFixed(1)},${(cy + d * Math.sin(a)).toFixed(1)}`;
+    })
+    .join(" ");
+}
+
+export function CompareCard({ lines, axes }: { lines: CompareLine[]; axes: readonly string[] }) {
+  const size = 400;
+  const c = size / 2;
+  const r = 128;
+  const n = axes.length;
+  return (
+    <CardFrame kicker="Percentile among every outfield player with 270+ minutes" title={lines.map((l) => l.row.webName).join(" vs ") || "Compare players"}>
+      {lines.length === 0 ? (
+        <Empty text="Pick players to compare" />
+      ) : (
+        <div style={{ display: "flex", flex: 1, alignItems: "center", gap: 24 }}>
+          <div style={{ display: "flex", position: "relative", width: size, height: size - 40 }}>
+            <svg width={size} height={size - 40} viewBox={`0 20 ${size} ${size - 40}`}>
+              {[25, 50, 75, 100].map((ring) => (
+                <polygon key={ring} points={radarPts(Array(n).fill(ring), c, c, r)} fill="none" stroke="rgba(237,237,237,0.1)" strokeWidth="1" />
+              ))}
+              {axes.map((_, i) => {
+                const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+                return <line key={i} x1={c} y1={c} x2={c + r * Math.cos(a)} y2={c + r * Math.sin(a)} stroke="rgba(237,237,237,0.1)" strokeWidth="1" />;
+              })}
+              {lines.map((l, i) => (
+                <polygon key={l.row.fplId} points={radarPts(l.percentiles, c, c, r)} fill={SERIES_HEX[i]} fillOpacity="0.14" stroke={SERIES_HEX[i]} strokeWidth="3" strokeLinejoin="round" />
+              ))}
+            </svg>
+            {axes.map((label, i) => {
+              const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+              const x = c + (r + 34) * Math.cos(a);
+              const y = c + (r + 34) * Math.sin(a) - 20;
+              return (
+                <div key={label} style={{ position: "absolute", left: x - 70, top: y - 11, width: 140, display: "flex", justifyContent: "center", fontSize: 16, color: C.muted }}>
+                  {label}
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 12 }}>
+            {lines.map((l, i) => (
+              <div key={l.row.fplId} style={{ display: "flex", flexDirection: "column", padding: "12px 18px", borderRadius: 12, background: C.panel, borderLeft: `4px solid ${SERIES_HEX[i]}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <Shirt teamCode={l.row.teamCode} position={l.row.position} size={30} />
+                  <div style={{ display: "flex", fontSize: 26 }}>{l.row.webName}</div>
+                  <div style={{ display: "flex", fontSize: 18, color: C.faint }}>
+                    {l.row.team} · £{l.row.priceM.toFixed(1)}m
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 22, marginTop: 6, fontSize: 18, color: C.muted }}>
+                  <span style={{ display: "flex" }}>{l.raw[0]} pts</span>
+                  <span style={{ display: "flex" }}>form {l.raw[1]}</span>
+                  <span style={{ display: "flex" }}>{l.raw[2]} xGI/90</span>
+                  <span style={{ display: "flex" }}>{l.raw[3]} G+A</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </CardFrame>

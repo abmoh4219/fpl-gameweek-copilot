@@ -372,3 +372,40 @@
   color: var(--accent-text);
   font-weight: 600;
 }
+
+/* -------------------------------------------------------------- radar -- */
+
+.radar {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.radar-ring {
+  fill: none;
+  stroke: var(--chart-grid);
+}
+
+.radar-spoke {
+  stroke: var(--chart-grid);
+}
+
+.radar-label {
+  font-size: 13px;
+  fill: var(--muted);
+}
+
+.radar-shape {
+  fill: var(--c);
+  fill-opacity: 0.12;
+  stroke: var(--c);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.radar-dot {
+  fill: var(--c);
+}

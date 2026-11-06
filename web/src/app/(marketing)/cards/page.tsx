@@ -30,6 +30,17 @@ export default function Cards() {
             </Link>
           ))}
         </div>
+        <h2 className="tool-h2">Your own cards</h2>
+        <div className="card-grid">
+          <Link href="/team" className="card-tile">
+            <b>Your gameweek, wrapped</b>
+            <span>Your points against the average, your captain, the bench and your rank. Open your team, then share it</span>
+          </Link>
+          <Link href="/compare" className="card-tile">
+            <b>Compare players</b>
+            <span>Two or three players on one radar, with their next five fixtures</span>
+          </Link>
+        </div>
       </div>
     </section>
   );

@@ -817,3 +817,19 @@
 .countdown-at {
   color: var(--faint);
 }
+
+.team-share {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+.team-share a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 3px;
+}
+
+.team-share a::after {
+  content: " →";
+}

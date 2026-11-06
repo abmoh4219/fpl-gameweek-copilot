@@ -101,6 +101,9 @@ export default async function PlayerPage({ params }: Params) {
               {status && <span className={`pp-status ${row.status === "d" ? "doubt" : "out"}`}>{status}</span>}
             </div>
             {raw.news && <p className="pp-news">{raw.news}</p>}
+            <p className="tool-share">
+              <Link href={`/compare?p=${row.fplId}`}>Compare {row.webName} with another player</Link>
+            </p>
           </div>
         </header>
 

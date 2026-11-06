@@ -1,4 +1,4 @@
-import { EntryPicksSchema, EntrySchema, type Entry, type EntryPicks } from "@fpl/shared";
+import { EntryPicksSchema, EntrySchema, EntrySeasonSchema, type Entry, type EntryPicks, type EntrySeason } from "@fpl/shared";
 
 /**
  * The ONLY live FPL call a visitor can cause (CLAUDE.md §7): a manager's
@@ -42,6 +42,16 @@ export async function fetchPicks(id: number, gameweek: number): Promise<EntryPic
   // a new gameweek is a new URL, so a day-long cache is never stale.
   const parsed = EntryPicksSchema.safeParse(await getJson(`/entry/${id}/event/${gameweek}/picks/`, 86_400));
   if (!parsed.success) throw new FplUnavailableError("Unexpected picks shape from FPL");
+  return parsed.data;
+}
+
+/**
+ * The manager's season so far (entry/{id}/history/): rank per gameweek and
+ * chips used. Cached half an hour per team, like the entry (ADR-0020).
+ */
+export async function fetchSeason(id: number): Promise<EntrySeason> {
+  const parsed = EntrySeasonSchema.safeParse(await getJson(`/entry/${id}/history/`, 1800));
+  if (!parsed.success) throw new FplUnavailableError("Unexpected history shape from FPL");
   return parsed.data;
 }
 

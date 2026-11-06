@@ -57,6 +57,11 @@ export interface Squad {
   bankM: number;
   valueM: number;
   activeChip: string | null;
+  /** FPL's own count of points left on the bench this gameweek. */
+  benchPoints: number;
+  /** Transfers made for this gameweek, and the points they cost beyond the free ones. */
+  transfers: number;
+  transfersCost: number;
   starters: SquadPlayer[];
   bench: SquadPlayer[];
   /** Picks whose player is not in our published cards (rare: a brand-new signing). */
@@ -170,6 +175,9 @@ export function buildSquad(input: {
     bankM: history.bank / 10,
     valueM: history.value / 10,
     activeChip: picks.active_chip,
+    benchPoints: history.points_on_bench,
+    transfers: history.event_transfers,
+    transfersCost: history.event_transfers_cost,
     starters: players.filter((p) => p.isStarter),
     bench: players.filter((p) => !p.isStarter),
     missing,

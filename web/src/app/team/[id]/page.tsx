@@ -68,6 +68,9 @@ export default async function TeamPage({ params }: Params) {
                 {result.squad.overallRank !== null && <> · Overall rank {fmt.format(result.squad.overallRank)}</>} ·{" "}
                 <RememberTeam id={id} name={result.squad.teamName} />
               </p>
+              <p className="team-share">
+                <Link href={`/wrapped/${id}`}>Share your Gameweek {result.squad.gameweek}, wrapped</Link>
+              </p>
             </div>
           </header>
           <SquadWatch squad={result.squad} tonight={squadTonight(result.squad, watch)} />

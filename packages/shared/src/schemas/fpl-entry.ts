@@ -50,6 +50,16 @@ export const EntryPicksSchema = z.object({
   picks: z.array(PickSchema),
 });
 
+/**
+ * entry/{id}/history/: one row per gameweek played this season, and the
+ * chips used. Used for rank movement (Gameweek wrapped) and the chip planner.
+ */
+export const EntrySeasonSchema = z.object({
+  current: z.array(EntryHistorySchema),
+  chips: z.array(z.object({ name: z.string(), event: z.number() })),
+});
+
 export type Entry = z.infer<typeof EntrySchema>;
+export type EntrySeason = z.infer<typeof EntrySeasonSchema>;
 export type Pick = z.infer<typeof PickSchema>;
 export type EntryPicks = z.infer<typeof EntryPicksSchema>;

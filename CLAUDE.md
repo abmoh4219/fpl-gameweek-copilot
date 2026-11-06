@@ -138,6 +138,11 @@ confirmed, every price-watch output is labelled an **estimate**.
   and tonight's price watch, each a PNG at `/cards/<card>/image.png` with the
   watermark, and a page whose link preview is the card
 
+- `/wrapped/[id]` — one manager's gameweek, wrapped, as a shareable card
+  (points vs FPL's average, captain vs the best captain in the XI, bench, hits,
+  rank move); `/compare?p=a,b,c` — up to three players on a radar of
+  percentiles, with a card (ADR-0020)
+
 - `/players` — search every player by name or club; `/players/[id]` — one
   player's season: points and xGI per gameweek, FPL's own points breakdown
   (`api.player_gameweeks`), price history rebuilt from confirmed changes,
@@ -283,7 +288,7 @@ Full detail in `docs/database.md`; these are the rules that bind every change.
   limits) must use RLS policies plus `security_invoker` views** — never an
   owner-privileged view over per-user rows.
 - **Exactly two Security Advisor findings are accepted**, both deliberate:
-  the eleven owner-privileged `api` views flagged as **"Security Definer View"**
+  the twelve owner-privileged `api` views flagged as **"Security Definer View"**
   (`api.waitlist` is `security_invoker` and must never be flagged), and
   **"RLS Enabled No Policy"** on every `core` table (intentional deny-all).
   **Anything else the advisor reports is a real problem** and must be fixed.
