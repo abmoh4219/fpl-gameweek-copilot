@@ -19,7 +19,7 @@ export default function Privacy() {
     <article className="legal wrap">
       <span className="legal-kicker">Last updated {UPDATED}</span>
       <h1>
-        Privacy, <em>plainly.</em>
+        Privacy, <em>plainly</em>
       </h1>
       <p className="legal-lede">
         Armband keeps as little about you as it can. Here is everything it stores, why, and how to remove it.

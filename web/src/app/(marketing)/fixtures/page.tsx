@@ -68,7 +68,7 @@ export default async function FixturesPage() {
             Planner
           </span>
           <h1 className="display">
-            Find the <em>easy runs.</em>
+            Find the <em>easy runs</em>
           </h1>
           <p className="sub">
             Every club&apos;s next five gameweeks, coloured by FPL&apos;s difficulty and ranked by our adjusted run, which

@@ -31,7 +31,7 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
           </>
         ) : (
           <>
-            Now, <em>your team.</em>
+            Now, <em>your team</em>
           </>
         )}
       </h1>

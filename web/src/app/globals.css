@@ -35,6 +35,8 @@
   --accent-ink: #0b1500;
   --accent-soft: rgba(var(--accent-rgb), 0.12);
   --accent-line: rgba(var(--accent-rgb), 0.42);
+  /* the accent as small text: volt reads on the night pitch as it is */
+  --accent-text: var(--accent);
 
   /* data: up, down, careful */
   --up-rgb: 62, 230, 168;
@@ -200,7 +202,7 @@ textarea {
   transition: color 0.2s, transform 0.2s var(--ease-out);
 }
 
-/* quiet buttons are plain; only the accent plate is slanted (see below) */
+/* buttons are straight; the slanted plate is kept for scores (.delta, .chance, the ticker) */
 .btn::before {
   content: "";
   position: absolute;
@@ -226,15 +228,12 @@ textarea {
 
 .btn-accent::before {
   border-color: transparent;
-  border-radius: 6px;
   background: var(--accent);
-  transform: skewX(var(--skew));
 }
 
 .btn-accent:hover::before {
   border-color: transparent;
   background: var(--accent-hover);
-  box-shadow: 0 10px 34px -10px rgba(var(--accent-rgb), 0.75);
 }
 
 .btn .arrow {
@@ -303,7 +302,7 @@ textarea {
   top: -12%;
   width: min(56vw, 760px);
   height: 125%;
-  background: linear-gradient(180deg, rgba(var(--beam), 0.2), rgba(var(--beam), 0.05) 45%, transparent 78%);
+  background: linear-gradient(180deg, rgba(var(--beam), 0.1), rgba(var(--beam), 0.025) 45%, transparent 78%);
   clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
   filter: blur(8px);
   transform-origin: 50% 0;
@@ -331,7 +330,7 @@ textarea {
   height: 90px;
   translate: -50% -40%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--beam), 0.55), transparent 65%);
+  background: radial-gradient(circle, rgba(var(--beam), 0.28), transparent 65%);
 }
 
 @keyframes lights-on {
@@ -458,10 +457,7 @@ textarea {
   align-items: center;
   gap: 14px;
   margin: 4px 0;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 13px;
   color: var(--faint);
 }
 
@@ -520,15 +516,12 @@ textarea {
 
 .on-air {
   display: inline-block;
-  padding: 3px 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
   background: var(--accent);
   color: var(--accent-ink);
-  font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transform: skewX(var(--skew));
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .delta,
@@ -536,7 +529,7 @@ textarea {
   padding: 3px 12px;
   font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
   transform: skewX(var(--skew));
 }
@@ -647,16 +640,13 @@ textarea {
   place-items: center;
   padding: 40px 20px;
   text-align: center;
-  background:
-    radial-gradient(60% 40% at 50% 0%, rgba(var(--beam), 0.12), transparent 65%),
-    var(--bg);
+  background: var(--bg);
 }
 
 .message-page .code {
   font-family: var(--font-display);
   font-size: clamp(110px, 26vw, 220px);
-  font-style: italic;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 0.85;
   color: transparent;
   -webkit-text-stroke: 1.5px var(--accent);
@@ -666,7 +656,7 @@ textarea {
   margin: 18px 0 8px;
   font-family: var(--font-heading);
   font-size: clamp(34px, 6vw, 52px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.05;
 }
 
@@ -700,6 +690,8 @@ textarea {
 
   --accent-rgb: 255, 90, 31;
   --accent: #ff5a1f;
+  /* orange as small text on paper needs a darker step to reach 4.5:1 */
+  --accent-text: #c2410c;
   --accent-hover: #ff7445;
   --accent-ink: #ffffff;
 

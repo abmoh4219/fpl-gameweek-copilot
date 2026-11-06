@@ -50,7 +50,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <p className="auth-quote">
             The captain&apos;s call,
             <br />
-            <em>with the numbers behind it.</em>
+            <em>with the numbers behind it</em>
           </p>
           <ul>
             <li>Your fifteen in their kits, with form, minutes and fixtures</li>

@@ -14,7 +14,7 @@ export default function Terms() {
     <article className="legal wrap">
       <span className="legal-kicker">Last updated {UPDATED}</span>
       <h1>
-        Terms, <em>plainly.</em>
+        Terms, <em>plainly</em>
       </h1>
       <p className="legal-lede">
         Armband is a free, independent tool for Fantasy Premier League managers. By creating an account you agree to these

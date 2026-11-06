@@ -45,7 +45,7 @@ export default async function Demo() {
         <header className="page-head">
           <span className="page-kicker">Demo · a real FPL team</span>
           <h1 className="page-title">
-            Take a look <em>around.</em>
+            Take a look <em>around</em>
           </h1>
           <p className="page-sub">
             This is {squad ? `${squad.teamName}, managed by ${squad.managerName}` : "a real FPL team"}. Tap any player for

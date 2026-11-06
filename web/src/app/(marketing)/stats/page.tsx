@@ -41,7 +41,7 @@ export default async function StatsPage() {
             Season leaderboards
           </span>
           <h1 className="display">
-            Who&apos;s actually <em>delivering.</em>
+            Who&apos;s actually <em>delivering</em>
           </h1>
           <p className="sub">
             Every Premier League player in the game, ranked on the numbers that matter for FPL. Filter by position and

@@ -54,7 +54,7 @@ export default async function PricesPage() {
             Price watch
           </span>
           <h1 className="display">
-            Beat the <em>price changes.</em>
+            Beat the <em>price changes</em>
           </h1>
           <p className="sub">
             Who is closest to a rise or a fall, read from FPL&apos;s own price-change data, and every change already

@@ -184,7 +184,6 @@ function VarCheck({ squad }: { squad: Squad }) {
           </span>
         </div>
       </div>
-      <span className="var-scan" aria-hidden="true" />
     </div>
   );
 }
@@ -247,7 +246,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
           label="Today in FPL"
           title={
             <>
-              The overnight, <em>already read.</em>
+              The overnight, <em>already read</em>
             </>
           }
           sub={`Straight from our pipeline's report for ${daily.payload.date}. Sign in and the Gaffer reads it against your squad.`}
@@ -351,9 +350,9 @@ export default async function Landing() {
               <span>Meet the Gaffer, your FPL manager</span>
             </span>
             <h1 className="hero-title">
-              <span className="line"><span>Your FPL team.</span></span>
-              <span className="line"><span>Scouted. Checked.</span></span>
-              <span className="line flare"><span>Deadline-ready.</span></span>
+              <span className="line"><span>Your FPL team,</span></span>
+              <span className="line"><span>scouted and checked,</span></span>
+              <span className="line flare"><span>deadline-ready</span></span>
             </h1>
             <p className="lede">
               Armband reads your fifteen against form, minutes, fixtures and prices, then picks your best XI, rates your
@@ -391,7 +390,7 @@ export default async function Landing() {
             label="Free tools"
             title={
               <>
-                Everything before the deadline, <em>free.</em>
+                Everything before the deadline, <em>free</em>
               </>
             }
             sub="Stats, prices, fixtures and every player, refreshed every three hours. No account needed."
@@ -407,17 +406,16 @@ export default async function Landing() {
             label="What it does"
             title={
               <>
-                Every decision <em>gets a reason.</em>
+                Every decision <em>gets a reason</em>
               </>
             }
             sub="No hunches dressed up as advice. Armband looks things up, checks the rules, and shows you how it got there."
           />
           <div className="features">
-            {FEATURES.map((f, i) => (
+            {FEATURES.map((f) => (
               <article className={`feature reveal${f.wide ? " wide" : ""}`} key={f.title}>
                 <div className="feature-art">{f.art}</div>
                 <div className="feature-text">
-                  <span className="feature-n">0{i + 1}</span>
                   <h3>{f.title}</h3>
                   <p>{f.body}</p>
                 </div>
@@ -435,7 +433,7 @@ export default async function Landing() {
               label="The Gaffer"
               title={
                 <>
-                  An AI manager that <em>shows its working.</em>
+                  An AI manager that <em>shows its working</em>
                 </>
               }
               sub="Ask in plain words. The Gaffer calls the same tools, looks up every figure, and puts its plan on your pitch for you to apply or revert."
@@ -456,7 +454,7 @@ export default async function Landing() {
               label="Trust, built in"
               title={
                 <>
-                  Every number <em>goes to VAR.</em>
+                  Every number <em>goes to VAR</em>
                 </>
               }
             />
@@ -486,7 +484,7 @@ export default async function Landing() {
       <section className="block" id="faq">
         <div className="wrap split faq">
           <div>
-            <SectionHead index="06" label="FAQ" title={<>Questions, <em>answered.</em></>} sub="The short version of how Armband works." />
+            <SectionHead index="06" label="FAQ" title={<>Questions, <em>answered</em></>} sub="The short version of how Armband works." />
             <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" className="text-link">
               Ask us on Telegram <Arrow />
             </a>
@@ -512,7 +510,7 @@ export default async function Landing() {
         </svg>
         <div className="wrap">
           <h2 className="display huge reveal">
-            The deadline <em>won&apos;t wait.</em>
+            The deadline <em>won&apos;t wait</em>
           </h2>
           <p className="sub">Connect your team in under a minute. Free, open source, and every number shown.</p>
           <div className="ctas center">

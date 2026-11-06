@@ -23,7 +23,7 @@ export default async function PlayersPage() {
             Every player in the game
           </span>
           <h1 className="display">
-            Find a <em>player.</em>
+            Find a <em>player</em>
           </h1>
           <p className="sub">Search by name, filter by position, and open any player for their full season.</p>
         </div>

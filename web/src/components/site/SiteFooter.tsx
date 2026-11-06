@@ -52,9 +52,6 @@ export function SiteFooter() {
           Fantasy Premier League. Uses public data only, with its own visuals — the club kits shown on the pitch belong
           to their clubs. Fixture runs, goal threat, captain picks and price movements are estimates, never guarantees.
         </p>
-        <div className="footer-giant" aria-hidden="true">
-          Armband
-        </div>
         <div className="footer-base">
           <span>
             © {new Date().getFullYear()} Armband · Free &amp; open source (
