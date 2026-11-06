@@ -806,8 +806,10 @@ used most of it.
 - Anyone can open any team. FPL makes every team public already, and our
   caching means repeat visits cost FPL nothing. A script looping through IDs
   would pass uncached calls through us; if that happens, we add a limit then.
-- Existing account data stays in `auth.users` and the `app` tables until a
-  purge migration deletes it. The privacy page says so.
+- Existing account data was deleted the same day by
+  `20261106134942_purge_accounts.sql`: logins, profiles, usage, the question
+  ledger and the old waitlist. The tables stay, empty and unused, until a
+  later migration drops them.
 
 ### Alternatives considered
 

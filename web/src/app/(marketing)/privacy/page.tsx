@@ -61,9 +61,8 @@ export default function Privacy() {
 
       <h2>Accounts made before 6 November 2026</h2>
       <p>
-        Armband used to have sign-in. If you made an account then, its email address, name, connected team ID and, if
-        you used the old AI Gaffer, a one-way fingerprint of your email with a question count are still in our database
-        until we delete all of them. To have yours removed sooner, ask us on Telegram (below).
+        Armband used to have sign-in. Every account it had (email addresses, names, connected team IDs and question
+        counts) was permanently deleted on 6 November 2026. Nothing from them is kept.
       </p>
 
       <h2>Who processes data</h2>

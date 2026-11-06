@@ -141,7 +141,7 @@ erDiagram
 | `deliveries` | `id` | Every Make webhook attempt, ok or not (ADR-0006). Audit trail, and the counter behind the daily news alert cap |
 | `player_cards` | `player_id` | Latest computed card per player, published by price-sync and daily-sync (ADR-0008) |
 | `team_runs` | `team_id` | Latest 3- and 5-gameweek fixture run per team (ADR-0008) |
-| `app.waitlist` | `lower(email)` | Landing-page signups. **`app` schema**: RLS policy, INSERT-only for anon through `security_invoker` `api.waitlist`, never readable over the Data API |
+| `app.*` (waitlist, profiles, agent_usage, question_ledger) | — | **Empty and unused since ADR-0017** (no accounts). Emptied by `20261106134942_purge_accounts.sql`; kept until a later migration drops them. The RLS rules above still hold if user-scoped tables ever return |
 | `alert_state` | `key` | When an operational alert last fired, so a persistent condition does not page every run |
 
 ### Type rules
