@@ -74,7 +74,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 12.5px;
   cursor: pointer;
 }
@@ -99,8 +99,7 @@
   min-height: 520px;
   overflow: hidden;
   border: 1px solid var(--line-2);
-  border-top: 3px solid var(--accent);
-  border-radius: 6px 6px var(--radius) var(--radius);
+  border-radius: var(--radius);
   background: var(--bg-1);
 }
 
@@ -142,7 +141,7 @@
   margin: 4px 0 8px;
   font-family: var(--font-heading);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
 }
 
@@ -178,7 +177,7 @@
   top: 50%;
   right: 14px;
   translate: 0 -50%;
-  color: var(--accent);
+  color: var(--accent-text);
   transition: translate 0.2s var(--ease-out);
 }
 
@@ -250,7 +249,7 @@
 .turn-trace .sym {
   display: grid;
   place-items: center;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .turn-trace .spinner {
@@ -312,7 +311,7 @@
 }
 
 .turn-answer li::marker {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .turn-answer strong {
@@ -351,8 +350,6 @@
   color: var(--warn);
   font-family: var(--font-mono);
   font-size: 10.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 /* the composer: a single line that grows, and a slanted send button */
@@ -383,7 +380,7 @@
 }
 
 .composer textarea:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
@@ -400,7 +397,6 @@
   border: 0;
   background: var(--accent);
   color: var(--accent-ink);
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -459,7 +455,6 @@
   overflow-y: auto;
   border-left: 1px solid var(--line-2);
   background:
-    radial-gradient(90% 30% at 100% 0%, rgba(var(--accent-rgb), 0.1), transparent 60%),
     var(--bg-1);
   box-shadow: -30px 0 80px rgba(0, 0, 0, 0.5);
   animation: sheet-in 0.35s var(--ease-out) backwards;
@@ -509,8 +504,6 @@
 .sheet-meta {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--muted);
 }
 
@@ -518,7 +511,7 @@
   margin: 4px 0 8px;
   font-family: var(--font-heading);
   font-size: 38px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.05;
 }
 
@@ -537,8 +530,7 @@
   border: 1px solid var(--line-3);
   font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 600;
   transform: skewX(var(--skew));
 }
 
@@ -576,7 +568,7 @@
   margin: 3px 0 0;
   font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .sheet-stats small {
@@ -640,11 +632,11 @@
 }
 
 /* FPL difficulty colours, shared by the sheet and the dashboard grid */
-.fdr-cell.d1 { background: var(--fdr-1); color: #fff; }
-.fdr-cell.d2 { background: var(--fdr-2); color: #062113; }
-.fdr-cell.d3 { background: var(--fdr-3); color: var(--text); }
-.fdr-cell.d4 { background: var(--fdr-4); color: #fff; }
-.fdr-cell.d5 { background: var(--fdr-5); color: #fff; }
+.fdr-cell.d1 { background: var(--fdr-1); color: var(--fdr-ink-1); }
+.fdr-cell.d2 { background: var(--fdr-2); color: var(--fdr-ink-2); }
+.fdr-cell.d3 { background: var(--fdr-3); color: var(--fdr-ink-3); }
+.fdr-cell.d4 { background: var(--fdr-4); color: var(--fdr-ink-4); }
+.fdr-cell.d5 { background: var(--fdr-5); color: var(--fdr-ink-5); }
 .fdr-cell.dx { background: transparent; color: var(--faint); box-shadow: inset 0 0 0 1px var(--line-2); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -663,7 +655,7 @@
 
 /* the season total leads the card */
 .sheet-stats div:first-child dd {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* ------------------------------------------------------------ plan bar -- */
@@ -682,11 +674,10 @@
 }
 
 .plan-bar.proposed {
-  border-left-color: var(--accent);
+  border-left-color: var(--accent-text);
   background:
-    radial-gradient(80% 120% at 0% 0%, rgba(var(--accent-rgb), 0.12), transparent 60%),
     var(--bg-1);
-  box-shadow: 0 20px 50px -30px rgba(var(--accent-rgb), 0.6);
+  box-shadow: 0 8px 24px -16px rgba(var(--shadow-rgb), 0.4);
 }
 
 .plan-head {
@@ -702,9 +693,7 @@
   color: #05261a;
   font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
   transform: skewX(var(--skew));
 }
 
@@ -729,7 +718,7 @@
 
 .plan-changes li::before {
   content: "→ ";
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .plan-changes .plan-bank {
@@ -755,7 +744,7 @@
 }
 
 .turn-meta .acted {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* suggestions stay one tap away once a conversation has started */

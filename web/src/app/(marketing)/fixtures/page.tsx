@@ -62,26 +62,18 @@ export default async function FixturesPage() {
   return (
     <section className="block fixtures-page">
       <div className="wrap">
-        <div className="sec-head">
-          <span className="sec-kicker">
-            <b>Fixtures</b>
-            Planner
-          </span>
-          <h1 className="display">
-            Find the <em>easy runs</em>
-          </h1>
-          <p className="sub">
-            Every club&apos;s next five gameweeks, coloured by FPL&apos;s difficulty and ranked by our adjusted run, which
-            also weighs opponent strength and home advantage. Run scores are estimates.
-          </p>
-        </div>
-        {targets.length > 0 && <TeamTargets targets={targets} />}
-        {rows.length > 0 && <FixtureSwings rows={rows} />}
+        <header className="tool-head">
+          <h1>Fixtures</h1>
+          <p>Every club&apos;s next five gameweeks in FPL&apos;s difficulty colours, easiest runs first</p>
+        </header>
         {rows.length > 0 ? (
           <FixturePlanner gameweeks={gameweeks} rows={rows} />
         ) : (
           <div className="notice error">The fixtures aren&apos;t available right now. Try again in a few minutes.</div>
         )}
+        {(targets.length > 0 || rows.length > 0) && <h2 className="tool-h2">Insights</h2>}
+        {rows.length > 0 && <FixtureSwings rows={rows} />}
+        {targets.length > 0 && <TeamTargets targets={targets} />}
       </div>
     </section>
   );

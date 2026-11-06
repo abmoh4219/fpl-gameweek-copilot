@@ -5,8 +5,9 @@ import { useMemo, useState } from "react";
 import { INSIGHT_CONFIG, LEADERBOARDS, formatStat, kitImageUrl, leaderboard, type Leaderboard, type StatPosition, type StatRow } from "@fpl/shared";
 
 /**
- * The stats hub: one leaderboard at a time, picked from grouped tabs, with
- * position and price filters. Everything is computed in the browser from the
+ * The stats hub: one leaderboard at a time. The six stats FPL managers check
+ * most are one tap away; the rest sit in "More" (redesign: simple first).
+ * Position and price filters. Everything is computed in the browser from the
  * one cached list the page already loaded; nothing here calls a server.
  */
 const POSITIONS: { id: StatPosition | null; label: string }[] = [
@@ -21,12 +22,16 @@ const PRICES = [null, 5, 6, 7, 8, 10] as const;
 
 const GROUPS = ["Attack", "Expected", "FPL", "Defence", "Market"] as const;
 
+/** One tap away; everything else is under "More". */
+const PRIMARY = ["points", "goals", "assists", "xgi", "form", "value"] as const;
+const SHORT: Record<string, string> = { value: "Value" };
+
 function Kit({ r }: { r: StatRow }) {
   return <img className="st-kit" src={kitImageUrl(r.teamCode, r.position === "GKP", 66)} alt="" loading="lazy" referrerPolicy="no-referrer" width={28} height={37} />;
 }
 
 export function StatsHub({ rows }: { rows: StatRow[] }) {
-  const [boardId, setBoardId] = useState("goals");
+  const [boardId, setBoardId] = useState("points");
   const [position, setPosition] = useState<StatPosition | null>(null);
   const [maxPriceM, setMaxPriceM] = useState<number | null>(null);
 
@@ -37,26 +42,32 @@ export function StatsHub({ rows }: { rows: StatRow[] }) {
 
   return (
     <div className="st">
-      <div className="st-boards" role="tablist" aria-label="Leaderboards">
-        {GROUPS.map((g) => (
-          <div className="st-group" key={g}>
-            <span className="st-group-label">{g}</span>
-            <div className="st-group-tabs">
-              {LEADERBOARDS.filter((b) => b.group === g).map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={b.id === board.id}
-                  className={`st-tab${b.id === board.id ? " is-on" : ""}`}
-                  onClick={() => setBoardId(b.id)}
-                >
-                  {b.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+      <div className="st-rank-by">
+        <div className="st-seg st-primary" role="group" aria-label="Rank by">
+          {PRIMARY.map((id) => {
+            const b = LEADERBOARDS.find((x) => x.id === id)!;
+            return (
+              <button key={id} type="button" className={b.id === board.id ? "is-on" : ""} aria-pressed={b.id === board.id} onClick={() => setBoardId(b.id)}>
+                {SHORT[id] ?? b.label}
+              </button>
+            );
+          })}
+        </div>
+        <label className={`st-price st-more${(PRIMARY as readonly string[]).includes(board.id) ? "" : " is-on"}`}>
+          <span className="sr-only">More stats</span>
+          <select value={(PRIMARY as readonly string[]).includes(board.id) ? "" : board.id} onChange={(e) => e.target.value && setBoardId(e.target.value)}>
+            <option value="">More stats</option>
+            {GROUPS.map((g) => (
+              <optgroup key={g} label={g}>
+                {LEADERBOARDS.filter((b) => b.group === g && !(PRIMARY as readonly string[]).includes(b.id)).map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </label>
       </div>
 
       <div className="st-filters">

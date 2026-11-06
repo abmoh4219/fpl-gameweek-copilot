@@ -35,24 +35,15 @@ export default async function StatsPage() {
   return (
     <section className="block stats-page">
       <div className="wrap">
-        <div className="sec-head">
-          <span className="sec-kicker">
-            <b>Stats</b>
-            Season leaderboards
-          </span>
-          <h1 className="display">
-            Who&apos;s actually <em>delivering</em>
-          </h1>
-          <p className="sub">
-            Every Premier League player in the game, ranked on the numbers that matter for FPL. Filter by position and
-            price{updated ? `, updated ${updatedLabel(updated)}` : ""}.
-          </p>
-        </div>
+        <header className="tool-head">
+          <h1>Stats</h1>
+          <p>Every player ranked on the numbers that matter for FPL{updated ? `, updated ${updatedLabel(updated)}` : ""}</p>
+        </header>
         {rows.length > 0 ? (
           <>
-            <StatsInsights rows={rows} />
-            <h2 className="stats-h2">Leaderboards</h2>
             <StatsHub rows={rows} />
+            <h2 className="tool-h2">Insights</h2>
+            <StatsInsights rows={rows} />
           </>
         ) : (
           <div className="notice error">The stats aren&apos;t available right now. Try again in a few minutes.</div>

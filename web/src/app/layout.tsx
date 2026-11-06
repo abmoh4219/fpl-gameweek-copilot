@@ -1,25 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Barlow_Condensed, Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+// One family (ADR-0018): Geist for the interface, Geist Mono for figures.
 const sans = Geist({ subsets: ["latin"], variable: "--font-geist-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
-// Display type: condensed and sporty, like a scoreboard or a kit number.
-const display = Barlow_Condensed({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  style: ["normal", "italic"],
-  variable: "--font-barlow",
-  display: "swap",
-});
-
-// Headlines: an editorial grotesk with character, in sentence case.
-const heading = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-bricolage",
-  display: "swap",
-});
 
 const SITE = process.env["NEXT_PUBLIC_SITE_URL"] ?? "http://localhost:3000";
 
@@ -37,8 +22,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#04100a" },
-    { media: "(prefers-color-scheme: light)", color: "#f4f1e9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e0e10" },
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -49,7 +34,7 @@ const THEME_SCRIPT = `try{var t=localStorage.getItem("theme");if(t!=="light"&&t!
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sans.variable} ${mono.variable} ${display.variable} ${heading.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

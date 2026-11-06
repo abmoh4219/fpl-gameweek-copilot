@@ -72,12 +72,12 @@
   margin: 12px 0 0;
   font-family: var(--font-heading);
   font-size: clamp(40px, 9vw, 54px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.05;
 }
 
 .auth-title em {
-  color: var(--accent);
+  color: var(--accent-text);
   font-style: normal;
 }
 
@@ -101,7 +101,7 @@
 }
 
 .auth-switch a:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
 }
 
 .auth-foot {
@@ -126,10 +126,7 @@
   color: var(--faint);
   font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  font-weight: 600;
 }
 
 .steps-mini li::before {
@@ -159,8 +156,6 @@
   overflow: hidden;
   border-left: 1px solid var(--line);
   background:
-    radial-gradient(70% 50% at 50% 0%, rgba(var(--beam), 0.14), transparent 65%),
-    radial-gradient(60% 50% at 50% 100%, rgba(var(--accent-rgb), 0.16), transparent 70%),
     linear-gradient(180deg, var(--sky), var(--bg));
 }
 
@@ -212,13 +207,13 @@
   margin: 0 0 24px;
   font-family: var(--font-heading);
   font-size: clamp(32px, 3vw, 44px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.08;
   letter-spacing: -0.03em;
 }
 
 .auth-quote em {
-  color: var(--accent);
+  color: var(--accent-text);
   font-style: normal;
 }
 
@@ -239,7 +234,7 @@
 .auth-pitch-copy li::before {
   content: "✓";
   color: var(--up);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* ------------------------------------------------------- "Is this you?" -- */
@@ -271,14 +266,13 @@
   color: var(--accent-ink);
   font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 800;
-  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  font-weight: 600;
 }
 
 .found-name {
   font-family: var(--font-heading);
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
   overflow-wrap: anywhere;
 }
@@ -316,7 +310,7 @@
 .found-stats b {
   font-family: var(--font-display);
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .found-stats span {
@@ -373,7 +367,7 @@
   color: var(--accent-ink);
   font-size: 9px;
   font-style: normal;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* ------------------------------------------------- where is my team ID? -- */
@@ -415,7 +409,7 @@
 
 .where mark {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 @media (prefers-reduced-motion: reduce) {

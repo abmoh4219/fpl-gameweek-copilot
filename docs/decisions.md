@@ -818,3 +818,51 @@ used most of it.
   more services to run.
 - **Optional accounts for cross-device sync.** The bookmarkable `/team/[id]`
   link already does that job.
+
+## ADR-0018 — Redesign: graphite, one volt accent, Geist, FPL difficulty colours
+
+*Date: 2026-11-06 · Status: accepted · Replaces the "Stadium / Daylight" look*
+
+### Context
+
+Before the public launch on X, the site still read as generated, and it was
+not simple to use:
+- Green-tinted surfaces.
+- Two accents: volt on dark, orange on light.
+- Four type families.
+- Slanted plates everywhere.
+- Every tool page opened with a kicker, a two-tone headline and a paragraph.
+- Charts each used their own colours.
+- Stats had 14 filter chips.
+
+The best football-stats products (FotMob, Sofascore) keep the chrome neutral
+and let club colours and the data carry the colour.
+
+### Decision
+
+- **Tokens, not rewrites** (`web/src/app/globals.css`). Graphite surfaces in
+  both themes. Three text roles. **One accent, volt**: on light it stays a
+  volt fill with dark ink, and `--accent-text` (dark olive) for small text.
+  Semantic colours are toned down. No washes, glows or floodlights.
+- **One family:** Geist, with Geist Mono for figures. Bricolage and Barlow are
+  gone, and the wordmark is "Armband" in Geist. Weights 400–600, sentence
+  case, no italics.
+- **Signature: FPL's own fixture difficulty colours** (1–5), on every fixture
+  cell, the player page and the share card. Text colours come from
+  `--fdr-ink-*` tokens.
+- **Simple pages.** A tool page opens with its name and one line, and the
+  tool comes before the insight charts. Chart explanations fold into "How
+  it's calculated" (`components/charts/How.tsx`). Stats ranks by six common
+  stats plus "More stats".
+- **Header:** the mark, Stats · Fixtures · Prices · Players, player search on
+  every page (a plain GET to `/players?q=`), the theme toggle and **My
+  team**. Demo and GitHub moved to the menu and the footer.
+- **The landing page keeps all its sections**, restyled. Only the numbering
+  went.
+
+### Consequences
+
+- The look lives in tokens, so a later change is a token change.
+- No logic or data changed; the production build and every page QA passed in
+  both themes, on phone and desktop.
+- The share card matches the site and needs no bundled font.

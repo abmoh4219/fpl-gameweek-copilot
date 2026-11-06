@@ -1,4 +1,5 @@
 import { fixtureSwings, kitImageUrl, type FixtureSwing, type GridRow } from "@fpl/shared";
+import { How } from "@/components/charts/How";
 
 /**
  * Fixture swings as small multiples: one mini line per club of FPL difficulty
@@ -82,12 +83,12 @@ export function FixtureSwings({ rows }: { rows: GridRow[] }) {
   return (
     <div className="ins-card sw">
       <h2 className="ins-title">Fixture swings</h2>
-      <p className="ins-how">
+      <How>
         How each club&apos;s fixtures change across the next five gameweeks, using FPL&apos;s own difficulty rating (1 easy,
         5 hard), easier plotted higher. It compares the next two games with the three after, so it shows a change, not
         whether the whole run is easy: check the five-game average. FPL&apos;s rating ignores form and injuries; treat it
         as an estimate. Lower-case opponents are away.
-      </p>
+      </How>
       {(
         [
           [`Gets easier after GW${swings[0]?.gameweeks[1] ?? ""}`, easier],

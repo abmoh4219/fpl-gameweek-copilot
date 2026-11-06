@@ -1,75 +1,80 @@
 /*
- * Armband — design system.
+ * Armband — design system (redesign, 2026-11-06).
  *
- * Two looks from one set of tokens:
- *   dark  "Stadium": a pitch-green night, cream chalk text, a volt accent.
- *   light "Daylight": warm paper, ink text, an orange accent.
- * The visitor's system setting picks one; the header toggle overrides it and
- * is remembered (the choice is applied before first paint, see layout.tsx).
- * Every colour is a token; components never invent one. Translucent tints
- * use the *-rgb triplets so they follow the theme too.
+ * Quiet graphite chrome, one volt accent, and colour only where it means
+ * something: the pitch, FPL's fixture difficulty, and the one number that
+ * matters in a chart. Two themes from one set of tokens: the visitor's system
+ * setting picks one, the toggle overrides it (applied before first paint, see
+ * layout.tsx). Every colour is a token; components never invent one.
+ * Translucent tints use the *-rgb triplets so they follow the theme too.
  */
 
 :root {
   color-scheme: dark;
 
-  /* surfaces: the night above a floodlit pitch */
-  --bg: #04100a;
-  --bg-1: #08180f;
-  --bg-2: #0d2117;
-  --bg-3: #142c20;
-  --line: rgba(var(--ink-rgb), 0.08);
-  --line-2: rgba(var(--ink-rgb), 0.14);
-  --line-3: rgba(var(--ink-rgb), 0.24);
+  /* surfaces: graphite, so the data and the kits carry the colour */
+  --bg: #0e0e10;
+  --bg-1: #151517;
+  --bg-2: #1c1c1f;
+  --bg-3: #252528;
+  --line: rgba(var(--ink-rgb), 0.07);
+  --line-2: rgba(var(--ink-rgb), 0.11);
+  --line-3: rgba(var(--ink-rgb), 0.2);
 
-  /* chalk, as on a tactics board */
-  --ink-rgb: 242, 246, 236;
-  --text: #f2f6ec;
-  --muted: #a9bbae;
-  --faint: #6f8779;
+  /* three text roles */
+  --ink-rgb: 237, 237, 237;
+  --text: #ededed;
+  --muted: #a1a1a6;
+  --faint: #85858b;
 
   /* one accent: volt */
   --accent-rgb: 214, 255, 58;
   --accent: #d6ff3a;
   --accent-hover: #e3ff72;
   --accent-ink: #0b1500;
-  --accent-soft: rgba(var(--accent-rgb), 0.12);
-  --accent-line: rgba(var(--accent-rgb), 0.42);
-  /* the accent as small text: volt reads on the night pitch as it is */
+  --accent-soft: rgba(var(--accent-rgb), 0.1);
+  --accent-line: rgba(var(--accent-rgb), 0.4);
+  /* the accent as small text: volt reads on graphite as it is */
   --accent-text: var(--accent);
 
-  /* data: up, down, careful */
-  --up-rgb: 62, 230, 168;
-  --up: #3ee6a8;
+  /* semantic: up, down, careful, toned to sit inside the palette */
+  --up-rgb: 76, 195, 138;
+  --up: #4cc38a;
   --up-soft: rgba(var(--up-rgb), 0.12);
-  --warn: #ffc145;
-  --warn-soft: rgba(255, 193, 69, 0.12);
-  --danger: #ff5c72;
-  --danger-soft: rgba(255, 92, 114, 0.12);
-  --flood: #eeffe2;
+  --warn: #e8b04a;
+  --warn-soft: rgba(232, 176, 74, 0.12);
+  --danger: #e5484d;
+  --danger-soft: rgba(229, 72, 77, 0.12);
+  --flood: #ffffff;
 
-  /* FPL fixture difficulty, 1 (easiest) to 5 (hardest) */
-  --fdr-1: #0d7a49;
-  --fdr-2: #26b56a;
-  --fdr-3: #2b3d33;
-  --fdr-4: #d9435a;
-  --fdr-5: #8e1b30;
+  /* FPL's own fixture difficulty colours, 1 (easiest) to 5 (hardest): the
+     signature. Every FPL manager reads them at a glance. 3 is neutral. */
+  --fdr-1: #257d5a;
+  --fdr-2: #00e07a;
+  --fdr-3: #3a3a3f;
+  --fdr-4: #ff1751;
+  --fdr-5: #80072d;
+  --fdr-ink-1: #ffffff;
+  --fdr-ink-2: #062b17;
+  --fdr-ink-3: #ededed;
+  --fdr-ink-4: #ffffff;
+  --fdr-ink-5: #ffffff;
 
-  /* the pitch, under floodlights */
+  /* the pitch: the one place green lives */
   --grass-1: #0b7a3e;
   --grass-2: #0d8444;
   --grass-line: rgba(255, 255, 255, 0.7);
-  --pitch-1: #04120a;
-  --pitch-2: #071a0f;
-  --pitch-line: rgba(255, 255, 255, 0.1);
-  --bench-bg: rgba(0, 40, 16, 0.45);
+  --pitch-1: #0e0e10;
+  --pitch-2: #151517;
+  --pitch-line: rgba(255, 255, 255, 0.08);
+  --bench-bg: rgba(var(--ink-rgb), 0.04);
 
-  /* charts: a warm/cool pair validated for CVD separation and contrast on --bg-1 */
-  --chart-hi: #de6f2b;
-  --chart-lo: #4d86ee;
-  --chart-base: rgba(var(--ink-rgb), 0.34);
-  --chart-grid: rgba(var(--ink-rgb), 0.07);
-  /* categorical slots (points breakdown), validated on --bg-1; colour follows the stat, never its rank */
+  /* charts: the thing that matters in volt, the rest in neutral steps */
+  --chart-hi: #d6ff3a;
+  --chart-lo: #7c8db5;
+  --chart-base: rgba(var(--ink-rgb), 0.3);
+  --chart-grid: rgba(var(--ink-rgb), 0.06);
+  /* categorical slots (points breakdown only), validated on --bg-1; colour follows the stat, never its rank */
   --cat-1: #3987e5;
   --cat-2: #d95926;
   --cat-3: #199e70;
@@ -77,39 +82,39 @@
   --cat-5: #d55181;
   --cat-6: #9085e9;
 
-  /* scene: the sky above the hero, the floodlight colour, the tactics-board art */
-  --sky: #0a2416;
-  --beam: 238, 255, 226;
-  --glow: rgba(var(--accent-rgb), 0.08);
-  --art-1: #12301f;
-  --art-2: #0d2418;
-  --art-3: #081a10;
-  --scrim: rgba(4, 16, 10, 0.82);
+  /* scene tokens, now neutral: no washes, no glow */
+  --sky: #0e0e10;
+  --beam: 237, 237, 237;
+  --glow: transparent;
+  --art-1: #19191b;
+  --art-2: #161618;
+  --art-3: #131315;
+  --scrim: rgba(14, 14, 16, 0.84);
   --shadow-rgb: 0, 0, 0;
 
-  --radius: 14px;
+  --radius: 12px;
   --radius-sm: 8px;
   --pill: 999px;
-  --skew: -12deg;
+  /* the old slanted plates are gone; kept as a token so nothing breaks */
+  --skew: 0deg;
   --rail: 40px;
   --max: 1200px;
-  --hatch: repeating-linear-gradient(135deg, transparent 0 6px, rgba(255, 255, 255, 0.07) 6px 7px);
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --hatch: repeating-linear-gradient(135deg, transparent 0 6px, rgba(var(--ink-rgb), 0.06) 6px 7px);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* one family: Geist for everything, Geist Mono for figures */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display: var(--font-barlow), "Arial Narrow", sans-serif-condensed, var(--font-sans);
-  /* headlines: sentence case, tight, with character; the condensed face is kept for scoreboard details */
-  --font-heading: var(--font-bricolage), var(--font-sans);
-
+  --font-display: var(--font-sans);
+  --font-heading: var(--font-sans);
 
   /* type scale (fluid) and spacing scale (4px base) */
   --step--1: 13px;
   --step-0: 16px;
   --step-1: 18px;
-  --step-2: clamp(22px, 2vw, 26px);
-  --step-3: clamp(30px, 3.4vw, 40px);
-  --step-4: clamp(40px, 5.4vw, 64px);
+  --step-2: clamp(20px, 1.8vw, 22px);
+  --step-3: clamp(28px, 3vw, 36px);
+  --step-4: clamp(36px, 4.6vw, 56px);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -280,17 +285,16 @@ textarea {
 }
 
 .wordmark {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-style: italic;
-  font-size: 23px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 18px;
   line-height: 1;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
-/* two floodlights in the top corners that flicker on at load */
+/* the floodlight beams are retired (redesign): kept in the markup, never drawn */
 .floodlights {
+  display: none;
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -388,7 +392,7 @@ textarea {
 }
 
 .input:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-text);
   background: var(--bg-2);
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
@@ -529,7 +533,7 @@ textarea {
   padding: 3px 12px;
   font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   white-space: nowrap;
   transform: skewX(var(--skew));
 }
@@ -646,7 +650,7 @@ textarea {
 .message-page .code {
   font-family: var(--font-display);
   font-size: clamp(110px, 26vw, 220px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 0.85;
   color: transparent;
   -webkit-text-stroke: 1.5px var(--accent);
@@ -678,36 +682,40 @@ textarea {
 [data-theme="light"] {
   color-scheme: light;
 
-  --bg: #f4f1e9;
-  --bg-1: #fffdf8;
-  --bg-2: #ece8de;
-  --bg-3: #e0dbcf;
+  --bg: #fafafa;
+  --bg-1: #ffffff;
+  --bg-2: #f4f4f5;
+  --bg-3: #e9e9ec;
 
-  --ink-rgb: 22, 20, 15;
-  --text: #16140f;
-  --muted: #5c5950;
-  --faint: #8a8679;
+  --ink-rgb: 23, 23, 23;
+  --text: #171717;
+  --muted: #525252;
+  --faint: #737373;
 
-  --accent-rgb: 255, 90, 31;
-  --accent: #ff5a1f;
-  /* orange as small text on paper needs a darker step to reach 4.5:1 */
-  --accent-text: #c2410c;
-  --accent-hover: #ff7445;
-  --accent-ink: #ffffff;
+  /* the same volt; a hairline keeps the fill from melting into white */
+  --accent-rgb: 214, 255, 58;
+  --accent: #d6ff3a;
+  --accent-hover: #c9f523;
+  --accent-ink: #0b1500;
+  /* volt as small text on white needs a dark olive to reach 4.5:1 */
+  --accent-text: #4d6a00;
 
-  --up-rgb: 10, 143, 94;
-  --up: #0a8f5e;
-  --warn: #b7791f;
-  --warn-soft: rgba(183, 121, 31, 0.12);
-  --danger: #d6334f;
-  --danger-soft: rgba(214, 51, 79, 0.1);
+  --up-rgb: 22, 163, 74;
+  --up: #15803d;
+  --warn: #a16207;
+  --warn-soft: rgba(161, 98, 7, 0.1);
+  --danger: #dc2626;
+  --danger-soft: rgba(220, 38, 38, 0.08);
   --flood: #ffffff;
 
-  --fdr-3: #d8d3c6;
-  --bench-bg: #dde8dc;
-  --chart-hi: #e8531a;
-  --chart-lo: #2f6fe0;
-  --chart-base: rgba(var(--ink-rgb), 0.3);
+  --fdr-3: #e7e7e4;
+  --fdr-ink-3: #171717;
+  --bench-bg: rgba(var(--ink-rgb), 0.04);
+  --pitch-1: #fafafa;
+  --pitch-2: #ffffff;
+  --chart-hi: #5d8000;
+  --chart-lo: #8a94ad;
+  --chart-base: rgba(var(--ink-rgb), 0.28);
   --cat-1: #2a78d6;
   --cat-2: #eb6834;
   --cat-3: #1baf7a;
@@ -715,14 +723,14 @@ textarea {
   --cat-5: #e87ba4;
   --cat-6: #6250d6;
 
-  --sky: #e8efe3;
-  --beam: 255, 255, 255;
-  --glow: rgba(var(--accent-rgb), 0.07);
-  --art-1: #fbfaf5;
-  --art-2: #f2eee4;
-  --art-3: #e8e3d7;
-  --scrim: rgba(244, 241, 233, 0.86);
-  --shadow-rgb: 60, 50, 30;
+  --sky: #fafafa;
+  --beam: 23, 23, 23;
+  --glow: transparent;
+  --art-1: #f4f4f5;
+  --art-2: #f7f7f8;
+  --art-3: #fafafa;
+  --scrim: rgba(250, 250, 250, 0.86);
+  --shadow-rgb: 0, 0, 0;
 }
 
 /* --------------------------------------------------------------- helpers -- */
@@ -760,7 +768,7 @@ textarea {
   height: 36px;
   padding: 0;
   border: 1px solid var(--line-2);
-  border-radius: 50%;
+  border-radius: 8px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;

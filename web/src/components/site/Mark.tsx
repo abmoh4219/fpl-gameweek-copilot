@@ -13,7 +13,7 @@ export function Mark({ size = 30 }: { size?: number }) {
   );
 }
 
-/** The wordmark: condensed and italic, like a name on a shirt. */
+/** The wordmark: the name in the interface family, nothing added. */
 export function Wordmark() {
   return <span className="wordmark">Armband</span>;
 }

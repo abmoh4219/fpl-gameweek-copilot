@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { teamTargetChart, type TeamTarget } from "@fpl/shared";
 import { ScatterPlot } from "@/components/charts/ScatterPlot";
 import "@/components/charts/charts.css";
+import { How } from "@/components/charts/How";
 
 /** Attack against fixtures: the clubs worth owning players from over the next five gameweeks. */
 export function TeamTargets({ targets }: { targets: TeamTarget[] }) {
@@ -12,11 +13,11 @@ export function TeamTargets({ targets }: { targets: TeamTarget[] }) {
   return (
     <div className="ins-card fx-targets">
       <h2 className="ins-title">Teams to target</h2>
-      <p className="ins-how">
+      <How>
         Each club&apos;s attack (season xG) against how hard its next five gameweeks are, by our adjusted difficulty.
         Top right: clubs that have created a lot and face an easier run. Both are estimates from the season so far, not
         predictions; injuries and form can change either.
-      </p>
+      </How>
       <ScatterPlot
         points={points}
         x={{ label: "Attack: season xG", format: (v) => (Number.isInteger(v) ? String(v) : v.toFixed(1)), zero: false }}

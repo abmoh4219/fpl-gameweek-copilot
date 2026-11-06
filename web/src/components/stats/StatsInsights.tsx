@@ -14,6 +14,7 @@ import {
 } from "@fpl/shared";
 import { ScatterPlot, type Axis } from "@/components/charts/ScatterPlot";
 import "@/components/charts/charts.css";
+import { How } from "@/components/charts/How";
 
 /**
  * The stats page's insights: four headline tiles, then one chart at a time
@@ -133,7 +134,7 @@ export function StatsInsights({ rows }: { rows: StatRow[] }) {
           </div>
         </div>
         <h2 className="ins-title">{view.title}</h2>
-        <p className="ins-how">{view.how}</p>
+        <How>{view.how}</How>
         <ScatterPlot
           points={view.points}
           x={view.x}

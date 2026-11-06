@@ -13,12 +13,33 @@ import { ThemeToggle } from "./ThemeToggle";
 const SHOW_STARS_FROM = 10;
 
 const NAV = [
-  ["/players", "Players"],
   ["/stats", "Stats"],
   ["/fixtures", "Fixtures"],
   ["/prices", "Prices"],
-  ["/demo", "Demo"],
+  ["/players", "Players"],
 ] as const;
+
+function SearchIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
+/** Search any player from every page: a plain GET form, so it needs no script and costs nothing. */
+function HeaderSearch({ id }: { id: string }) {
+  return (
+    <form action="/players" method="get" role="search" className="hd-search">
+      <label htmlFor={id} className="sr-only">
+        Search players
+      </label>
+      <SearchIcon />
+      <input id={id} name="q" type="search" placeholder="Search players" autoComplete="off" maxLength={40} />
+    </form>
+  );
+}
 
 export function SiteHeader({ stars }: { stars: number | null }) {
   const [scrolled, setScrolled] = useState(false);
@@ -56,25 +77,7 @@ export function SiteHeader({ stars }: { stars: number | null }) {
           ))}
         </nav>
         <div className="site-actions">
-          <ThemeToggle />
-          <a
-            href={GITHUB_URL}
-            className="gh-pill"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Star Armband on GitHub"
-          >
-            <span>
-              <GitHubIcon size={16} />
-              <span className="hide-mobile">Star</span>
-            </span>
-            {stars !== null && stars >= SHOW_STARS_FROM && (
-              <span className="gh-count">
-                <span className="gh-star" aria-hidden="true">★</span>
-                {compactCount(stars)}
-              </span>
-            )}
-          </a>
+          <HeaderSearch id="hd-q" />
           <button
             type="button"
             className="menu-toggle"
@@ -83,25 +86,35 @@ export function SiteHeader({ stars }: { stars: number | null }) {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             onClick={() => setMenuOpen((o) => !o)}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
               {menuOpen ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
             </svg>
           </button>
-          <Link href={teamHref} className="btn btn-accent">
+          <span className="hd-theme">
+            <ThemeToggle />
+          </span>
+          <Link href={teamHref} className="btn btn-accent btn-sm">
             My team
           </Link>
         </div>
       </div>
       {menuOpen && (
         <nav id="site-menu" className="menu-panel" aria-label="Menu">
+          <HeaderSearch id="menu-q" />
           {NAV.map(([href, label]) => (
             <Link key={href} href={href} onClick={() => setMenuOpen(false)}>
               {label}
             </Link>
           ))}
-          <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="menu-gh">
-            <GitHubIcon size={16} /> Star on GitHub
-          </a>
+          <Link href="/demo" onClick={() => setMenuOpen(false)}>
+            Demo team
+          </Link>
+          <div className="menu-row">
+            <a href={GITHUB_URL} target="_blank" rel="noreferrer" className="menu-gh">
+              <GitHubIcon size={16} /> GitHub{stars !== null && stars >= SHOW_STARS_FROM ? ` · ${compactCount(stars)} stars` : ""}
+            </a>
+            <ThemeToggle />
+          </div>
         </nav>
       )}
       <span className="scroll-progress" aria-hidden="true" />

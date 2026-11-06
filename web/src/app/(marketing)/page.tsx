@@ -93,13 +93,10 @@ const Arrow = () => (
 
 // -------------------------------------------------------------- sections --
 
-function SectionHead({ index, label, title, sub, center }: { index: string; label: string; title: React.ReactNode; sub?: string; center?: boolean }) {
+function SectionHead({ label, title, sub, center }: { index?: string; label: string; title: React.ReactNode; sub?: string; center?: boolean }) {
   return (
     <div className={`sec-head reveal${center ? " center" : ""}`}>
-      <span className="sec-kicker">
-        <b>{index}</b>
-        {label}
-      </span>
+      <span className="sec-kicker">{label}</span>
       <h2 className="display">{title}</h2>
       {sub && <p className="sub">{sub}</p>}
     </div>

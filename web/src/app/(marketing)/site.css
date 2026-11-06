@@ -23,31 +23,32 @@
 }
 
 /* --------------------------------------------------------------- header -- */
+/* Quiet: the mark, four links, search, the theme and one button (redesign). */
 
 .site-header {
   position: fixed;
   inset: 0 0 auto;
   z-index: 50;
   border-bottom: 1px solid transparent;
-  transition: background 0.3s, border-color 0.3s;
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
 }
 
 .site-header[data-scrolled="true"] {
   background: var(--scrim);
-  backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(12px);
   border-bottom-color: var(--line);
 }
 
 .site-header .wrap {
   display: flex;
   align-items: center;
-  gap: 28px;
-  height: 72px;
+  gap: 24px;
+  height: 64px;
 }
 
 .site-nav {
   display: none;
-  gap: 2px;
+  gap: 4px;
 }
 
 @media (min-width: 860px) {
@@ -58,109 +59,101 @@
 
 .site-nav a,
 .nav-login {
-  position: relative;
   padding: 8px 12px;
-  font-size: 15px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--muted);
-  transition: color 0.2s;
-}
-
-.site-nav a::after {
-  content: "";
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 3px;
-  height: 2px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s var(--ease-out);
+  transition: color 0.15s var(--ease-out), background-color 0.15s var(--ease-out);
 }
 
 .site-nav a:hover,
 .nav-login:hover {
+  background: rgba(var(--ink-rgb), 0.05);
   color: var(--text);
-}
-
-.site-nav a:hover::after {
-  transform: scaleX(1);
-}
-
-/* the GitHub pill: icon, "Star", and the live star count in its own cell */
-.gh-pill {
-  display: inline-flex;
-  align-items: stretch;
-  height: 36px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--pill);
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.gh-pill:hover {
-  border-color: var(--line-3);
-  background: rgba(var(--ink-rgb), 0.04);
-}
-
-.gh-pill > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 12px;
-}
-
-.gh-pill .gh-star {
-  color: var(--warn);
-  transition: transform 0.3s var(--ease-out);
-}
-
-.gh-pill:hover .gh-star {
-  transform: rotate(72deg) scale(1.15);
-}
-
-.gh-pill .gh-count {
-  border-left: 1px solid var(--line-2);
-  font-family: var(--font-mono);
-  font-feature-settings: "tnum" 1;
-  font-size: 13px;
-  color: var(--muted);
 }
 
 .site-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   margin-left: auto;
 }
 
 .site-header .btn {
-  height: 38px;
-  padding: 0 18px;
+  height: 36px;
+  padding: 0 16px;
   font-size: 14px;
 }
 
-@media (max-width: 420px) {
-  .site-actions {
-    gap: 8px;
+/* player search, from every page */
+.hd-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--bg-1);
+  color: var(--faint);
+  transition: border-color 0.15s var(--ease-out);
+}
+
+.hd-search:focus-within {
+  border-color: var(--line-3);
+}
+
+.hd-search input {
+  width: 160px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.hd-search input::placeholder {
+  color: var(--faint);
+}
+
+.site-actions > .hd-search {
+  display: none;
+}
+
+@media (min-width: 1040px) {
+  .site-actions > .hd-search {
+    display: flex;
   }
 }
 
-@media (max-width: 380px) {
-  .site-header .wrap {
-    gap: 12px;
+.hd-theme {
+  display: none;
+}
+
+@media (min-width: 860px) {
+  .hd-theme {
+    display: inline-flex;
   }
-  .wordmark {
-    font-size: 18px;
-  }
-  .site-header .btn {
-    padding: 0 14px;
-    font-size: 14px;
-  }
+}
+
+.menu-panel .hd-search {
+  margin-bottom: 8px;
+}
+
+.menu-panel .hd-search input {
+  width: 100%;
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
 
 .hide-mobile {
@@ -202,15 +195,16 @@
   background: linear-gradient(180deg, var(--sky) 0%, var(--bg) 78%);
 }
 
-/* chalk pitch markings behind everything, drawn on at load */
+/* the chalk markings behind the hero are retired (redesign): quiet background */
 .hero-chalk {
+  display: none;
   position: absolute;
   inset: 0;
   z-index: -1;
   width: 100%;
   height: 100%;
   fill: none;
-  stroke: rgba(var(--ink-rgb), 0.07);
+  stroke: rgba(var(--ink-rgb), 0.05);
   stroke-width: 1.5;
   mask-image: linear-gradient(180deg, #000 30%, transparent 92%);
 }
@@ -273,9 +267,9 @@
   margin: 24px 0 0;
   font-family: var(--font-heading);
   font-size: clamp(40px, 10.5vw, 60px);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
 }
 
 @media (min-width: 640px) {
@@ -311,7 +305,7 @@
 }
 
 .hero-title .flare {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 @keyframes line-up {
@@ -381,7 +375,7 @@
   border-left: 3px solid var(--accent);
   border-radius: 4px var(--radius) var(--radius) 4px;
   background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 16px 40px -24px rgba(var(--shadow-rgb), 0.5);
   animation: rise 0.8s 0.8s var(--ease-out) backwards;
 }
 
@@ -451,7 +445,7 @@
 }
 
 .analysis-answer strong {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .est {
@@ -517,10 +511,9 @@
   color: var(--accent-ink);
   font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
 }
 
 .ticker-label::before {
@@ -644,9 +637,9 @@
   margin: 18px 0 0;
   font-family: var(--font-heading);
   font-size: var(--step-4);
-  font-weight: 600;
-  line-height: 1.04;
-  letter-spacing: -0.035em;
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
@@ -686,8 +679,8 @@
 }
 
 .text-link:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--accent-text);
+  color: var(--accent-text);
 }
 
 .text-link .arrow {
@@ -795,14 +788,14 @@
   fill: var(--accent-ink);
   font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .tactics .board-text {
   fill: rgba(var(--ink-rgb), 0.82);
   font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
 }
 
@@ -878,18 +871,15 @@
   color: var(--accent-ink);
   font-family: var(--font-display);
   font-size: 26px;
-  font-style: italic;
-  font-weight: 800;
-  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  font-weight: 600;
 }
 
 .timeline h3 {
   margin: 0 0 8px;
   font-family: var(--font-display);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .timeline p {
@@ -987,7 +977,7 @@
   background: var(--up-soft);
   color: var(--up);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .checks b {
@@ -1001,7 +991,7 @@
   border: 1px solid var(--line-2);
   border-radius: var(--radius);
   background: var(--bg-1);
-  box-shadow: 0 40px 100px -40px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 16px 40px -24px rgba(var(--shadow-rgb), 0.5);
 }
 
 .var-top {
@@ -1020,7 +1010,7 @@
   color: var(--bg);
   font-family: var(--font-display);
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
 }
 
@@ -1108,9 +1098,7 @@
   color: var(--danger);
   font-family: var(--font-display);
   font-size: 21px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-weight: 600;
   transform: rotate(-6deg);
 }
 
@@ -1244,7 +1232,7 @@
 
 .faq-list details[open] summary::after {
   transform: rotate(45deg);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .qn {
@@ -1255,7 +1243,7 @@
 }
 
 .faq-list details[open] .qn {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .faq-list details p {
@@ -1282,6 +1270,7 @@
 }
 
 .final-chalk {
+  display: none;
   position: absolute;
   left: 50%;
   bottom: 0;
@@ -1501,7 +1490,7 @@
 }
 
 .legal li::marker {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .legal a {
@@ -1613,7 +1602,7 @@ a.kicker b {
   background: var(--accent);
   color: var(--accent-ink);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   transition: transform 0.15s, background 0.2s;
 }
 
@@ -1743,28 +1732,38 @@ a.kicker b {
 
 .st-seg {
   display: inline-flex;
-  padding: 3px;
+  max-width: 100%;
+  padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
   border-radius: 12px;
   background: var(--bg-1);
   box-shadow: inset 0 0 0 1px var(--line);
 }
 
 .st-seg button {
+  flex: none;
   height: 32px;
   min-width: 48px;
   padding: 0 12px;
   border: 0;
-  border-radius: 9px;
+  border-radius: 8px;
   background: transparent;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--muted);
   cursor: pointer;
+  transition: background-color 0.15s var(--ease-out), color 0.15s var(--ease-out);
+}
+
+.st-seg button:hover {
+  color: var(--text);
 }
 
 .st-seg button.is-on {
   background: var(--bg-3);
   color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* availability tags beside a player's name (stats, players) */
@@ -1774,7 +1773,7 @@ a.kicker b {
   border-radius: 5px;
   font-size: 11px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .st-flag.doubt {
@@ -1796,7 +1795,7 @@ a.kicker b {
   height: 36px;
   padding: 0;
   border: 1px solid var(--line-2);
-  border-radius: 50%;
+  border-radius: 8px;
   background: transparent;
   color: var(--text);
   cursor: pointer;
@@ -1941,7 +1940,7 @@ a.kicker b {
 
 .explore-card:hover h3 .arrow {
   transform: translateX(4px);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .explore-text p {
@@ -1949,4 +1948,34 @@ a.kicker b {
   font-size: 14px;
   line-height: 1.55;
   color: var(--muted);
+}
+
+/* ------------------------------------------------------------ tool pages -- */
+/* A tool page opens with its name and one line, then the tool (redesign). */
+
+.tool-head {
+  max-width: 720px;
+  margin-bottom: 32px;
+}
+
+.tool-head h1 {
+  margin: 0;
+  font-size: var(--step-3);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.tool-head p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tool-h2 {
+  margin: 64px 0 16px;
+  font-size: var(--step-2);
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }

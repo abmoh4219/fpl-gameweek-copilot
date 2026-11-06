@@ -1,7 +1,7 @@
 /* The price watch. Built on the site tokens, so it follows both themes. */
 
 .prices-page {
-  padding-top: 132px;
+  padding-top: 112px;
 }
 
 .prices-page .sec-head {
@@ -157,7 +157,7 @@
   margin: 0 0 20px;
   font-family: var(--font-heading);
   font-size: var(--step-3);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
@@ -291,7 +291,7 @@
 }
 
 .pw-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -387,7 +387,7 @@
 }
 
 .pb-name:hover {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .pb-track {

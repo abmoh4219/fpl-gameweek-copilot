@@ -20,6 +20,7 @@ import { SegmentedBar } from "@/components/charts/SegmentedBar";
 import { readView } from "@/lib/supabase";
 import "@/components/charts/charts.css";
 import "./player.css";
+import { How } from "@/components/charts/How";
 
 export const revalidate = 3600;
 
@@ -86,9 +87,8 @@ export default async function PlayerPage({ params }: Params) {
         <header className="pp-head">
           <img className="pp-kit" src={kitImageUrl(row.teamCode, row.position === "GKP", 220)} alt="" referrerPolicy="no-referrer" width={110} height={146} />
           <div className="pp-id">
-            <span className="sec-kicker">
-              <b>{row.team}</b>
-              {POSITION_NAME[row.position]}
+            <span className="pp-kicker">
+              {row.team} · {POSITION_NAME[row.position]}
             </span>
             <h1 className="display pp-name">{row.webName}</h1>
             <div className="pp-meta">
@@ -143,7 +143,7 @@ export default async function PlayerPage({ params }: Params) {
             <>
               <div className="ins-card pp-wide">
                 <h2 className="ins-title">Points per gameweek</h2>
-                <p className="ins-how">FPL points in each gameweek this season. Hover a column for minutes, goals and assists.</p>
+                <How>FPL points in each gameweek this season. Hover a column for minutes, goals and assists.</How>
                 <ColumnChart
                   columns={series.map((g) => ({
                     key: String(g.gameweek),
@@ -158,7 +158,7 @@ export default async function PlayerPage({ params }: Params) {
 
               <div className="ins-card">
                 <h2 className="ins-title">Expected goal involvements</h2>
-                <p className="ins-how">xG plus xA per gameweek: the quality of chances, whether or not they went in.</p>
+                <How>xG plus xA per gameweek: the quality of chances, whether or not they went in.</How>
                 <ColumnChart
                   columns={series.map((g) => ({ key: String(g.gameweek), label: `GW${g.gameweek}`, value: Math.round(g.xgi * 100) / 100, detail: [`${g.minutes} minutes`] }))}
                   format="dec2"
@@ -178,13 +178,13 @@ export default async function PlayerPage({ params }: Params) {
           {/* On its own (a player with no minutes) the price card takes the full row. */}
           <div className={`ins-card${row.minutes > 0 ? "" : " pp-wide"}`}>
             <h2 className="ins-title">Price this season</h2>
-            <p className="ins-how">Every confirmed price change since we started tracking.</p>
+            <How>Every confirmed price change since we started tracking.</How>
             <PriceLine points={prices} summary={`${row.webName}'s price: ${prices.map((x) => `£${x.priceM.toFixed(1)}m on ${x.date}`).join(", ")}.`} />
           </div>
 
           <div className="ins-card pp-wide">
             <h2 className="ins-title">Where the points came from</h2>
-            <p className="ins-how">FPL&apos;s own breakdown of every point this season, by stat.</p>
+            <How>FPL&apos;s own breakdown of every point this season, by stat.</How>
             {breakdown.parts.length > 0 ? (
               <>
                 <SegmentedBar
@@ -211,9 +211,9 @@ export default async function PlayerPage({ params }: Params) {
           {fixtures.length > 0 && (
             <div className="ins-card pp-wide">
               <h2 className="ins-title">Next five gameweeks</h2>
-              <p className="ins-how">
+              <How>
                 FPL difficulty for {row.team}. Run: <b>{card?.fixturesLong.band}</b> (estimate).
-              </p>
+              </How>
               <div className="pp-fixtures">
                 {fixtures.map((f) => (
                   <div key={f.gameweek} className={`pp-fx d${f.isBlank ? "x" : (f.difficulty ?? 3)}`}>

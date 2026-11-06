@@ -169,14 +169,47 @@
   margin: 0;
   font-family: var(--font-heading);
   font-size: var(--step-2);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .ins-how {
   max-width: 720px;
-  margin: 6px 0 14px;
+  margin: 4px 0 16px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.ins-how summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  cursor: pointer;
+  transition: color 0.15s var(--ease-out);
+}
+
+.ins-how summary::-webkit-details-marker {
+  display: none;
+}
+
+.ins-how summary::after {
+  content: "+";
+  font-family: var(--font-mono);
+}
+
+.ins-how[open] summary::after {
+  content: "−";
+}
+
+.ins-how summary:hover {
+  color: var(--text);
+}
+
+.ins-how p {
+  margin: 8px 0 0;
   font-size: 14px;
+  line-height: 1.6;
   color: var(--muted);
 }
 
@@ -295,7 +328,7 @@
 }
 
 .pts-split-part b {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .pts-split-legend {
@@ -336,6 +369,6 @@
 
 .chart-tip .chart-tip-go {
   margin: 6px 0 0;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }

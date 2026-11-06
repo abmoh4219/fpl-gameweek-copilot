@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { kitImageUrl, normalizeName, type StatPosition, type StatRow } from "@fpl/shared";
 
 /**
@@ -22,6 +22,11 @@ const LIMIT = 40;
 export function PlayerSearch({ rows }: { rows: StatRow[] }) {
   const [query, setQuery] = useState("");
   const [position, setPosition] = useState<StatPosition | null>(null);
+  // The header search sends "/players?q=…"; the page stays cached, so the query is read here.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setQuery(q.slice(0, 40));
+  }, []);
   const indexed = useMemo(() => rows.map((r) => ({ r, key: normalizeName(`${r.webName} ${r.team}`) })), [rows]);
   const results = useMemo(() => {
     const q = normalizeName(query.trim());

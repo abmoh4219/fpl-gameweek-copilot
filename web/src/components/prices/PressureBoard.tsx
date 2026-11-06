@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { closestToChange, type WatchRow } from "@fpl/shared";
+import { How } from "@/components/charts/How";
 
 /**
  * Tonight at a glance: a diverging bar chart. The players closest to a rise
@@ -42,10 +43,10 @@ export function PressureBoard({ rows }: { rows: WatchRow[] }) {
   return (
     <div className="ins-card pb">
       <h2 className="ins-title">Tonight at a glance</h2>
-      <p className="ins-how">
+      <How>
         How far each player is toward a price change, from FPL&apos;s own data. 100% is the threshold, but a player can
         pass it and still not move: an estimate, never a promise.
-      </p>
+      </How>
       <div className="pb-board" role="img" aria-label={summary}>
         <div className="pb-side">
           <span className="pb-side-label">

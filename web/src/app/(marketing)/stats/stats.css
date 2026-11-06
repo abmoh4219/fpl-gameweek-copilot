@@ -1,7 +1,7 @@
 /* The stats hub. Built on the site tokens, so it follows both themes. */
 
 .stats-page {
-  padding-top: 132px;
+  padding-top: 112px;
 }
 
 .stats-page .sec-head {
@@ -10,10 +10,31 @@
 
 .st {
   display: grid;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
 }
 
 /* --------------------------------------------------------- board picker -- */
+
+.st-rank-by {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-rank-by > .st-seg {
+  min-width: 0;
+}
+
+.st-more select {
+  height: 40px;
+}
+
+.st-more.is-on select {
+  border-color: var(--line-3);
+  background-color: var(--bg-3);
+}
 
 .st-boards {
   display: flex;
@@ -110,7 +131,7 @@
   margin: 0;
   font-family: var(--font-heading);
   font-size: var(--step-2);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.02em;
 }
 
@@ -174,7 +195,7 @@
 }
 
 .st-table tbody tr:nth-child(-n + 3) .st-rank {
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -352,7 +373,7 @@
   margin: 48px 0 16px;
   font-family: var(--font-heading);
   font-size: var(--step-3);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
@@ -372,7 +393,7 @@
 }
 
 .st-link:hover {
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: underline;
   text-underline-offset: 3px;
 }

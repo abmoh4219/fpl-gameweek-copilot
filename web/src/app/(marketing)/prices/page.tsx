@@ -48,19 +48,10 @@ export default async function PricesPage() {
   return (
     <section className="block prices-page">
       <div className="wrap">
-        <div className="sec-head">
-          <span className="sec-kicker">
-            <b>Prices</b>
-            Price watch
-          </span>
-          <h1 className="display">
-            Beat the <em>price changes</em>
-          </h1>
-          <p className="sub">
-            Who is closest to a rise or a fall, read from FPL&apos;s own price-change data, and every change already
-            confirmed. Prices change once a night; everything about tonight is an estimate.
-          </p>
-        </div>
+        <header className="tool-head">
+          <h1>Prices</h1>
+          <p>Who is closest to a rise or fall tonight, from FPL&apos;s own data (an estimate), and every confirmed change</p>
+        </header>
 
         {rows.length > 0 && <PressureBoard rows={rows} />}
         {rows.length > 0 ? (
