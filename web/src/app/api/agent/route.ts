@@ -1,5 +1,5 @@
 import { AGENT_LIMITS, AgentRequestSchema } from "@fpl/shared";
-import { failure, gafferStream, NDJSON_HEADERS } from "@/lib/agent";
+import { aiGafferEnabled, failure, gafferStream, NDJSON_HEADERS } from "@/lib/agent";
 import { createAuthClient } from "@/lib/auth/server";
 import { loadSquad } from "@/lib/squad";
 
@@ -17,6 +17,7 @@ export const maxDuration = 60;
 const RequestSchema = AgentRequestSchema.omit({ teamId: true });
 
 export async function POST(request: Request): Promise<Response> {
+  if (!aiGafferEnabled()) return failure("unavailable", "The Gaffer runs as free checks on your dugout now.", 410);
   let body: unknown;
   try {
     body = await request.json();

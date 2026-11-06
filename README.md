@@ -6,49 +6,51 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Live](https://img.shields.io/badge/live-armband--one.vercel.app-ff6a3d.svg)](https://armband-one.vercel.app)
 
-**Free, open-source tools and an AI manager for Fantasy Premier League.** Connect your FPL team and Armband
-shows your fifteen on the pitch with the numbers that matter. Then give the
-**Gaffer**, Armband's agent, a job: pick your XI, rate your lineup, make a
-transfer, choose a captain. It makes the changes on your pitch for you to
-apply or revert, and shows the working behind every call.
+**Free, open-source tools for Fantasy Premier League.** Season stats, a
+fixture planner, a price watch and a page for every player, with every number
+shown. Connect your FPL team and Armband shows your fifteen on the pitch, next
+to the **Gaffer**: five checks computed in code (best XI, lineup rating,
+captain, transfers within your bank, injuries). Each check shows its numbers
+and puts its plan on your pitch for you to apply or revert.
 
 Behind it, a data pipeline watches FPL every few hours, detects price changes
 and injury news, and posts the ones that matter to a Telegram channel.
 
 **[Live site](https://armband-one.vercel.app)** ·
 **[Try the demo](https://armband-one.vercel.app/demo)** (no account needed) ·
-[How the Gaffer works](docs/agent.md) ·
+[The agent (switched off)](docs/agent.md) ·
 [Architecture decisions](docs/decisions.md)
 
 ![The landing page](docs/images/landing.png)
 
 ## Highlights
 
-- **The Gaffer: an agent, not a chatbot.** Claude Haiku 5.5 on the Messages
-  API, with a tool loop of our own and its own FPL tools. It acts on a draft of your team: best XI, bench and captaincy
-  changes, transfers. Every change shows on the pitch with **Apply** and
-  **Revert**.
-- **Code computes, the model decides.** Every number comes from a tested
-  insight engine: form, xGI per 90 scaled by minutes, minutes risk, fixture
-  difficulty, goal threat, captain score. The best XI is an exhaustive search
-  over legal formations, and every transfer is rule-checked (positions, three
-  per club, the bank). The model chooses what to do and explains it; it never
-  invents a figure.
-- **Honest by construction.** Estimates are labelled as estimates. Gemini's
-  preview prose is rejected if it contains any number the code didn't
-  compute. Questions outside FPL get one polite line and aren't counted.
+- **The Gaffer: five checks, no limits.** Best XI, lineup rating, captain,
+  transfers and injuries, computed in code from FPL's data. The same squad
+  always gets the same answer, and every plan shows on the pitch with
+  **Apply** and **Revert** ([ADR-0016](docs/decisions.md)).
+- **Code computes every number.** A tested insight engine: form, xGI per 90
+  scaled by minutes, minutes risk, fixture difficulty, goal threat, captain
+  score. The best XI is an exhaustive search over legal formations, and every
+  transfer is rule-checked (positions, three per club, the bank).
+- **Honest by construction.** Estimates are labelled as estimates, rankings
+  show the numbers behind them, and Gemini's preview prose is rejected if it
+  contains any number the code didn't compute.
+- **An agent in the repo, switched off.** [`agent/`](agent) is a working
+  Claude agent with its own tool loop and FPL tools. It ran the Gaffer until
+  its key expired on 1 November 2026, and turns back on with a key and one
+  environment variable ([docs/agent.md](docs/agent.md)).
 - **Free-tier engineering.** GitHub Actions, Supabase, Vercel Hobby
   and Make's free plan, each with its budget worked out.
-  Five questions per account, a daily spend cap, and a demo recorded
-  once per gameweek and replayed to everyone.
 - **Its own identity.** A floodlit "Matchnight" design system: condensed
   display type, slanted broadcast plates, chalk tactics-board illustrations,
   motion that respects reduced-motion settings.
 
-## The Gaffer at work
+## The agent, when it was on
 
-Ask for a best XI and the Gaffer calls one tool, the pitch redraws, and
-**Apply** or **Revert** decides. Every figure in the answer came from code.
+Before ADR-0016 the Gaffer was a Claude agent. Asked for a best XI, it called
+one tool, the pitch redrew, and **Apply** or **Revert** decided. Every figure
+in the answer came from code. The same engine now powers the five checks.
 
 ![The Gaffer picks a best XI: the plan, the redrawn pitch and the reasoning](docs/images/gaffer-best-xi.png)
 
@@ -62,9 +64,8 @@ pick_best_xi()   →  4-4-2 · C Haaland · 61 → 65.6 exp. pts (est.)
 plan             →  Start: Truffert, O'Reilly · Bench: Kayode, Schade · Vice: Kayode → Tavernier
 ```
 
-Measured on the real model: a best-XI answer takes two model turns, about
-8 seconds, and costs about a tenth of a cent. Ask it something outside
-football and it says so in one sentence, without using your allowance.
+Measured on the real model: a best-XI answer took two model turns, about
+8 seconds, and cost about a tenth of a cent.
 
 ## A look around
 
@@ -90,9 +91,10 @@ football and it says so in one sentence, without using your allowance.
                   core · app (RLS) · api (views)
                             │
                             ▼
-                    Next.js on Vercel ──/api/agent──▶ the Gaffer, in-process:
-                 landing · accounts · dugout ·        Claude Haiku 5.5 ⇄ our tools
-                 demo, from read-only views           (read tools + action tools)
+                    Next.js on Vercel
+                 landing · stats · fixtures · prices · players ·
+                 accounts · dugout with the Gaffer's checks · demo,
+                 all from read-only views
 ```
 
 - **Watch:** `price-sync` runs every three hours, `daily-sync` nightly after
@@ -104,8 +106,8 @@ football and it says so in one sentence, without using your allowance.
   config file, with unit tests around them.
 - **Deliver:** one webhook per run, only when there's news. Before each
   deadline a preview of captains, differentials and fixture swings.
-- **Explain:** the Gaffer works from the same computed cards, through tools.
-  See [docs/agent.md](docs/agent.md).
+- **Explain:** the Gaffer's checks and every tool page read the same
+  computed cards.
 
 Make stays thin on purpose: code formats every message, so each scenario is a
 handful of modules and a month of alerts fits well inside the free plan's
@@ -121,7 +123,7 @@ handful of modules and a month of alerts fits well inside the free plan's
 | --- | --- |
 | Language | TypeScript (strict), Zod at every external boundary |
 | Web | Next.js 16 · React 19 · Supabase Auth (email and Google) |
-| Agent | Claude Haiku 5.5 · Anthropic TypeScript SDK · our own streaming tool loop |
+| Agent (switched off) | Claude Haiku 5.5 · Anthropic TypeScript SDK · our own streaming tool loop |
 | Data | Supabase Postgres: three schemas, RLS, owner-privileged read views |
 | Jobs | GitHub Actions cron · `tsx` |
 | Automation | Make.com · Gemini (preview prose) · Telegram Bot API |
@@ -132,7 +134,7 @@ handful of modules and a month of alerts fits well inside the free plan's
 | Path | |
 | --- | --- |
 | [`web/`](web) | Next.js app: landing, accounts, the dugout, the demo |
-| [`agent/`](agent) | The Gaffer: tools, prompt, spend guards |
+| [`agent/`](agent) | The Claude agent (switched off): tools, prompt, spend guards |
 | [`jobs/`](jobs) | Sync, change detection, reports, delivery, alerts |
 | [`packages/shared/`](packages/shared) | Schemas, the insight engine, squads and plans |
 | [`supabase/migrations/`](supabase/migrations) | Every schema change, in order |
@@ -155,9 +157,9 @@ pnpm --filter @fpl/web dev    # http://localhost:3000
 
 ## Docs
 
-- [Architecture decisions](docs/decisions.md): fifteen ADRs, from storage to
+- [Architecture decisions](docs/decisions.md): sixteen ADRs, from storage to
   the agent
-- [The Gaffer](docs/agent.md): the agent's tools, plans, limits, testing
+- [The agent](docs/agent.md): the switched-off Claude agent: tools, plans, limits, testing
 - [Database](docs/database.md): schemas, security model, retention
 - [Data dictionary](docs/data-dictionary.md): what the FPL API returns, and
   its traps

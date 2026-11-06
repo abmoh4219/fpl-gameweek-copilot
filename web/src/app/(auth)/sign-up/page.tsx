@@ -19,11 +19,11 @@ export default async function SignUp() {
       <h1 className="auth-title">
         Create your <em>free account</em>
       </h1>
-      <p className="auth-sub">Five questions to the Gaffer included, free. Your squad view and player cards are unlimited. No FPL password, ever.</p>
+      <p className="auth-sub">Your squad on the pitch, the Gaffer&apos;s five checks and every player card, free with no limits. No FPL password, ever.</p>
       <AuthForm mode="sign-up" next="/onboarding" />
       <p className="auth-fine">
-        By creating an account you agree to the <Link href="/terms">Terms</Link>. We keep only your login, your team ID
-        and a question counter — <Link href="/privacy">Privacy</Link>.
+        By creating an account you agree to the <Link href="/terms">Terms</Link>. We keep only your login and your team
+        ID — <Link href="/privacy">Privacy</Link>.
       </p>
     </div>
   );

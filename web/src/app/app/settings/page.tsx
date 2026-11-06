@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AGENT_LIMITS } from "@fpl/shared";
 import { createAuthClient, getViewer } from "@/lib/auth/server";
 import { DeleteAccount } from "./DeleteAccount";
 
@@ -12,12 +11,7 @@ export default async function Settings() {
   const viewer = await getViewer();
   if (!viewer?.profile) return null;
   const supabase = await createAuthClient();
-  const [{ data: usage }, { data: since }] = await Promise.all([
-    supabase.from("my_usage_total").select("questions").limit(1),
-    supabase.from("my_profile").select("created_at").limit(1),
-  ]);
-  const used = (usage?.[0] as { questions: number } | undefined)?.questions ?? 0;
-  const limit = AGENT_LIMITS.questionsPerAccount;
+  const { data: since } = await supabase.from("my_profile").select("created_at").limit(1);
   const created = (since?.[0] as { created_at: string } | undefined)?.created_at;
 
   return (
@@ -88,21 +82,6 @@ export default async function Settings() {
 
       <section className="setting">
         <div className="setting-label">
-          <h2>The Gaffer</h2>
-          <p>Every account includes {limit} questions. They don&apos;t reset — the demo and your squad view stay free.</p>
-        </div>
-        <div className="usage">
-          <div className="usage-top">
-            <b>{Math.min(used, limit)}</b> of {limit} questions used
-          </div>
-          <div className="usage-bar" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={Math.min(used, limit)}>
-            <i style={{ width: `${Math.min(100, (used / limit) * 100)}%` }} />
-          </div>
-        </div>
-      </section>
-
-      <section className="setting">
-        <div className="setting-label">
           <h2>Session</h2>
           <p>Sign out of Armband on this device.</p>
         </div>
@@ -116,7 +95,7 @@ export default async function Settings() {
       <section className="setting danger">
         <div className="setting-label">
           <h2>Delete account</h2>
-          <p>Removes your login, your connected team and your usage history. Your FPL team itself is untouched, and signing up again with the same email does not reset your questions.</p>
+          <p>Removes your login and your connected team. Your FPL team itself is untouched.</p>
         </div>
         <DeleteAccount />
       </section>

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "The terms for using Armband, in plain words.",
 };
 
-const UPDATED = "28 October 2026";
+const UPDATED = "6 November 2026";
 
 export default function Terms() {
   return (
@@ -23,8 +23,8 @@ export default function Terms() {
 
       <h2>What Armband is</h2>
       <p>
-        Armband reads your public FPL team, shows it with numbers computed from public football data, and offers a
-        the Gaffer, an AI manager that can suggest and plan changes. It is in early access: features may change, pause or be removed, and
+        Armband reads your public FPL team, shows it with numbers computed from public football data, and offers the
+        Gaffer, a set of checks that suggest lineup, captain and transfer changes. It is in early access: features may change, pause or be removed, and
         it is provided as it is, without guarantees.
       </p>
 
@@ -43,10 +43,9 @@ export default function Terms() {
 
       <h2>Fair use</h2>
       <ul>
-        <li>One account per person. Each account includes five questions to the Gaffer.</li>
+        <li>One account per person.</li>
         <li>
-          Do not try to get around the limits, overload the service, scrape it, or use the Gaffer for anything other than
-          Fantasy Premier League.
+          Do not overload the service or scrape it.
         </li>
       </ul>
       <p>Accounts that break these rules may be suspended or deleted.</p>

@@ -1,9 +1,9 @@
-import { AGENT_LIMITS, type Squad } from "@fpl/shared";
+import type { Squad } from "@fpl/shared";
 import { Dugout } from "@/components/copilot/Dugout";
 import { SquadCheck } from "@/components/copilot/SquadCheck";
-import { createAuthClient, getViewer } from "@/lib/auth/server";
-import { LIVE_SUGGESTIONS } from "@/lib/demo";
+import { getViewer } from "@/lib/auth/server";
 import { FplUnavailableError, TeamNotFoundError } from "@/lib/fpl";
+import { gafferData } from "@/lib/gaffer";
 import { loadSquad } from "@/lib/squad";
 
 const fmt = new Intl.NumberFormat("en-GB");
@@ -27,13 +27,8 @@ export default async function MyTeam({ searchParams }: { searchParams: Promise<{
   if (!viewer || !teamId) return null;
 
   const { welcome } = await searchParams;
-  const supabase = await createAuthClient();
-  const [result, { data: usage }] = await Promise.all([
-    squadOrError(teamId),
-    supabase.from("my_usage_total").select("questions").limit(1),
-  ]);
-  const limit = AGENT_LIMITS.questionsPerAccount;
-  const used = (usage?.[0] as { questions: number } | undefined)?.questions ?? 0;
+  const result = await squadOrError(teamId);
+  const gaffer = "squad" in result ? await gafferData(result.squad).catch(() => null) : null;
   const first = (viewer.name ?? viewer.profile?.manager_name ?? "").split(" ")[0];
 
   return (
@@ -66,7 +61,7 @@ export default async function MyTeam({ searchParams }: { searchParams: Promise<{
       {welcome === "1" && (
         <div className="notice ok welcome" role="status">
           <b>You&apos;re in.</b> {"squad" in result ? `${result.squad.teamName} is connected` : "Your team is connected"} —
-          tap any player for their card, or give the Gaffer a job.
+          tap any player for their card, or run one of the Gaffer&apos;s checks.
         </div>
       )}
 
@@ -74,7 +69,7 @@ export default async function MyTeam({ searchParams }: { searchParams: Promise<{
         <div className="notice error">{result.error}</div>
       ) : (
         <>
-          <Dugout squad={result.squad} mode="live" suggestions={LIVE_SUGGESTIONS} remaining={Math.max(limit - used, 0)} limit={limit} />
+          <Dugout squad={result.squad} gaffer={gaffer} mode="live" />
           <SquadCheck squad={result.squad} />
         </>
       )}

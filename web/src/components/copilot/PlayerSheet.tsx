@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { kitImageUrl, type SquadPlayer } from "@fpl/shared";
 
@@ -17,12 +16,12 @@ const STATUS: Record<string, string> = {
 export function PlayerSheet({
   player: p,
   onClose,
-  onAsk,
+  onReplace,
 }: {
   player: SquadPlayer;
   onClose: () => void;
-  /** Live: ask the co-pilot. Demo: undefined, and the card invites a sign-up. */
-  onAsk?: (question: string) => void;
+  /** Open the Gaffer's "Find a transfer" on this player. Undefined for a player not in the squad. */
+  onReplace?: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -109,18 +108,10 @@ export function PlayerSheet({
         </ol>
 
         <div className="sheet-actions">
-          {onAsk ? (
-            <button
-              type="button"
-              className="btn btn-accent btn-block"
-              onClick={() => onAsk(`Should I keep ${p.webName}, or is there a better ${p.position} for my budget?`)}
-            >
-              Ask the Gaffer about {p.webName}
+          {onReplace && (
+            <button type="button" className="btn btn-block" onClick={onReplace}>
+              Find a replacement for {p.webName}
             </button>
-          ) : (
-            <Link href="/sign-up" className="btn btn-accent btn-block">
-              Ask about your own players — free
-            </Link>
           )}
           <p className="hint">Minutes risk, goal threat and fixture runs are computed by our pipeline. Anything about the future is an estimate.</p>
         </div>

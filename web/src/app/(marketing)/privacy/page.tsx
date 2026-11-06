@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "What Armband stores about you, why, and how to delete it.",
 };
 
-const UPDATED = "28 October 2026";
+const UPDATED = "6 November 2026";
 
 /**
  * Written to match what the code actually does: the tables in
@@ -35,12 +35,10 @@ export default function Privacy() {
           <b>Your FPL team.</b> The team ID you connect, with the team name and manager name FPL shows publicly for it.
         </li>
         <li>
-          <b>A question counter.</b> How many questions your account has asked the Gaffer, by day, so the limit holds.
-        </li>
-        <li>
-          <b>An email fingerprint.</b> A one-way, keyed hash of your email address with the number of questions it has
-          used. It cannot be turned back into your address. It exists so the five free questions cannot be reset by
-          deleting an account and signing up again.
+          <b>An email fingerprint, only if you asked the old AI Gaffer questions.</b> Until November 2026 the Gaffer ran
+          on AI with five questions per account. For accounts that used it, we keep a one-way, keyed hash of the email
+          address with the number of questions asked. It cannot be turned back into your address. Nothing new is added
+          to it: the Gaffer now runs as checks in code.
         </li>
       </ul>
       <p>
@@ -51,8 +49,8 @@ export default function Privacy() {
       <h2>What we do not store</h2>
       <ul>
         <li>
-          <b>Your questions and the answers.</b> They are processed to answer you and not saved. The Gaffer runs on
-          Anthropic&apos;s Claude, which receives your question and your squad to produce the answer.
+          <b>The Gaffer&apos;s results.</b> Its checks run on our server from your public FPL team and are not saved.
+          No AI service receives your squad.
         </li>
         <li>
           <b>Plans you apply.</b> A lineup or transfer plan you apply is kept in your own browser, not on our servers.
@@ -65,16 +63,16 @@ export default function Privacy() {
 
       <h2>Who processes it</h2>
       <p>
-        Armband runs on <b>Supabase</b> (database and sign-in), <b>Vercel</b> (the website), <b>Hugging Face</b> (the
-        Gaffer&apos;s service), <b>Anthropic</b> (the Gaffer&apos;s answers) and, if you choose it, <b>Google</b> (sign-in).
+        Armband runs on <b>Supabase</b> (database and sign-in), <b>Vercel</b> (the website) and, if you choose it,{" "}
+        <b>Google</b> (sign-in).
         Football data comes from Fantasy Premier League&apos;s public data and football-data.org.
       </p>
 
       <h2>Deleting your data</h2>
       <p>
-        Go to <Link href="/app/settings">Settings</Link> and choose <b>Delete account</b>. Your login, connected team and
-        question history are deleted immediately and permanently. The only thing kept is the email fingerprint above —
-        a hash and a count, nothing that identifies you. To clear an applied plan, use <b>Clear plan</b> or your
+        Go to <Link href="/app/settings">Settings</Link> and choose <b>Delete account</b>. Your login and connected team are
+        deleted immediately and permanently. The only thing kept is the email fingerprint above, if your account ever
+        had one: a hash and a count, nothing that identifies you. To clear an applied plan, use <b>Clear plan</b> or your
         browser&apos;s site data.
       </p>
 

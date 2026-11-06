@@ -15,3 +15,4 @@ export * from "./stats.ts";
 export * from "./fixtures-grid.ts";
 export * from "./prices.ts";
 export * from "./player.ts";
+export * from "./gaffer.ts";

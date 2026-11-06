@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import type { AgentEvent } from "@fpl/shared";
 import { DEMO_TEAM_ID } from "@/components/site/links";
-import { collectGaffer, failure, NDJSON_HEADERS } from "@/lib/agent";
+import { aiGafferEnabled, collectGaffer, failure, NDJSON_HEADERS } from "@/lib/agent";
 import { DEMO_QUESTIONS } from "@/lib/demo";
 import { frozenDemo } from "@/lib/demo-snapshot";
 import { loadSquad } from "@/lib/squad";
@@ -39,6 +39,7 @@ const recorded = unstable_cache(async (_gameweek: number, q: number) => record(q
 const inFlight = new Map<string, Promise<AgentEvent[]>>();
 
 export async function GET(request: Request): Promise<Response> {
+  if (!aiGafferEnabled()) return failure("unavailable", "The Gaffer runs as free checks on the demo now.", 410);
   const q = Number(new URL(request.url).searchParams.get("q"));
   if (!Number.isInteger(q) || q < 0 || q >= DEMO_QUESTIONS.length) return failure("bad_request", "Unknown demo question.", 400);
 

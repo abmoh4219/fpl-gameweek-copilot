@@ -61,3 +61,12 @@ export async function collectGaffer(input: GafferInput): Promise<AgentEvent[]> {
   await runGaffer(input, (event) => events.push(event));
   return events;
 }
+
+/**
+ * The AI Gaffer is switched off (ADR-0016): the Gaffer now runs as five free
+ * checks in code. The agent stays in the repo; setting GAFFER_AI=on together
+ * with an Anthropic key turns this route back on.
+ */
+export function aiGafferEnabled(): boolean {
+  return process.env["GAFFER_AI"] === "on" && Boolean(process.env["ANTHROPIC_API_KEY"]);
+}

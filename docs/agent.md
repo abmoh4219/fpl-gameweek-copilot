@@ -1,6 +1,12 @@
-# The Gaffer
+# The Gaffer agent (switched off)
 
-How the Gaffer, Armband's agent, works: what it can do, where it runs, what
+> **Switched off since 6 November 2026 (ADR-0016).** The Gaffer on the site is
+> now five checks computed in code (`packages/shared/src/gaffer.ts`). This
+> document describes the Claude agent that ran it before, which is still in
+> `agent/`. To turn it back on: set `ANTHROPIC_API_KEY` and `GAFFER_AI=on` in
+> Vercel, and put `Copilot` back in `Dugout` in place of `Gaffer`.
+
+How the Gaffer agent worked: what it can do, where it runs, what
 it may spend, and how it stays honest. Decisions behind it: ADR-0012 (actions
 and limits), ADR-0013 (the allowance), ADR-0014 (running it on Vercel).
 

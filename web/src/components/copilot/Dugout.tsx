@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { applyPlan, describePlan, planOf, TeamPlanSchema, type HighlightTone, type Squad, type SquadPlayer, type TeamPlan } from "@fpl/shared";
+import type { GafferData } from "@/lib/gaffer";
 import { FplPitch, type PlateValue } from "../pitch/FplPitch";
 import { ScoreBug } from "../pitch/ScoreBug";
-import { Copilot, type Highlight, type PlanEvent } from "./Copilot";
+import { Gaffer, type Highlight, type Proposal } from "./Gaffer";
 import { PlayerSheet } from "./PlayerSheet";
 import "./copilot.css";
 
@@ -67,31 +68,23 @@ function planMarks(base: Squad, shown: Squad, plan: TeamPlan): Map<number, strin
 }
 
 /**
- * The pitch and the co-pilot side by side. They share the highlights (the
- * co-pilot points at players) and the PLAN: when the co-pilot changes the
- * team, the pitch redraws with the change and offers Apply or Revert.
+ * The pitch and the Gaffer side by side. They share the highlights (a check
+ * points at players) and the PLAN: when a check changes the team, the pitch
+ * redraws with the change and offers Apply or Revert.
  */
-export function Dugout(
-  props: { squad: Squad } & (
-    | { mode: "live"; suggestions: readonly string[]; remaining: number; limit: number }
-    | { mode: "demo"; questions: readonly string[] }
-  ),
-) {
-  const { squad: base } = props;
-  const key = storageKey(props.mode, base);
+export function Dugout({ squad: base, gaffer, mode }: { squad: Squad; gaffer: GafferData | null; mode: "live" | "demo" }) {
+  const key = storageKey(mode, base);
   const [value, setValue] = useState<PlateValue>("fixture");
   const [selected, setSelected] = useState<SquadPlayer | null>(null);
   const [highlights, setHighlights] = useState(new Map<number, { tone: HighlightTone; note: string }>());
-  const [pendingLive, setPendingLive] = useState<string | null>(null);
+  const [replace, setReplace] = useState<{ id: number; at: number } | null>(null);
   const [applied, setApplied] = useState<StoredPlan | null>(null);
-  const [proposed, setProposed] = useState<PlanEvent | null>(null);
+  const [proposed, setProposed] = useState<Proposal | null>(null);
 
   useEffect(() => setApplied(loadPlan(key, base)), [key, base]);
 
   const onHighlight = useCallback((players: Highlight[]) => setHighlights(new Map(players.map((p) => [p.id, { tone: p.tone, note: p.note }]))), []);
-  const onPlan = useCallback((e: PlanEvent) => setProposed(e), []);
-  const clearLive = useCallback(() => setPendingLive(null), []);
-  const noop = useCallback(() => {}, []);
+  const onPlan = useCallback((p: Proposal) => setProposed(p), []);
   const close = useCallback(() => setSelected(null), []);
 
   // What the pitch shows: the co-pilot's proposal first, then the applied plan, then FPL as-is.
@@ -184,36 +177,27 @@ export function Dugout(
       </section>
 
       <div className="dugout-copilot">
-        {props.mode === "live" ? (
-          <Copilot
-            mode="live"
-            suggestions={props.suggestions}
-            remaining={props.remaining}
-            limit={props.limit}
-            pending={pendingLive}
-            onPendingConsumed={clearLive}
-            onHighlight={onHighlight}
-            onPlan={onPlan}
-            appliedPlan={applied?.plan ?? null}
-          />
+        {gaffer ? (
+          <Gaffer squad={base} data={gaffer} replace={replace} onPlan={onPlan} onHighlight={onHighlight} />
         ) : (
-          <Copilot mode="demo" questions={props.questions} pending={null} onPendingConsumed={noop} onHighlight={onHighlight} onPlan={onPlan} />
+          <div className="notice">The Gaffer&apos;s checks are unavailable right now. Your squad is still up to date.</div>
         )}
       </div>
 
-      {selected &&
-        (props.mode === "live" ? (
-          <PlayerSheet
-            player={selected}
-            onClose={close}
-            onAsk={(q) => {
-              setSelected(null);
-              setPendingLive(q);
-            }}
-          />
-        ) : (
-          <PlayerSheet player={selected} onClose={close} />
-        ))}
+      {selected && (
+        <PlayerSheet
+          player={selected}
+          onClose={close}
+          {...(gaffer && [...base.starters, ...base.bench].some((p) => p.fplId === selected.fplId)
+            ? {
+                onReplace: () => {
+                  setSelected(null);
+                  setReplace({ id: selected.fplId, at: Date.now() });
+                },
+              }
+            : {})}
+        />
+      )}
     </div>
   );
 }

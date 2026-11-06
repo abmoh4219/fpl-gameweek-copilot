@@ -5,22 +5,21 @@ import { SquadCheck } from "@/components/copilot/SquadCheck";
 import { Mark, Wordmark } from "@/components/site/Mark";
 import { DEMO_TEAM_ID } from "@/components/site/links";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
-import { DEMO_QUESTIONS } from "@/lib/demo";
-import { frozenDemo } from "@/lib/demo-snapshot";
+import { gafferData } from "@/lib/gaffer";
 import { loadSquad } from "@/lib/squad";
 import "../app/app.css";
 
 export const metadata: Metadata = {
   title: "Demo",
-  description: "Explore a real FPL squad with the Gaffer, Armband's AI manager — no account needed.",
+  description: "A real FPL squad on the pitch with the Gaffer's five free checks: best XI, lineup rating, captain, transfers and injuries. No account needed.",
 };
 
-// The squad comes from FPL through our cache; the answers are recorded once a gameweek.
+// The squad comes from FPL through our cache; the checks are computed by code on each render.
 export const revalidate = 900;
 
 export default async function Demo() {
-  // Without a key the answers are frozen, so the pitch is frozen with them.
-  const squad = frozenDemo()?.squad ?? (await loadSquad(DEMO_TEAM_ID).catch(() => null));
+  const squad = await loadSquad(DEMO_TEAM_ID).catch(() => null);
+  const gaffer = squad ? await gafferData(squad).catch(() => null) : null;
 
   return (
     <div className="demo">
@@ -49,13 +48,13 @@ export default async function Demo() {
           </h1>
           <p className="page-sub">
             This is {squad ? `${squad.teamName}, managed by ${squad.managerName}` : "a real FPL team"}. Tap any player for
-            their card, and give the Gaffer a job to see how it works it out.
+            their card, and run the Gaffer&apos;s checks to see the numbers behind each answer.
           </p>
         </header>
 
         {squad ? (
           <>
-            <Dugout squad={squad} mode="demo" questions={DEMO_QUESTIONS} />
+            <Dugout squad={squad} gaffer={gaffer} mode="demo" />
             <SquadCheck squad={squad} />
           </>
         ) : (

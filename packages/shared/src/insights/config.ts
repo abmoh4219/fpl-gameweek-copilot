@@ -216,6 +216,15 @@ export const INSIGHT_CONFIG = {
      */
     sendWithinHours: 36,
   },
+
+  gaffer: {
+    /** Captain options shown, best first, out of the starting XI. */
+    captainOptions: 5,
+    /** Replacement options per squad player, for each sort. */
+    transferIdeas: 3,
+    /** A search wider than the shown ideas, so the 3-per-club check can drop some and still leave enough. */
+    transferSearch: 10,
+  },
 } as const;
 
 export type InsightConfig = typeof INSIGHT_CONFIG;

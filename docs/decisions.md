@@ -702,3 +702,57 @@ daily-sync leaves the site and the channel a night behind.
 
 - **More frequent GitHub schedules.** Same unreliability, more minutes.
 - **A Vercel cron.** Hobby crons run at most once a day.
+
+## ADR-0016 — The Gaffer runs as five checks in code; the agent is switched off
+
+*Date: 2026-11-06 · Status: accepted · Supersedes the live parts of ADR-0012, ADR-0013 and ADR-0014*
+
+### Context
+
+The Gaffer was a Claude agent (ADR-0014) with five questions per account
+(ADR-0012). Its API key expired on 1 November 2026. Since then the dugout's
+chat could not answer, and the demo replayed a frozen recording. Armband is
+now positioned as free, open-source tools, and a five-question allowance does
+not fit that.
+
+Every number the agent gave already came from the tested engine in
+`packages/shared` (lineup, captain score, transfer search and checks). The
+model chose which tool to call and wrote the sentences around the result.
+
+### Decision
+
+- **The Gaffer is five checks computed in code**: best XI, rate my lineup,
+  captain, find a transfer, injury check (`packages/shared/src/gaffer.ts`,
+  `web/src/components/copilot/Gaffer.tsx`). Each one shows the numbers behind
+  it. The ones that change the team return a `TeamPlan`, which the dugout draws
+  on the pitch with Apply and Revert, exactly as the agent's plans were drawn.
+- **Computed on the server at render time**, from the squad (already loaded)
+  and the cached `player_cards` view. Transfer options for all fifteen players
+  are computed up front, so the panel needs no API route. The market read only
+  selects available players with minutes behind them, which keeps it under
+  Next's 2 MB fetch-cache limit.
+- **Options, not advice.** Transfer options are ranked by one number at a time
+  (expected points, last four gameweeks, fixtures). The captain list shows the
+  inputs to the score, and an ineligible player shows no score.
+- **The agent stays in the repo, switched off.** `agent/`, `/api/agent`,
+  `/api/demo` and the web chat component are kept. Both routes answer 410
+  unless `GAFFER_AI=on` and `ANTHROPIC_API_KEY` are both set.
+- **No limits.** The usage counter is gone from the dugout and settings. The
+  question ledger is no longer written. Fingerprints recorded before this
+  change stay, as the privacy page says.
+
+### Consequences
+
+- No model cost, no quota, and the same squad always gets the same answer.
+- The demo now runs live on the demo team instead of replaying recordings.
+- Usage: no new FPL calls; Supabase gains one cached read per dugout or demo
+  render; Gemini, Make and football-data are unchanged; Claude goes to zero.
+- Lost: free-form questions and prose answers. The checks only cover the five
+  jobs.
+
+### Alternatives considered
+
+- **Renew the key, keep five questions.** It costs money on a free product,
+  and a hard limit is a poor first impression.
+- **Delete the agent.** It is working, tested code and a reference for turning
+  the AI back on, so it stays, switched off.

@@ -112,15 +112,15 @@ function Analysis({ squad }: { squad: Squad }) {
   if (!pick) return null;
   const flagged = [...squad.starters, ...squad.bench].filter((p) => p.status !== "a").length;
   const trace = [
-    ["get_my_squad", `15 players · £${squad.bankM.toFixed(1)}m in the bank${flagged ? ` · ${flagged} flagged` : ""}`],
-    ["get_player", `${pick.best.webName} · ${pick.best.xgiPer90.toFixed(2)} xGI/90 · ${pick.best.minutesRisk.toLowerCase()} minutes risk`],
-    ["get_fixture_runs", `${pick.best.team} · ${pick.best.fixtureBand.toLowerCase()} run${pick.next ? ` · next ${pick.next}` : ""}`],
+    ["Squad", `15 players · £${squad.bankM.toFixed(1)}m in the bank${flagged ? ` · ${flagged} flagged` : ""}`],
+    ["Threat", `${pick.best.webName} · ${pick.best.xgiPer90.toFixed(2)} xGI/90 · ${pick.best.minutesRisk.toLowerCase()} minutes risk`],
+    ["Fixtures", `${pick.best.team} · ${pick.best.fixtureBand.toLowerCase()} run${pick.next ? ` · next ${pick.next}` : ""}`],
   ];
   return (
-    <div className="analysis" aria-label="Example: the Gaffer answering a question about the demo team">
+    <div className="analysis" aria-label="Example: the Gaffer's captain check on the demo team">
       <div className="analysis-head">
         <span className="on-air">Gaffer</span>
-        <span className="q">Who should I captain this week?</span>
+        <span className="q">Captain check · demo team</span>
       </div>
       <ol className="analysis-trace">
         {trace.map(([call, res], i) => (
@@ -197,8 +197,8 @@ const FEATURES = [
   },
   {
     art: <TraceArt />,
-    title: "It acts like a manager",
-    body: "Ask it to pick your XI, rate your lineup, make a transfer or choose a captain. It makes the changes on your pitch — with every lookup shown — and you apply or revert them.",
+    title: "Five checks, one tap each",
+    body: "Best XI, a lineup rating, captain options, legal transfers within your bank and an injury check. Each one shows the numbers behind it, puts its plan on your pitch, and you apply or revert it.",
   },
   {
     art: <WatchArt />,
@@ -214,17 +214,17 @@ const FEATURES = [
 ];
 
 const FAQ: [string, string][] = [
-  ["What is Armband?", "Free, open-source tools for Fantasy Premier League. Connect your team and see your fifteen with the numbers that matter (form, expected goal involvement, minutes risk, fixture difficulty), then pick your best XI, rate your lineup, choose a captain and find transfers that fit your bank. The Gaffer, our AI manager, does the same work in plain words."],
+  ["What is Armband?", "Free, open-source tools for Fantasy Premier League. Connect your team and see your fifteen with the numbers that matter (form, expected goal involvement, minutes risk, fixture difficulty), then pick your best XI, rate your lineup, choose a captain and find transfers that fit your bank. The Gaffer runs those checks in one tap each, all of it computed in code."],
   ["Is it free?", "Yes, and it stays free. Every tool is free with no limits and no ads. The code is open source, so anyone can check how it works or run their own copy."],
   ["Is it open source?", "Yes. All of Armband is on GitHub under the MIT license: the website, the data pipeline, the insight engine and the Gaffer. Read how every number is computed, run it yourself, or contribute."],
   ["Does it change my real FPL team?", "No — Armband only reads your team and never asks for your FPL password. When the Gaffer picks your XI, makes a transfer or changes your captain, it shows the plan on your pitch. You apply or revert it in Armband, then make the changes in the FPL app."],
   ["Do I need to give you my FPL password?", "No. We only ever need your public FPL team ID — the number in your Points page address. We read your team; we cannot make transfers or change anything."],
   ["Where does the data come from?", "From Fantasy Premier League's public data, refreshed every three hours, plus Champions League fixture dates for fixture congestion. Our own pipeline computes every metric from it."],
-  ["Can the Gaffer make things up?", "It is built not to. It may only use figures that came back from a lookup in that conversation, and you see every lookup on screen. If it does not have a number, it says so instead of guessing."],
+  ["Is there AI in it?", "Not in your squad tools. The Gaffer's five checks are plain code over FPL's data, so the same squad always gets the same answer and every number is shown. The only AI writes the pre-deadline preview on our Telegram channel, and code checks every figure in it before it goes out."],
   ["What does \"estimate\" mean?", "Anything about the future — fixture difficulty, goal threat, price rises and falls — is our best computed estimate, never a guarantee. We label it every time."],
   ["How are transfers checked?", "Against FPL's rules: positions must match, no more than three players from one club, and your bank cannot go negative. Selling prices are estimates, because FPL keeps half of any rise since you bought and your purchase prices are private."],
   ["Is this the official FPL app?", "No. Armband is an independent project, not affiliated with, endorsed by or connected to the Premier League or Fantasy Premier League. It uses public data only; the club kits on the pitch belong to their clubs."],
-  ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your login, your connected team and your usage history. We keep only a one-way fingerprint of your email with its question count, so the free allowance can't be reset by signing up again."],
+  ["How do I delete my account?", "From Settings, at any time. Deleting your account removes your login and your connected team immediately and permanently."],
 ];
 
 function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null; codes: Map<string, number> }) {
@@ -249,7 +249,7 @@ function TodayInFpl({ daily, codes }: { daily: { payload: ReportPayload } | null
               The overnight, <em>already read</em>
             </>
           }
-          sub={`Straight from our pipeline's report for ${daily.payload.date}. Sign in and the Gaffer reads it against your squad.`}
+          sub={`Straight from our pipeline's report for ${daily.payload.date}. Connect your team and the injury check reads it against your fifteen.`}
         />
         <div className="boards">
           <div className="board reveal">
@@ -347,7 +347,7 @@ export default async function Landing() {
           <div className="hero-copy">
             <span className="kicker">
               <b>Free</b>
-              <span>Meet the Gaffer, your FPL manager</span>
+              <span>Five squad checks, every number shown</span>
             </span>
             <h1 className="hero-title">
               <span className="line"><span>Your FPL team,</span></span>
@@ -433,13 +433,13 @@ export default async function Landing() {
               label="The Gaffer"
               title={
                 <>
-                  An AI manager that <em>shows its working</em>
+                  Five checks that <em>show their working</em>
                 </>
               }
-              sub="Ask in plain words. The Gaffer calls the same tools, looks up every figure, and puts its plan on your pitch for you to apply or revert."
+              sub="Best XI, lineup rating, captain, transfers and injuries, computed in code from FPL's data with no limits. Each check shows its numbers and puts its plan on your pitch for you to apply or revert."
             />
             <Link href="/demo" className="text-link">
-              Watch it work in the demo <Arrow />
+              Try the checks on the demo team <Arrow />
             </Link>
           </div>
           {squad && <Analysis squad={squad} />}

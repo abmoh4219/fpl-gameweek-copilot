@@ -64,7 +64,7 @@ export function SquadArt() {
   );
 }
 
-/** The co-pilot's working: one question, three lookups ticked, one answer. */
+/** The Gaffer at work: your team checked against squad, form and fixtures, then one answer. */
 export function TraceArt() {
   const steps = [
     ["SQUAD", 52],
@@ -72,7 +72,7 @@ export function TraceArt() {
     ["FIXTURES", 172],
   ] as const;
   return (
-    <Board id="trace" label="A question branching into three ticked lookups, then one answer">
+    <Board id="trace" label="Your team checked against squad, form and fixtures, then one answer">
       <circle className="chalk" cx="56" cy="125" r="26" />
       <text className="board-text big" x="56" y="135" textAnchor="middle">?</text>
       {steps.map(([label, y], i) => (

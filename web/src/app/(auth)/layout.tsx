@@ -54,7 +54,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </p>
           <ul>
             <li>Your fifteen in their kits, with form, minutes and fixtures</li>
-            <li>The Gaffer: your XI, transfers and captain, every lookup shown</li>
+            <li>The Gaffer: best XI, captain, transfers and injuries, every number shown</li>
             <li>Estimates labelled as estimates. Always.</li>
           </ul>
         </div>
