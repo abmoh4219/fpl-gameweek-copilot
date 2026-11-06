@@ -8,7 +8,9 @@ import {
   type StatViewRow,
   type WatchRow,
 } from "@fpl/shared";
+import { allCards } from "../cards";
 import { readView } from "../supabase";
+import type { FixtureChip } from "./frame";
 
 /**
  * The reads behind the shareable cards and the deadline countdown. All of
@@ -65,4 +67,18 @@ export async function gameweekInfo(gameweek: number): Promise<{ average: number 
 export function dayLabel(iso: string | null): string {
   if (!iso) return "";
   return new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" });
+}
+
+/** The next `n` fixtures for some players, as card chips, from the shared card read (no extra query). */
+export async function fixturesFor(ids: readonly number[], n = 3): Promise<Record<number, FixtureChip[]>> {
+  const cards = await allCards();
+  const out: Record<number, FixtureChip[]> = {};
+  for (const id of ids) {
+    out[id] = (cards.get(id)?.card.fixturesLong.fixtures ?? []).slice(0, n).map((f) => ({
+      gameweek: f.gameweek,
+      label: f.isBlank || !f.opponent ? "–" : f.isHome ? f.opponent : f.opponent.toLowerCase(),
+      difficulty: f.isBlank ? null : f.difficulty,
+    }));
+  }
+  return out;
 }

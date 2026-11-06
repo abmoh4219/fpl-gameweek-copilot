@@ -219,9 +219,9 @@ export const INSIGHT_CONFIG = {
 
   cards: {
     /** Players on each side of the transfer radar card. */
-    radarSize: 5,
+    radarSize: 7,
     /** Players on each side of tonight's price card. */
-    priceSize: 5,
+    priceSize: 7,
   },
 
   squadWatch: {

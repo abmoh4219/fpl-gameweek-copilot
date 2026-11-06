@@ -93,3 +93,33 @@ export function compact(n: number, signed = false): string {
   const sign = n < 0 ? "−" : signed && n > 0 ? "+" : "";
   return `${sign}${body}`;
 }
+
+/** One upcoming fixture, as the cards draw it: FPL's difficulty colour, home in capitals. */
+export interface FixtureChip {
+  gameweek: number;
+  label: string;
+  difficulty: number | null;
+}
+
+const FDR_COLOURS: Record<number, [string, string]> = {
+  1: ["#257d5a", "#ffffff"],
+  2: ["#00e07a", "#062b17"],
+  3: ["#3a3a3f", "#ededed"],
+  4: ["#ff1751", "#ffffff"],
+  5: ["#80072d", "#ffffff"],
+};
+
+export function FdrChips({ fixtures, width = 40 }: { fixtures: readonly FixtureChip[]; width?: number }) {
+  return (
+    <div style={{ display: "flex", gap: 3 }}>
+      {fixtures.map((f) => {
+        const [bg, ink] = f.difficulty === null ? [C.raised, C.faint] : (FDR_COLOURS[f.difficulty] ?? [C.raised, C.text]);
+        return (
+          <div key={f.gameweek} style={{ display: "flex", alignItems: "center", justifyContent: "center", width, height: 22, borderRadius: 4, background: bg, color: ink, fontSize: 11 }}>
+            {f.label}
+          </div>
+        );
+      })}
+    </div>
+  );
+}

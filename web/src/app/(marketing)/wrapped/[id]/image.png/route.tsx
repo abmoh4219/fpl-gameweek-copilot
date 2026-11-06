@@ -10,7 +10,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   if (!id) return new Response("Not a team ID", { status: 404 });
   try {
     const { squad, wrapped, finished } = await wrappedFor(id);
-    return new ImageResponse(<WrappedCard w={wrapped} team={squad.teamName} finished={finished} />, {
+    return new ImageResponse(<WrappedCard w={wrapped} team={squad.teamName} finished={finished} total={squad.totalPoints} />, {
       ...CARD_SIZE,
       headers: { "cache-control": "public, max-age=600, s-maxage=1800" },
     });
