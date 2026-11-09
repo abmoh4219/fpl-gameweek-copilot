@@ -164,14 +164,18 @@ export function buildSquad(input: {
   }
 
   const history = picks.entry_history;
+  // During a live gameweek FPL's picks answer lags (it still said 25 points
+  // when the team had 70); the entry summary is live. Prefer the summary when
+  // it is about the same gameweek.
+  const live = entry.current_event === history.event;
   return {
     entryId: entry.id,
     teamName: entry.name,
     managerName: `${entry.player_first_name} ${entry.player_last_name}`.trim(),
     gameweek: history.event,
-    gameweekPoints: history.points,
-    totalPoints: history.total_points,
-    overallRank: history.overall_rank,
+    gameweekPoints: live && entry.summary_event_points !== null ? entry.summary_event_points : history.points,
+    totalPoints: live && entry.summary_overall_points !== null ? entry.summary_overall_points : history.total_points,
+    overallRank: live && entry.summary_overall_rank !== null ? entry.summary_overall_rank : history.overall_rank,
     bankM: history.bank / 10,
     valueM: history.value / 10,
     activeChip: picks.active_chip,

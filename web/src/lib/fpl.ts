@@ -44,10 +44,15 @@ export async function fetchEntry(id: number): Promise<Entry> {
   return parsed.data;
 }
 
-export async function fetchPicks(id: number, gameweek: number): Promise<EntryPicks> {
-  // Picks for a gameweek are locked at its deadline and never change after it;
-  // a new gameweek is a new URL, so a day-long cache is never stale.
-  const parsed = EntryPicksSchema.safeParse(await getJson(`/entry/${id}/event/${gameweek}/picks/`, 86_400));
+/**
+ * One team's picks for a gameweek. The picks themselves are locked at the
+ * deadline, but the same answer carries the team's LIVE points, total and
+ * rank (`entry_history`), which move all gameweek. So the default cache is
+ * half an hour, like the entry. Callers that only read who was picked and
+ * captained (the mini-league spy) can cache for a day.
+ */
+export async function fetchPicks(id: number, gameweek: number, revalidateSeconds = 1800): Promise<EntryPicks> {
+  const parsed = EntryPicksSchema.safeParse(await getJson(`/entry/${id}/event/${gameweek}/picks/`, revalidateSeconds));
   if (!parsed.success) throw new FplUnavailableError("Unexpected picks shape from FPL");
   return parsed.data;
 }

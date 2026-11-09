@@ -1093,3 +1093,17 @@ pages answers a real search ("<player> FPL stats").
 - No new services and no new data reads beyond the cached player list.
 - To finish: verify the domain in Google Search Console and submit
   `/sitemap.xml`; Bing Webmaster Tools can import it from Google.
+
+**Correction to ADR-0017 (2026-11-09).** The team page showed GW10 at 25
+points while the team had 70. Two causes:
+- **FPL's picks answer lags during a live gameweek.** Its `entry_history`
+  still said 25 points and 635 total, while the entry summary said 70 and 680.
+  `buildSquad` now takes the gameweek points, total and overall rank from the
+  entry summary whenever it covers the same gameweek.
+- **We cached a team's picks for a day**, on the grounds that picks never
+  change after a deadline, which froze those live numbers even longer. Your
+  own team's picks are now cached for 30 minutes, like the entry. The
+  mini-league spy still caches rival picks for a day, because it reads only
+  who was picked and captained.
+
+FPL calls: at most two an hour per team that someone is looking at.

@@ -22,6 +22,15 @@ describe("squad", () => {
     expect(squad.valueM).toBe(101.6);
   });
 
+  it("takes live points, total and rank from the entry when the picks answer lags", () => {
+    const lagging = { ...picks, entry_history: { ...picks.entry_history, event: 8, points: 25, total_points: 525, overall_rank: 450_000 } };
+    const live = buildSquad({ entry, picks: lagging, cards: cardRows, eventPoints: new Map() });
+    expect([live.gameweekPoints, live.totalPoints, live.overallRank]).toEqual([48, 548, 399407]);
+    // A different gameweek: the summary is about another week, so the picks answer is used.
+    const other = buildSquad({ entry: { ...entry, current_event: 9 }, picks: lagging, cards: cardRows, eventPoints: new Map() });
+    expect(other.gameweekPoints).toBe(25);
+  });
+
   it("applies the captain's multiplier to his points", () => {
     const haaland = squad.starters.find((p) => p.webName === "Haaland")!;
     expect(haaland.isCaptain).toBe(true);

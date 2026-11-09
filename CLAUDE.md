@@ -471,8 +471,9 @@ the pipeline; the website and bot read what the pipeline already produced.
   back on, its limits (5 questions per account, a daily budget) come back
   with it.
 - **A manager's squad is the only live FPL call:** their entry and picks,
-  cached per team (entry 30 minutes; picks a day, since a gameweek's picks
-  never change after its deadline). Player data for squads comes from ONE
+  cached per team for 30 minutes (entry and picks: the picks answer also
+  carries the live gameweek points, total and rank). The mini-league spy
+  caches rival picks for a day, since it reads only picks and captains. Player data for squads comes from ONE
   shared cached read of every card (`web/src/lib/cards.ts`), never a
   per-team database read, so Supabase egress stays flat with traffic
   (ADR-0017).

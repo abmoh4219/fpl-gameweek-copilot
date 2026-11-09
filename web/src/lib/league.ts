@@ -20,7 +20,8 @@ async function currentGameweek(firstEntry: number): Promise<number | null> {
 
 async function picksFor(entry: number, gameweek: number): Promise<RivalPicks | null> {
   try {
-    const p = await fetchPicks(entry, gameweek);
+    // Only the picks and the captain are read here, and those never change after the deadline.
+    const p = await fetchPicks(entry, gameweek, 86_400);
     return { entry, picks: p.picks.map((x) => x.element), captain: p.picks.find((x) => x.is_captain)?.element ?? null, chip: p.active_chip };
   } catch {
     return null;

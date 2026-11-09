@@ -14,7 +14,7 @@ describe("gameweek wrapped", () => {
     expect(w.bestCaptain).toEqual({ name: "Tavernier", points: 24, isYours: false });
     expect(w.topScorer).toEqual({ name: "Tavernier", points: 12 });
     expect(w.benchPoints).toBe(19);
-    expect(w.rankMove).toBe(410_000 - 399_408);
+    expect(w.rankMove).toBe(410_000 - 399_407); // the live entry rank, not the lagging picks one
   });
 
   it("leaves rank movement out when there is no history", () => {
