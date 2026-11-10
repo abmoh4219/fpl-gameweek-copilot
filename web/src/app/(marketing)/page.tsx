@@ -16,7 +16,7 @@ import { bestXi, squadCards } from "@/lib/toolkit";
 
 export const revalidate = 900;
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = { alternates: { canonical: "/", types: { "text/markdown": "/index.md" } } };
 
 const SITE = process.env["NEXT_PUBLIC_SITE_URL"] ?? "http://localhost:3000";
 

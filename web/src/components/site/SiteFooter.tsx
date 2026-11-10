@@ -17,7 +17,7 @@ export function SiteFooter() {
             </p>
           </div>
           <div>
-            <h4>Product</h4>
+            <h2>Product</h2>
             <ul>
               <li><a href="/#features">Features</a></li>
               <li><Link href="/players">Players</Link></li>
@@ -32,15 +32,17 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4>Your team</h4>
+            <h2>Your team</h2>
             <ul>
               <li><Link href="/team">Find your team</Link></li>
+              <li><Link href="/about">About</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
               <li><Link href="/privacy">Privacy</Link></li>
               <li><Link href="/terms">Terms</Link></li>
             </ul>
           </div>
           <div>
-            <h4>Open source</h4>
+            <h2>Open source</h2>
             <ul>
               <li><a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a></li>
               <li><a href={`${GITHUB_URL}/blob/main/CONTRIBUTING.md`} target="_blank" rel="noreferrer">Contribute</a></li>

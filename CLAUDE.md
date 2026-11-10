@@ -152,6 +152,11 @@ confirmed, every price-watch output is labelled an **estimate**.
   (`api.player_gameweeks`), price history rebuilt from confirmed changes,
   ring gauges and the next five fixtures (`packages/shared/src/player.ts`)
 
+- **For agents (ADR-0024):** Markdown copies at `/index.md`, `/md/<path>` and on
+  `Accept: text/markdown`; `/llms.txt`; an MCP server at `/api/mcp` and a
+  read-only JSON API at `/api/v1` (`/openapi.json`), all from cached views, no
+  FPL calls. `/about` and `/contact` exist for people and agents
+
 The Claude agent (`agent/`, `docs/agent.md`) is switched off (ADR-0016):
 `/api/agent` and `/api/demo` answer 410 unless `GAFFER_AI=on` and
 `ANTHROPIC_API_KEY` are set. `app.waitlist` exists from an earlier plan and is

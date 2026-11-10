@@ -38,6 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {/* For agents (ADR-0024): the public API's description, and the llms.txt guide. */}
+        <link rel="service-desc" type="application/openapi+json" href="/openapi.json" />
+        <link rel="help" type="text/markdown" href="/llms.txt" />
       </head>
       <body>
         <a href="#content" className="skip-link">

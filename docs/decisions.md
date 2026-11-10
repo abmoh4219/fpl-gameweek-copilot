@@ -1107,3 +1107,56 @@ points while the team had 70. Two causes:
   who was picked and captained.
 
 FPL calls: at most two an hour per team that someone is looking at.
+
+## ADR-0024 — Agent-ready: Markdown pages, llms.txt, an MCP server and a public read-only API
+
+*Date: 2026-11-09 · Status: accepted*
+
+### Context
+
+The Farm.js agent-ready check scored the site 58/100. AI agents are a growing
+way people find and use tools; for a free, open-source stats hub, being easy
+for agents to read and query is distribution at no cost.
+
+### Decision
+
+- **Markdown versions of the public pages:**
+  - `/index.md`, `/md/<path>` (home, stats, prices, fixtures, players, every
+    player page, cards, about, contact, privacy, terms), built by
+    `web/src/lib/markdown.ts` from the same data as the HTML pages.
+  - A request with `Accept: text/markdown` on any page is rewritten to the
+    Markdown version **by a rule in `next.config.ts`, not middleware**, so
+    ordinary visitors pay nothing.
+  - Unknown pages answer **404** in Markdown with where to look next.
+  - Markdown answers send `X-Robots-Tag: noindex` and a canonical link to the
+    HTML page, so they never compete with it in search.
+  - The home page links its Markdown copy with
+    `<link rel="alternate" type="text/markdown">`.
+- **`/llms.txt`** (also at `/.well-known/llms.txt`): the site in one Markdown
+  page, with links to the pages agents should read.
+- **An MCP server at `/api/mcp`:** Streamable HTTP, stateless, plain JSON
+  answers, written by hand (a handful of JSON-RPC methods) rather than adding
+  the SDK. It offers four read-only tools: `search_players`, `get_player`,
+  `price_watch`, `fixture_runs`.
+- **A public read-only JSON API:** `/api/v1/players`, `/api/v1/players/{id}`,
+  `/api/v1/prices` and `/api/v1/fixtures`, described at `/openapi.json` and
+  linked with `rel="service-desc"`.
+  - The MCP tools, the API and the Markdown pages share
+    `web/src/lib/public-api.ts`.
+  - They read only the shared cached views: **no FPL calls, and nothing
+    personal** (no team, league or wrapped data).
+- **`/about` and `/contact` pages**, with their copy shared with the Markdown
+  versions (`web/src/lib/site-copy.ts`), linked from the footer.
+- The footer's column titles became H2s, so the heading outline no longer
+  skips from H2 to H4.
+- **Not done: schema.org Organization.** The check requires a postal address,
+  and Armband is run by one person who chose not to publish one. That leaves
+  98/100.
+
+### Consequences
+
+- Agents and developers can query Armband's data freely. Because every route
+  reads the shared caches, heavy use adds no FPL calls and barely moves
+  Supabase egress; API answers are CDN-cached for 15–30 minutes.
+- New public surface to keep stable: `/api/v1` is versioned so it can change
+  without breaking callers.

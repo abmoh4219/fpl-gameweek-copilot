@@ -15,6 +15,22 @@ const config: NextConfig = {
       { source: "/demo", destination: "/", permanent: false },
     ];
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // llms.txt is also expected under .well-known (ADR-0024).
+        { source: "/.well-known/llms.txt", destination: "/llms.txt" },
+        // An agent asking for Markdown gets the Markdown version of any page, or
+        // a Markdown 404. A rewrite, not middleware: ordinary visitors never
+        // send this header, so they pay nothing (ADR-0024).
+        {
+          source: "/:path((?!api/|_next/|md/|md$|index\\.md$|llms\\.txt$|openapi\\.json$|sitemap\\.xml$|robots\\.txt$).*)",
+          has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
+          destination: "/md/:path",
+        },
+      ],
+    };
+  },
   async headers() {
     return [
       {
