@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CardPage } from "@/components/cards/CardPage";
-import { parseTeamId } from "@/lib/fpl";
+import { FplUnavailableError, parseTeamId } from "@/lib/fpl";
 import { wrappedFor } from "@/lib/wrapped";
 
 type Params = { params: Promise<{ id: string }> };
+
+// Built on the first visit, then served from the cache for ten minutes (ADR-0025).
+export const revalidate = 600;
+export function generateStaticParams() {
+  return [];
+}
 
 /** A manager's gameweek, wrapped (ADR-0020). Shareable, but kept out of search engines. */
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
@@ -22,7 +28,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 export default async function Wrapped({ params }: Params) {
   const id = parseTeamId((await params).id);
   if (!id) notFound();
-  const data = await wrappedFor(id).catch(() => null);
+  // FPL busy is thrown, not cached as a 404 (ADR-0025); any other failure is a team with nothing to wrap.
+  const data = await wrappedFor(id).catch((error: unknown) => {
+    if (error instanceof FplUnavailableError) throw error;
+    return null;
+  });
   if (!data) notFound();
   const { squad, wrapped } = data;
   return (

@@ -11,7 +11,7 @@ export function YouHint({ league }: { league: number }) {
   if (!mine) return null;
   return (
     <p className="tool-share">
-      <Link href={`/league/${league}?me=${mine.id}`}>Show {mine.name}&apos;s differentials in this league</Link>
+      <Link href={`/league/${league}?me=${mine.id}`} prefetch={false}>Show {mine.name}&apos;s differentials in this league</Link>
     </p>
   );
 }

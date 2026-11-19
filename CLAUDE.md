@@ -487,6 +487,16 @@ the pipeline; the website and bot read what the pipeline already produced.
   error, fall back to the template version — the report still ships.
 - **Pages are cached.** Public pages are static or revalidated; nothing a
   visitor does calls Gemini or football-data.org.
+- **Per-ID pages are cached too (ADR-0025).** `/team/[id]`, `/league/[id]`,
+  `/wrapped/[id]`, `/players/[id]` and `/compare` are built on demand
+  (`generateStaticParams` returns `[]`, plus a `revalidate`). Never read
+  `searchParams`, `cookies()` or `headers()` in a page: a query a page needs
+  becomes a path segment through a `beforeFiles` rewrite. FPL-busy errors are
+  thrown, never rendered, so they are not cached. Per-manager links set
+  `prefetch={false}`.
+- **AI crawlers are denied at the edge** by the `routes` rule in
+  `web/vercel.json`, before any function runs. Not middleware: middleware is
+  a function too.
 
 ---
 

@@ -22,7 +22,12 @@ import "@/components/charts/charts.css";
 import "./player.css";
 import { How } from "@/components/charts/How";
 
+// Built on the first visit, then served from the cache for an hour: a player's
+// numbers change only when the pipeline runs (ADR-0025).
 export const revalidate = 3600;
+export function generateStaticParams() {
+  return [];
+}
 
 type Params = { params: Promise<{ id: string }> };
 

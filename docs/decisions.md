@@ -1160,3 +1160,82 @@ for agents to read and query is distribution at no cost.
   Supabase egress; API answers are CDN-cached for 15–30 minutes.
 - New public surface to keep stable: `/api/v1` is versioned so it can change
   without breaking callers.
+
+## ADR-0025 — Block AI crawlers at the edge; cache the per-ID pages
+
+*Date: 2026-11-19 · Status: accepted*
+
+### Context
+
+Armband used 90% of the Vercel Hobby team's free Fluid Active CPU; a project
+is paused when it runs out.
+
+- In 12 hours, at least 9,979 requests ran server functions (99.8% of
+  traffic), every one a cache miss, about 30 a minute without a break.
+- They hit `/team/[id]` (9,361), `/league/[id]` (482), `/wrapped/[id]`, `/players/[id]` and
+  `/compare`, with 9,854 distinct IDs in under six hours.
+- Almost all of it was Meta's AI-training crawler (`meta-externalagent`),
+  which ignores `robots.txt`.
+
+Every one of those pages rendered on every request
+(`cache-control: private, no-cache, no-store`), for different reasons:
+
+- `/team/[id]` and `/wrapped/[id]` declared no caching at all.
+- `/players/[id]` declared `revalidate = 3600`, but a dynamic segment without
+  `generateStaticParams` still renders per request.
+- `/league/[id]` and `/compare` read `searchParams` (`?me=`, `?p=`), which
+  makes a page dynamic.
+
+### Decision
+
+- **Deny AI crawlers before any function runs**, with a `routes` rule in
+  `web/vercel.json`:
+  - The rule is `mitigate: { action: "deny" }`, with a `has` condition on
+    `user-agent`. It covers meta-externalagent, meta-webindexer, FacebookBot,
+    GPTBot, ClaudeBot, CCBot, Bytespider, Amazonbot, PerplexityBot,
+    Google-Extended and TikTokSpider.
+  - The regex is case-insensitive through `[aA]` character classes, which
+    behave the same in every regex engine.
+  - It does not match Googlebot, Bingbot, `facebookexternalhit` and
+    Twitterbot (link previews), or agents fetching for a person
+    (ChatGPT-User, Claude-User).
+  - `/robots.txt` stays reachable, so polite crawlers can read it and stop.
+  - This repeats the dashboard's Firewall, AI Bots, Deny setting on purpose:
+    the rule is versioned with the code.
+  - Not middleware: middleware is itself a function.
+- **The per-ID pages are cached on demand (ISR):**
+  - Each declares `generateStaticParams() { return [] }` and a `revalidate`.
+    The first visit builds the page; later visits are served from Vercel's
+    cache until it expires, then rebuilt in the background.
+  - `/team/[id]`, `/wrapped/[id]` and `/league/[id]` are cached for **10
+    minutes**. FPL's own answers are already cached 30 minutes underneath.
+  - `/players/[id]` and `/compare` are cached for **1 hour**, as on `/stats`.
+    They read only the pipeline's data, which changes every few hours at
+    most.
+- **A query string becomes a path, in the router.** Two `beforeFiles`
+  rewrites in `next.config.ts` turn:
+  - `/league/<id>?me=<team>` into `/league/<id>/me/<team>`
+  - `/compare?p=<ids>` into `/compare/with/<ids>`
+
+  Each combination is then its own cached page. The address people see and
+  share keeps its `?me=` / `?p=`, and link previews still get the per-query
+  title and card image. Moving those queries to the browser would have broken
+  previews, because X's crawler runs no JavaScript.
+- **An FPL outage is never cached.** When FPL is busy (`FplUnavailableError`),
+  the team, league and wrapped pages throw instead of rendering a notice. ISR
+  never caches an error, so an earlier good copy keeps being served, and a
+  first visit sees the same message from the route's `error.tsx`.
+- **No prefetching of per-manager pages.** Links to a team, league or wrapped
+  page set `prefetch={false}`. Otherwise a league table's 50 team links would
+  each build a team page, with its FPL calls, as they scrolled into view.
+
+### Consequences
+
+- A repeat view of a team, league, wrapped, player or compare page is a CDN
+  hit, not a function. Blocked crawlers cost no function time at all.
+- A page can be up to 10 minutes (team, league, wrapped) or an hour (player,
+  compare) behind its data.
+- Each distinct ID still costs one render on its first visit. The edge block,
+  not the cache, is what stops a crawler walking millions of IDs.
+- A new AI crawler is added by extending the `user-agent` pattern in
+  `web/vercel.json` (`docs/operations.md`).

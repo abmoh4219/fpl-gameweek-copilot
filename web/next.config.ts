@@ -28,6 +28,13 @@ const config: NextConfig = {
           has: [{ type: "header", key: "accept", value: ".*text/markdown.*" }],
           destination: "/md/:path",
         },
+        // A query string can't be part of a cached page's key, so the one query
+        // each of these pages reads becomes a path segment here, in the router,
+        // before any function runs. Every league + manager and every comparison
+        // is then its own cached page, while the address people see and share
+        // keeps its ?me= and ?p= (ADR-0025).
+        { source: "/league/:id(\\d{1,10})", has: [{ type: "query", key: "me", value: "(?<me>\\d{1,10})" }], destination: "/league/:id/me/:me" },
+        { source: "/compare", has: [{ type: "query", key: "p", value: "(?<p>[\\d,]{1,40})" }], destination: "/compare/with/:p" },
       ],
     };
   },

@@ -18,6 +18,14 @@ type Params = { params: Promise<{ id: string }> };
 
 const fmt = new Intl.NumberFormat("en-GB");
 
+// Built on the first visit, then served from the cache for ten minutes
+// (ADR-0025). Nothing here is per visitor: the team is public and "remember
+// this team" lives in the browser.
+export const revalidate = 600;
+export function generateStaticParams() {
+  return [];
+}
+
 /**
  * A manager's dugout, by FPL team ID, with no account (ADR-0017). FPL teams
  * are public; this page reads one through the cached FPL calls and the shared
@@ -28,9 +36,9 @@ async function squadOrError(id: number): Promise<{ squad: Squad } | { error: str
     return { squad: await loadSquad(id) };
   } catch (error) {
     if (error instanceof TeamNotFoundError) notFound();
-    if (error instanceof FplUnavailableError) {
-      return { error: "FPL isn't answering right now — it pauses while a gameweek is being scored. This team will be back in a few minutes." };
-    }
+    // FPL busy is thrown, not rendered, so it is never cached: error.tsx says
+    // so, and a copy that loaded before keeps being served meanwhile (ADR-0025).
+    if (error instanceof FplUnavailableError) throw error;
     return { error: "This team hasn't played a gameweek yet, or we couldn't load it just now. Try again in a moment." };
   }
 }
@@ -79,13 +87,13 @@ export default async function TeamPage({ params }: Params) {
                 <RememberTeam id={id} name={result.squad.teamName} />
               </p>
               <p className="team-share">
-                <Link href={`/wrapped/${id}`}>Share your Gameweek {result.squad.gameweek}, wrapped</Link>
+                <Link href={`/wrapped/${id}`} prefetch={false}>Share your Gameweek {result.squad.gameweek}, wrapped</Link>
               </p>
               {leagues.length > 0 && (
                 <p className="team-leagues">
                   <span>Your leagues</span>
                   {leagues.map((l) => (
-                    <Link key={l.id} href={`/league/${l.id}?me=${id}`}>
+                    <Link key={l.id} href={`/league/${l.id}?me=${id}`} prefetch={false}>
                       {l.name}
                       {l.entry_rank ? <small>#{l.entry_rank.toLocaleString("en-GB")}</small> : null}
                     </Link>

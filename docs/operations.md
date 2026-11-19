@@ -253,3 +253,24 @@ pnpm supabase db push                # deploy, deliberately
 
 Migrations are **immutable once pushed**. Change shipped behaviour with a new
 migration, never by editing an old one.
+
+## Blocking a crawler (ADR-0025)
+
+AI crawlers are denied at the edge by the one `routes` rule in
+`web/vercel.json`, before any function runs. The `user-agent` pattern spells
+each letter as a `[xX]` class so it is case-insensitive in any regex engine.
+To add a crawler, print a new pattern and paste it in as the rule's `value`:
+
+```bash
+node -e 'const bots = ["meta-externalagent","meta-webindexer","FacebookBot","GPTBot","ClaudeBot","CCBot","Bytespider","Amazonbot","PerplexityBot","Google-Extended","TikTokSpider"];
+console.log(`.*(${bots.map((b) => [...b].map((c) => /[a-z]/i.test(c) ? `[${c.toLowerCase()}${c.toUpperCase()}]` : c).join("")).join("|")}).*`)'
+```
+
+Never add Googlebot, Bingbot, `facebookexternalhit` or Twitterbot: search and
+link previews depend on them. Check after deploying:
+
+```bash
+curl -sI -A "meta-externalagent/1.1" https://armband.abdela.dev/team/<id> | head -1   # 403
+curl -sI https://armband.abdela.dev/team/<id> | grep -i x-vercel-cache               # MISS, then HIT
+curl -sI https://armband.abdela.dev/team/<id> | grep -i x-vercel-cache
+```
